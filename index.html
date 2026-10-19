@@ -17,87 +17,27 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #touchControls{position:fixed;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;padding:0 22px;pointer-events:none}
 .touchButton{width:72px;height:72px;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(255,255,255,.18);color:white;font:bold 34px Arial,sans-serif;pointer-events:auto;touch-action:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .touchButton:active{background:rgba(255,255,255,.35)}
-/* Настройки управления */
-.controlSettings {
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    background: rgba(20, 35, 60, 0.85);
-    border-radius: 16px;
-    padding: 12px;
-    color: white;
-    font-size: 11px;
-    z-index: 100;
-    display: none;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.2);
-}
-.controlSettings.show {
-    display: block;
-}
-.controlSettings h3 {
-    margin: 0 0 8px 0;
-    font-size: 13px;
-    text-align: center;
-}
-.sliderContainer {
-    margin: 8px 0;
-}
-.sliderContainer label {
-    display: block;
-    margin-bottom: 4px;
-    opacity: 0.9;
-}
-.sliderContainer input {
-    width: 100%;
-}
-.controlSettings button {
-    width: 100%;
-    margin-top: 8px;
-    padding: 6px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,.3);
-    background: rgba(40, 170, 190, 0.7);
-    color: white;
-    cursor: pointer;
-}
-
 @media(hover:hover) and (pointer:fine){#touchControls{display:none}}
-/* Мобильные улучшения: десктопные стили не меняются */
-@media (max-width: 600px) and (pointer: coarse) {
-    body {
-        padding: 4px 0;
-    }
-
-    #gameStage {
-        gap: 8px;
-    }
-
-    #game {
-        width: min(96vw, calc((100dvh - 90px) * 2 / 3));
-        border-radius: 12px;
-    }
-
-    #touchControls {
-        bottom: max(12px, env(safe-area-inset-bottom));
-        padding: 0 16px;
-    }
-
-    .touchButton {
-        font-size: 36px;
-        background: rgba(20, 35, 60, .48);
-        box-shadow: 0 4px 18px rgba(0, 0, 0, .25);
-    }
-
-    .touchButton:active {
-        background: rgba(40, 170, 190, .65);
-        transform: scale(.95);
-    }
-
-    #fullscreenButton {
-        width: 48px;
-        height: 42px;
-    }
+/* Мобильные улучшения: стили ПК не меняются */
+@media (max-width:600px) and (pointer:coarse){
+    html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
+    body{padding:max(6px,env(safe-area-inset-top)) 0 max(96px,calc(88px + env(safe-area-inset-bottom)))}
+    #gameStage{width:100%;gap:8px}
+    #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
+    #fullscreenButton{width:46px;height:42px;border-radius:13px;font-size:26px;background:rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+    #touchControls{left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom));padding:0 max(18px,env(safe-area-inset-left)) 0 max(18px,env(safe-area-inset-right));align-items:center;pointer-events:none}
+    .touchButton{width:76px;height:76px;border:1px solid rgba(255,255,255,.72);background:linear-gradient(145deg,rgba(72,110,145,.82),rgba(24,43,70,.88));box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 2px rgba(255,255,255,.25);font-size:34px;-webkit-tap-highlight-color:transparent}
+    .touchButton:active{background:linear-gradient(145deg,rgba(40,170,190,.95),rgba(20,115,150,.95));transform:scale(.94)}
+    #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+    #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-height:none;border-radius:0}
+    #gameStage:fullscreen #fullscreenButton{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
+}
+@media (max-width:900px) and (pointer:coarse) and (orientation:landscape){
+    body{padding:0}
+    #gameStage{height:100dvh;gap:4px}
+    #game{width:auto;height:calc(100dvh - 54px);max-width:68vw;border-radius:10px}
+    #touchControls{bottom:max(10px,env(safe-area-inset-bottom));padding-right:max(20px,env(safe-area-inset-right));padding-left:max(20px,env(safe-area-inset-left))}
+    .touchButton{width:64px;height:64px;font-size:30px}
 }
 </style>
 </head>
@@ -110,32 +50,24 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 <button class="touchButton" id="leftButton" aria-label="Влево">←</button>
 <button class="touchButton" id="rightButton" aria-label="Вправо">→</button>
 </div>
-<div class="controlSettings" id="controlSettings">
-    <h3>Настройки управления</h3>
-    <div class="sliderContainer">
-        <label for="sizeSlider">Размер кнопок: <span id="sizeValue">100%</span></label>
-        <input type="range" id="sizeSlider" min="70" max="130" value="100">
-    </div>
-    <div class="sliderContainer">
-        <label for="opacitySlider">Прозрачность: <span id="opacityValue">18%</span></label>
-        <input type="range" id="opacitySlider" min="10" max="80" value="18">
-    </div>
-    <button id="closeSettings">Закрыть</button>
-</div>
 <script>
 'use strict';
 
 const canvas=document.getElementById('game');
 const ctx=canvas.getContext('2d');
-const RENDER_SCALE = 4;
-ctx.scale(RENDER_SCALE, RENDER_SCALE);
+const RENDER_SCALE=4;
+ctx.scale(RENDER_SCALE,RENDER_SCALE);
 const gameStage=document.getElementById('gameStage');
 const fullscreenButton=document.getElementById('fullscreenButton');
 const STATE={MENU:0,PLAYING:1,PAUSE:2,GAMEOVER:3};
 let currentState=STATE.MENU,lastFrameTime=0;
 
-const CHARACTER_SCORES=[0,15000,22500,30000,37500,45000,52500,60000,67500,75000];
-const characterImages=Array.from({length:10},(_,i)=>{const image=new Image();image.src=`${i+1}.jpg`;return image});
+const CHARACTER_SCORES=Array.from({length:21},(_,index)=>index*2500);
+const characterImages=Array.from({length:21},(_,i)=>{
+    const image=new Image();
+    image.src=`${i+1}.jpg`;
+    return image;
+});
 
 function readStoredNumber(key,fallback=0){
     try{const value=Number(localStorage.getItem(key));return Number.isFinite(value)&&value>=0?value:fallback}
@@ -146,26 +78,7 @@ let highScore=readStoredNumber('doodleHighScore');
 function getUnlockedCharacters(score){return CHARACTER_SCORES.map((required,index)=>({required,index})).filter(item=>score>=item.required).map(item=>item.index)}
 let unlockedCharacters=getUnlockedCharacters(highScore);
 let selectedCharacter=readStoredNumber('morjakaSelectedCharacter');
-if(!Number.isInteger(selectedCharacter)||selectedCharacter<0||selectedCharacter>9||!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;
-
-// Настройки управления
-let touchButtonSize=readStoredNumber('touchButtonSize',100);
-let touchButtonOpacity=readStoredNumber('touchButtonOpacity',18);
-function applyTouchButtonSettings(){
-    const buttons=document.querySelectorAll('.touchButton');
-    buttons.forEach(button=>{
-        button.style.width=`${72*touchButtonSize/100}px`;
-        button.style.height=`${72*touchButtonSize/100}px`;
-        button.style.background=`rgba(255,255,255,${touchButtonOpacity/100})`;
-        button.style.fontSize=`${34*touchButtonSize/100}px`;
-        if(window.matchMedia('(max-width: 600px) and (pointer: coarse)').matches){
-            button.style.width=`${78*touchButtonSize/100}px`;
-            button.style.height=`${78*touchButtonSize/100}px`;
-            button.style.fontSize=`${36*touchButtonSize/100}px`;
-        }
-    });
-}
-applyTouchButtonSettings();
+if(!Number.isInteger(selectedCharacter)||selectedCharacter<0||selectedCharacter>20||!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;
 
 function saveProgress(){
     try{
@@ -173,163 +86,85 @@ function saveProgress(){
         localStorage.setItem('morjakaUnlockedCharacters',JSON.stringify(unlockedCharacters));
         localStorage.setItem('morjakaSelectedCharacter',String(selectedCharacter));
         localStorage.setItem('doodleHighScore',String(highScore));
-        localStorage.setItem('touchButtonSize',String(touchButtonSize));
-        localStorage.setItem('touchButtonOpacity',String(touchButtonOpacity));
     }catch(error){console.warn('Не удалось сохранить прогресс:',error)}
 }
 
 let player={x:185,y:500,vx:0,dy:0,score:0};
-let platforms=[],springs=[],coins=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
+let platforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
 const currentTheme={bg:'#d8f6ff',plat:'#38cdb4'};
 
-// Новые системы
-let birds=[];
-let jumpWaves=[];
-let playerAnimations={squash:0,rotation:0,fallEffect:0,jetDash:false,jetDashTime:0};
-
 function resetGame(){
     player={x:185,y:500,vx:0,dy:0,score:0};
     platforms=[{x:120,y:550,w:160,h:15,type:'static'}];
-    springs=[];coins=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;
-    birds=[];
-    jumpWaves=[];
-    playerAnimations={squash:0,rotation:0,fallEffect:0,jetDash:false,jetDashTime:0};
+    springs=[];coins=[];birds=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;
     for(let i=0;i<7;i++)platforms.push(spawnPlatform(500-i*100));
 }
 function startGame(){resetGame();lastFrameTime=0;currentState=STATE.PLAYING}
 function spawnPlatform(y){
     const level=Math.floor(player.score/5000),brokenChance=Math.min(.4,.15+level*.05),movingChance=Math.min(.4,.15+level*.05);
-    const rand=Math.random();
-    let type=rand<brokenChance?'broken':rand<brokenChance+movingChance?'moving':'static';
+    const rand=Math.random(),type=rand<brokenChance?'broken':rand<brokenChance+movingChance?'moving':'static';
     const width=70*Math.max(.7,2-level*.25);
-    
-    // Новые движущиеся вверх-вниз платформы
-    if(type==='moving'&&Math.random()<0.5){
-        type='updown';
-    }
-    
-    const platform={
-        x:Math.random()*(400-width),
-        y,
-        w:width,
-        h:15,
-        type,
-        dir:2*Math.min(10,1+Math.floor(player.score/2500)*.2)
-    };
-    
-    if(type==='updown'){
-        platform.verticalDir=Math.random()<0.5?1:-1;
-        platform.verticalSpeed=0.5+Math.random()*0.7;
-        platform.originalY=y;
-        platform.verticalRange=30+Math.random()*40;
-    }
-    
+    const platform={x:Math.random()*(400-width),y,w:width,h:15,type,dir:2*Math.min(10,1+Math.floor(player.score/2500)*.2)};
     if(type==='static'&&Math.random()>.7)springs.push({x:platform.x+platform.w/2-10,y:y-15});
     if(Math.random()>.92)coins.push({x:platform.x+platform.w/2,y:y-25,r:8});
     if(Math.random()>.985)platform.life={x:platform.x+platform.w/2-10,y:y-35};
-    
-    // Спавн птиц на высоких платформах
-    if(type!=='broken'&&y<400&&Math.random()>.85&&birds.length<3){
-        birds.push({
-            x:Math.random()*380,
-            y:y-80,
-            vx:(Math.random()-0.5)*4,
-            vy:0,
-            size:12+Math.random()*8,
-            color:Math.random()<0.5?'#FF6B6B':'#4ECDC4',
-            wingPhase:Math.random()*Math.PI*2
-        });
-    }
-    
     return platform;
 }
+function spawnBird(){
+    const direction=Math.random()<0.5?1:-1;
+    const type=Math.floor(Math.random()*3);
 
+    const birdTypes=[
+        {speed:2.2, size:1, color:'#4b5563'}, // обычная
+        {speed:3.4, size:.78, color:'#9b59b6'}, // маленькая и быстрая
+        {speed:1.6, size:1.25, color:'#c0392b'} // крупная и медленная
+    ];
+    const birdType=birdTypes[type];
+
+    birds.push({
+        x:direction===1?-40:440,
+        y:100+Math.random()*400,
+        vx:direction*(birdType.speed+Math.min(2,player.score/20000)),
+        flap:Math.random()*Math.PI*2,
+        hitCooldown:0,
+        size:birdType.size,
+        color:birdType.color
+    });
+}
 window.addEventListener('keydown',event=>{
     keys[event.code]=true;
-    
-    // Реактивный рывок (двойное нажатие в одну сторону)
-    if(currentState===STATE.PLAYING&&!playerAnimations.jetDash){
-        if((event.code==='ArrowLeft'||event.code==='KeyA')&&keys.ArrowLeftCount){
-            playerAnimations.jetDash=true;
-            playerAnimations.jetDashTime=15;
-            player.vx=-8;
-        }else if((event.code==='ArrowRight'||event.code==='KeyD')&&keys.ArrowRightCount){
-            playerAnimations.jetDash=true;
-            playerAnimations.jetDashTime=15;
-            player.vx=8;
-        }
-        
-        if(event.code==='ArrowLeft'||event.code==='KeyA'){
-            keys.ArrowLeftCount=(keys.ArrowLeftCount||0)+1;
-            setTimeout(()=>{keys.ArrowLeftCount=0;},300);
-        }else if(event.code==='ArrowRight'||event.code==='KeyD'){
-            keys.ArrowRightCount=(keys.ArrowRightCount||0)+1;
-            setTimeout(()=>{keys.ArrowRightCount=0;},300);
-        }
-    }
-    
     if((event.code==='ArrowUp'||event.code==='KeyW'||event.code==='Space')&&currentState===STATE.PLAYING&&doubleJumpAvailable){
-        event.preventDefault();
-        player.dy=-15;
-        doubleJumpAvailable=false;
-        
-        // Эффект волны на платформе
-        const platform=platforms.find(p=>
-            player.dy>0&&
-            player.x+25>p.x&&
-            player.x+10<p.x+p.w&&
-            player.y+35>p.y&&
-            player.y+35<p.y+p.h+player.dy
-        );
-        if(platform){
-            jumpWaves.push({
-                x:platform.x+platform.w/2,
-                y:platform.y,
-                radius:0,
-                maxRadius:platform.w*0.8,
-                alpha:1
-            });
-        }
+        event.preventDefault();player.dy=-15;doubleJumpAvailable=false;
     }
-    
     if(currentState===STATE.MENU){
         if(event.code==='Enter'||event.code==='Space')startGame();
-    }else if(currentState===STATE.GAMEOVER){
-        startGame();
-    }else if(currentState===STATE.PLAYING&&event.code==='Escape'){
-        currentState=STATE.PAUSE;lastFrameTime=0;
-    }else if(currentState===STATE.PAUSE&&event.code==='Escape'){
-        currentState=STATE.PLAYING;lastFrameTime=0;
-    }
+    }else if(currentState===STATE.GAMEOVER)startGame();
+    else if(currentState===STATE.PLAYING&&event.code==='Escape'){currentState=STATE.PAUSE;lastFrameTime=0}
+    else if(currentState===STATE.PAUSE&&event.code==='Escape'){currentState=STATE.PLAYING;lastFrameTime=0}
 });
 window.addEventListener('keyup',event=>{keys[event.code]=false});
-window.addEventListener('blur',()=>{
-    keys.ArrowLeft=false;keys.ArrowRight=false;keys.KeyA=false;keys.KeyD=false;
-    keys.ArrowLeftCount=0;keys.ArrowRightCount=0;
-});
+window.addEventListener('blur',()=>{keys.ArrowLeft=false;keys.ArrowRight=false;keys.KeyA=false;keys.KeyD=false});
 
 function setMenuMessage(text){menuMessage=text;menuMessageUntil=performance.now()+2200}
 function canvasPoint(event){
-    const rect = canvas.getBoundingClientRect();
-    return {
-        x: (event.clientX - rect.left) * 400 / rect.width,
-        y: (event.clientY - rect.top) * 600 / rect.height
-    };
+    const rect=canvas.getBoundingClientRect();
+    return{x:(event.clientX-rect.left)*400/rect.width,y:(event.clientY-rect.top)*600/rect.height};
 }
 function getCharacterCardRects(){
-    const result = [];
-    const cardW = 62, cardH = 91, startX = 30, startY = 243;
+    const result=[];
+    const cardW=44,cardH=70,startX=22,startY=243;
+    const colGap=52,rowGap=76;
 
-    for(let i = 0; i < 10; i++){
-        const row = Math.floor(i / 5);
-        const col = i % 5;
+    for(let i=0;i<21;i++){
+        const row=Math.floor(i/7);
+        const col=i%7;
         result.push({
-            x: startX + col * 70,
-            y: startY + row * 99,
-            w: cardW,
-            h: cardH
+            x:startX+col*colGap,
+            y:startY+row*rowGap,
+            w:cardW,
+            h:cardH
         });
     }
 
@@ -337,7 +172,7 @@ function getCharacterCardRects(){
 }
 function handleMenuPointer(point){
     if(currentState!==STATE.MENU)return;
-    for(let i=0;i<10;i++){
+    for(let i=0;i<21;i++){
         const r=getCharacterCardRects()[i];
         if(point.x<r.x||point.x>r.x+r.w||point.y<r.y||point.y>r.y+r.h)continue;
         if(unlockedCharacters.includes(i)){selectedCharacter=i;saveProgress();setMenuMessage(`Выбран персонаж ${i+1}`)}
@@ -348,48 +183,18 @@ function handleMenuPointer(point){
 }
 canvas.addEventListener('pointerdown',event=>{
     const point=canvasPoint(event);
-    
-    if(currentState===STATE.PAUSE){
-        // Проверка нажатия на кнопки паузы
-        if(point.x>=115&&point.x<=285&&point.y>=390&&point.y<=440){
-            currentState=STATE.PLAYING;
-            lastFrameTime=0;
-        }else if(point.x>=115&&point.x<=285&&point.y>=450&&point.y<=500){
-            currentState=STATE.MENU;
-        }
-        event.preventDefault();
-        return;
+    if(currentState===STATE.PAUSE){currentState=STATE.PLAYING;lastFrameTime=0;event.preventDefault();return}
+    if(currentState===STATE.GAMEOVER){
+        if(point.x>=85&&point.x<=315&&point.y>=395&&point.y<=455)currentState=STATE.MENU;
+        else startGame();
+        event.preventDefault();return;
     }
-    
     if(currentState===STATE.MENU){
         handleMenuPointer(point);
         menuButtonDown=point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580;
-        event.preventDefault();
-        return;
+        event.preventDefault();return;
     }
-    if(currentState===STATE.GAMEOVER){
-        if(point.x>=85&&point.x<=315&&point.y>=395&&point.y<=455){
-            currentState=STATE.MENU;
-        }else{
-            startGame();
-        }
-        event.preventDefault();
-        return;
-    }
-    if(currentState===STATE.PLAYING){
-        // Проверка нажатия на кнопку настроек
-        if(point.x>=364&&point.x<=396&&point.y>=564&&point.y<=596){
-            document.getElementById('controlSettings').classList.add('show');
-            event.preventDefault();
-            return;
-        }
-        // Проверка нажатия на кнопку паузы
-        if(point.x>350&&point.y>550){
-            currentState=STATE.PAUSE;
-            lastFrameTime=0;
-            event.preventDefault();
-        }
-    }
+    if(currentState===STATE.PLAYING&&point.x>350&&point.y>550){currentState=STATE.PAUSE;lastFrameTime=0;event.preventDefault()}
 });
 canvas.addEventListener('pointerup',event=>{
     if(currentState===STATE.MENU&&menuButtonDown){
@@ -402,239 +207,68 @@ canvas.addEventListener('pointercancel',()=>{menuButtonDown=false});
 
 function bindTouchButton(id,keyCode){
     const button=document.getElementById(id);
-    const press=event=>{
-        event.preventDefault();
-        keys[keyCode]=true;
-        
-        // Реактивный рывок для сенсорного управления
-        if(currentState===STATE.PLAYING&&!playerAnimations.jetDash){
-            if(id==='leftButton'&&keys.leftButtonCount){
-                playerAnimations.jetDash=true;
-                playerAnimations.jetDashTime=15;
-                player.vx=-8;
-            }else if(id==='rightButton'&&keys.rightButtonCount){
-                playerAnimations.jetDash=true;
-                playerAnimations.jetDashTime=15;
-                player.vx=8;
-            }
-            
-            if(id==='leftButton'){
-                keys.leftButtonCount=(keys.leftButtonCount||0)+1;
-                setTimeout(()=>{keys.leftButtonCount=0;},300);
-            }else if(id==='rightButton'){
-                keys.rightButtonCount=(keys.rightButtonCount||0)+1;
-                setTimeout(()=>{keys.rightButtonCount=0;},300);
-            }
-        }
-        
-        if(button.setPointerCapture&&event.pointerId!==undefined)button.setPointerCapture(event.pointerId);
-    };
+    const press=event=>{event.preventDefault();keys[keyCode]=true;if(button.setPointerCapture&&event.pointerId!==undefined)button.setPointerCapture(event.pointerId)};
     const release=event=>{event.preventDefault();keys[keyCode]=false};
     button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);
     button.addEventListener('lostpointercapture',()=>{keys[keyCode]=false});
 }
 bindTouchButton('leftButton','ArrowLeft');bindTouchButton('rightButton','ArrowRight');
 
-// Настройки управления
-const sizeSlider=document.getElementById('sizeSlider');
-const opacitySlider=document.getElementById('opacitySlider');
-const sizeValue=document.getElementById('sizeValue');
-const opacityValue=document.getElementById('opacityValue');
-const controlSettings=document.getElementById('controlSettings');
-const closeSettings=document.getElementById('closeSettings');
-
-sizeSlider.value=touchButtonSize;
-opacitySlider.value=touchButtonOpacity;
-sizeValue.textContent=touchButtonSize+'%';
-opacityValue.textContent=touchButtonOpacity+'%';
-
-sizeSlider.addEventListener('input',()=>{
-    touchButtonSize=parseInt(sizeSlider.value);
-    sizeValue.textContent=touchButtonSize+'%';
-    applyTouchButtonSettings();
-    saveProgress();
-});
-
-opacitySlider.addEventListener('input',()=>{
-    touchButtonOpacity=parseInt(opacitySlider.value);
-    opacityValue.textContent=touchButtonOpacity+'%';
-    applyTouchButtonSettings();
-    saveProgress();
-});
-
-closeSettings.addEventListener('click',()=>{
-    controlSettings.classList.remove('show');
-});
-
-// Закрытие настроек при клике вне окна
-document.addEventListener('click',(event)=>{
-    if(controlSettings.classList.contains('show')&&
-       !controlSettings.contains(event.target)&&
-       !(event.target.id==='game'&&
-         event.offsetX>=364*RENDER_SCALE&&event.offsetX<=396*RENDER_SCALE&&
-         event.offsetY>=564*RENDER_SCALE&&event.offsetY<=596*RENDER_SCALE)){
-        controlSettings.classList.remove('show');
-    }
-});
-
 function update(dt){
     if(currentState!==STATE.PLAYING)return;
     dt=Math.min(dt,2);
-    
-    // Обновление реактивного рывка
-    if(playerAnimations.jetDash){
-        playerAnimations.jetDashTime-=dt;
-        if(playerAnimations.jetDashTime<=0){
-            playerAnimations.jetDash=false;
-        }
-    }
-    
     if(keys.ArrowLeft||keys.KeyA)player.vx-=1.2*dt;
     if(keys.ArrowRight||keys.KeyD)player.vx+=1.2*dt;
-    player.vx*=Math.pow(.85,dt);
-    player.x+=player.vx*dt;
-    player.dy+=.5464*dt;
-    player.y+=player.dy*dt;
+    player.vx*=Math.pow(.85,dt);player.x+=player.vx*dt;
+    player.dy+=.5464*dt;player.y+=player.dy*dt;
     if(player.x<-30)player.x=400;if(player.x>400)player.x=-30;
-    
-    // Анимации персонажа
-    if(player.dy<0){
-        playerAnimations.rotation+=0.15*dt;
-        playerAnimations.squash=Math.max(0,playerAnimations.squash-0.1*dt);
-    }else if(player.dy>5){
-        playerAnimations.fallEffect=Math.min(1,playerAnimations.fallEffect+0.05*dt);
-        playerAnimations.rotation+=0.05*dt;
-    }else{
-        playerAnimations.fallEffect=Math.max(0,playerAnimations.fallEffect-0.1*dt);
-        playerAnimations.rotation*=Math.pow(0.9,dt);
+    if(Math.random()<.004*dt)spawnBird();
+    for(let i=birds.length-1;i>=0;i--){
+        const bird=birds[i];bird.x+=bird.vx*dt;bird.flap+=.22*dt;bird.hitCooldown=Math.max(0,bird.hitCooldown-dt);
+        if(bird.x<-55||bird.x>455){birds.splice(i,1);continue}
+        const playerCenterX=player.x+15,playerCenterY=player.y+15;
+        if(bird.hitCooldown<=0&&Math.abs(playerCenterX-bird.x)<29&&Math.abs(playerCenterY-bird.y)<25){
+            const pushDirection=playerCenterX<bird.x?-1:1;
+            player.vx=pushDirection*9;player.dy=-8;player.x+=pushDirection*12;bird.hitCooldown=45;
+        }
     }
-    
-    // Сжатие при приземлении
-    let landedOnPlatform=false;
     platforms.forEach(platform=>{
         if(platform.type==='broken'&&platform.breaking&&player.dy<0&&player.y+35<=platform.y)platform.removeAfterBounce=true;
-        
         if(player.dy>0&&!platform.breaking&&player.x+25>platform.x&&player.x+10<platform.x+platform.w&&player.y+35>platform.y&&player.y+35<platform.y+platform.h+player.dy){
-            player.y=platform.y-35;
-            player.dy=-12.98;
-            doubleJumpAvailable=true;
-            
-            // Сжатие при приземлении
-            playerAnimations.squash=0.3;
-            
-            if(platform.type==='broken')platform.breaking=true;
-            landedOnPlatform=true;
+            player.y=platform.y-35;player.dy=-12.98;doubleJumpAvailable=true;if(platform.type==='broken')platform.breaking=true;
         }
-        
-        // Движение платформ вверх-вниз
-        if(platform.type==='updown'){
-            platform.y+=platform.verticalDir*platform.verticalSpeed*dt;
-            if(platform.y>=platform.originalY+platform.verticalRange){
-                platform.verticalDir=-1;
-            }else if(platform.y<=platform.originalY-platform.verticalRange){
-                platform.verticalDir=1;
-            }
-        }
-        
         if(platform.type==='moving'){
             platform.x+=platform.dir*dt;
-            if(platform.x<=0||platform.x+platform.w>=400){
-                platform.x=Math.max(0,Math.min(400-platform.w,platform.x));
-                platform.dir*=-1;
-            }
+            if(platform.x<=0||platform.x+platform.w>=400){platform.x=Math.max(0,Math.min(400-platform.w,platform.x));platform.dir*=-1}
         }
     });
-    
     platforms=platforms.filter(platform=>!platform.removeAfterBounce);
-    
     springs.forEach(spring=>{
-        if(player.dy>0&&player.x+25>spring.x&&player.x<spring.x+20&&player.y+35>spring.y&&player.y+35<spring.y+20){
-            player.dy=-32;
-            doubleJumpAvailable=true;
-            playerAnimations.squash=0.2;
-        }
+        if(player.dy>0&&player.x+25>spring.x&&player.x<spring.x+20&&player.y+35>spring.y&&player.y+35<spring.y+20){player.dy=-32;doubleJumpAvailable=true}
     });
-    
     for(let i=coins.length-1;i>=0;i--){
         const coin=coins[i];
         if(player.x<coin.x+20&&player.x+30>coin.x&&player.y<coin.y+20&&player.y+30>coin.y){
             runCoins++;bankCoins++;if(runCoins%10===0)lives++;saveProgress();coins.splice(i,1);
         }
     }
-    
     platforms.forEach(platform=>{
         if(!platform.life)return;
         const life=platform.life;
         if(player.x<life.x+20&&player.x+30>life.x&&player.y<life.y+20&&player.y+30>life.y){lives++;platform.life=null}
     });
-    
-    // Обновление птиц
-    birds.forEach(bird=>{
-        bird.x+=bird.vx*dt;
-        bird.y+=bird.vy*dt;
-        bird.wingPhase+=0.2*dt;
-        
-        if(bird.x<-20)bird.x=420;
-        if(bird.x>420)bird.x=-20;
-        
-        // Проверка столкновения с игроком
-        const dx=player.x+15-(bird.x+bird.size/2);
-        const dy=player.y+15-(bird.y+bird.size/2);
-        const distance=Math.sqrt(dx*dx+dy*dy);
-        
-        if(distance<20+bird.size/2&&player.dy>0&&!playerAnimations.jetDash){
-            player.dy=-8;
-            bird.vx=(Math.random()-0.5)*8;
-            bird.vy=-4;
-        }
-    });
-    birds=birds.filter(bird=>bird.y<650);
-    
-    // Обновление волн от прыжка
-    for(let i=jumpWaves.length-1;i>=0;i--){
-        const wave=jumpWaves[i];
-        wave.radius+=2*dt;
-        wave.alpha-=0.04*dt;
-        if(wave.alpha<=0||wave.radius>=wave.maxRadius){
-            jumpWaves.splice(i,1);
-        }
-    }
-    
     if(player.y<250){
         const diff=250-player.y;player.score+=diff;
         while(player.score>=nextLifeScore){lives++;nextLifeScore+=10000}
-        player.y=250;
-        platforms.forEach(platform=>platform.y+=diff);
-        springs.forEach(spring=>spring.y+=diff);
-        coins.forEach(coin=>coin.y+=diff);
-        birds.forEach(bird=>bird.y+=diff);
-        jumpWaves.forEach(wave=>wave.y+=diff);
+        player.y=250;platforms.forEach(platform=>platform.y+=diff);springs.forEach(spring=>spring.y+=diff);coins.forEach(coin=>coin.y+=diff);birds.forEach(bird=>bird.y+=diff);
     }
-    
-    platforms=platforms.filter(platform=>platform.y<650);
-    springs=springs.filter(spring=>spring.y<650);
-    coins=coins.filter(coin=>coin.y<650);
-    
-    while(platforms.length<8){
-        const lastY=platforms.length?Math.min(...platforms.map(platform=>platform.y)):550;
-        platforms.push(spawnPlatform(lastY-100));
-    }
-    
-    if(player.y>600&&lives>0){
-        lives--;
-        player.y=500;
-        player.dy=-8.5;
-        doubleJumpAvailable=true;
-        playerAnimations.squash=0.4;
-    }else if(player.y>600){
+    platforms=platforms.filter(platform=>platform.y<650);springs=springs.filter(spring=>spring.y<650);coins=coins.filter(coin=>coin.y<650);
+    while(platforms.length<8){const lastY=platforms.length?Math.min(...platforms.map(platform=>platform.y)):550;platforms.push(spawnPlatform(lastY-100))}
+    if(player.y>600&&lives>0){lives--;player.y=500;player.dy=-8.5;doubleJumpAvailable=true}
+    else if(player.y>600){
         currentState=STATE.GAMEOVER;
         const finalScore=Math.floor(player.score);
-        if(finalScore>highScore){
-            highScore=finalScore;
-            unlockedCharacters=getUnlockedCharacters(highScore);
-            if(!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;
-            saveProgress();
-        }
+        if(finalScore>highScore){highScore=finalScore;unlockedCharacters=getUnlockedCharacters(highScore);if(!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;saveProgress()}
     }
 }
 
@@ -678,14 +312,35 @@ function drawMenu(){
     drawCharacterImage(selectedCharacter,174,151,52,58,false);
     ctx.fillStyle='#154c68';ctx.font='bold 13px Arial';ctx.fillText(`Выбран: ${selectedCharacter+1}`,200,222);
     ctx.fillStyle='#155576';ctx.font='bold 13px Arial';ctx.fillText('ВЫБЕРИ ПЕРСОНАЖА',200,235);
-    getCharacterCardRects().forEach((rect,index)=>{
-        const unlocked=unlockedCharacters.includes(index),selected=selectedCharacter===index;
-        drawGlassPanel(rect.x,rect.y,rect.w,rect.h,13);drawCharacterImage(index,rect.x+5,rect.y+5,rect.w-10,55,!unlocked);
-        ctx.textAlign='center';ctx.textBaseline='middle';
-        if(unlocked){ctx.font='bold 11px Arial';ctx.fillStyle=selected?'#087f62':'#23516a';ctx.fillText(selected?'ВЫБРАН':'ОТКРЫТ',rect.x+rect.w/2,rect.y+69)}
-        else{ctx.font='bold 9px Arial';ctx.fillStyle='#865100';ctx.fillText(`${CHARACTER_SCORES[index]} очков`,rect.x+rect.w/2,rect.y+69)}
-        if(selected){ctx.save();roundedRect(rect.x-1,rect.y-1,rect.w+2,rect.h+2,14);ctx.strokeStyle='#10a981';ctx.lineWidth=3;ctx.stroke();ctx.restore()}
-    });
+	getCharacterCardRects().forEach((rect,index)=>{
+		const unlocked=unlockedCharacters.includes(index);
+		const selected=selectedCharacter===index;
+
+		drawGlassPanel(rect.x,rect.y,rect.w,rect.h,9);
+		drawCharacterImage(index,rect.x+4,rect.y+4,rect.w-8,43,!unlocked);
+
+		ctx.textAlign='center';
+		ctx.textBaseline='middle';
+
+		if(unlocked){
+			ctx.font='bold 8px Arial';
+			ctx.fillStyle=selected?'#087f62':'#23516a';
+			ctx.fillText(selected?'ВЫБРАН':'ОТКРЫТ',rect.x+rect.w/2,rect.y+58);
+		}else{
+			ctx.font='bold 7px Arial';
+			ctx.fillStyle='#865100';
+			ctx.fillText(`${CHARACTER_SCORES[index]} очков`,rect.x+rect.w/2,rect.y+58);
+		}
+
+		if(selected){
+			ctx.save();
+			roundedRect(rect.x-1,rect.y-1,rect.w+2,rect.h+2,10);
+			ctx.strokeStyle='#10a981';
+			ctx.lineWidth=2;
+			ctx.stroke();
+			ctx.restore();
+		}
+	});
     ctx.save();const gradient=ctx.createLinearGradient(100,524,300,580);gradient.addColorStop(0,'rgba(32,210,170,.92)');gradient.addColorStop(1,'rgba(26,145,220,.92)');
     roundedRect(104,524,192,56,19);ctx.fillStyle=gradient;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ИГРАТЬ',200,552);ctx.restore();
@@ -700,33 +355,58 @@ function drawPlatform(p){
         ctx.fillStyle=wood;ctx.shadowColor='rgba(0,0,0,.22)';ctx.shadowBlur=5;ctx.shadowOffsetY=3;roundedRect(p.x,p.y,p.w,p.h,5);ctx.fill();ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
         ctx.strokeStyle='rgba(120,35,35,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.x+5,p.y+5);ctx.lineTo(p.x+p.w-5,p.y+5);ctx.moveTo(p.x+8,p.y+11);ctx.lineTo(p.x+p.w-8,p.y+11);ctx.stroke();
         ctx.strokeStyle='#702b2b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x+p.w*.35,p.y);ctx.lineTo(p.x+p.w*.42,p.y+5);ctx.lineTo(p.x+p.w*.37,p.y+9);ctx.lineTo(p.x+p.w*.48,p.y+15);ctx.stroke();
-    }else if(p.type==='updown'){
-        // Платформы, движущиеся вверх-вниз
-        const gradient=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);
-        gradient.addColorStop(0,'#6a8cff');
-        gradient.addColorStop(1,'#4d6bff');
-        ctx.fillStyle=gradient;
-        ctx.shadowColor='rgba(0,0,0,.25)';
-        ctx.shadowBlur=6;
-        ctx.shadowOffsetY=3;
-        roundedRect(p.x,p.y,p.w,p.h,7);
-        ctx.fill();
-        ctx.shadowColor='transparent';
-        ctx.shadowBlur=0;
-        ctx.shadowOffsetY=0;
-        
-        // Индикатор движения
-        ctx.fillStyle='rgba(255,255,255,.3)';
-        ctx.fillRect(p.x+p.w/2-15,p.y-3,30,3);
-        ctx.fillStyle=p.verticalDir>0?'#4CAF50':'#FF5252';
-        const indicatorX=p.x+p.w/2-15+15+(p.verticalDir>0?5:-5);
-        ctx.beginPath();
-        ctx.arc(indicatorX,p.y-1.5,2,0,Math.PI*2);
-        ctx.fill();
     }else{
         ctx.fillStyle=p.type==='moving'?'#4d96ff':currentTheme.plat;ctx.shadowColor='rgba(0,0,0,.22)';ctx.shadowBlur=6;ctx.shadowOffsetY=3;roundedRect(p.x,p.y,p.w,p.h,7);ctx.fill();ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
     }
     if(p.life){ctx.fillStyle='#3498db';ctx.beginPath();ctx.arc(p.life.x+8,p.life.y+8,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('+',p.life.x+8,p.life.y+8)}
+}
+function drawBird(bird){
+    ctx.save();
+    ctx.translate(bird.x,bird.y);
+    ctx.scale(bird.vx<0?-bird.size:bird.size,bird.size);
+
+    const wing=Math.sin(bird.flap)*7;
+
+    ctx.fillStyle='rgba(0,0,0,.16)';
+    ctx.beginPath();
+    ctx.ellipse(0,15,17,4,0,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle=bird.color;
+    ctx.beginPath();
+    ctx.ellipse(0,0,15,10,0,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(-3,-3);
+    ctx.quadraticCurveTo(-13,-17-wing,-22,-8-wing);
+    ctx.quadraticCurveTo(-16,2,-3,5);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(1,-3);
+    ctx.quadraticCurveTo(12,-17-wing,21,-7-wing);
+    ctx.quadraticCurveTo(14,3,2,5);
+    ctx.fill();
+
+    ctx.fillStyle='#f5a623';
+    ctx.beginPath();
+    ctx.moveTo(12,-2);
+    ctx.lineTo(23,1);
+    ctx.lineTo(12,4);
+    ctx.fill();
+
+    ctx.fillStyle='#fff';
+    ctx.beginPath();
+    ctx.arc(7,-5,3,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle='#111827';
+    ctx.beginPath();
+    ctx.arc(8,-5,1.4,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
 }
 function drawSpring(s){
     ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(s.x+10,s.y+16,11,3,0,0,Math.PI*2);ctx.fill();
@@ -743,162 +423,16 @@ function drawCoin(c){
     ctx.fillStyle='#d88900';ctx.font=`bold ${c.r+3}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('$',c.x,c.y+1);ctx.textAlign='start';ctx.textBaseline='alphabetic';
     ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(c.x-3,c.y-4,2,3.5,-.5,0,Math.PI*2);ctx.fill();
 }
-function drawBird(bird){
-    ctx.save();
-    ctx.translate(bird.x+bird.size/2,bird.y+bird.size/2);
-    
-    // Тело птицы
-    ctx.fillStyle=bird.color;
-    ctx.beginPath();
-    ctx.ellipse(0,0,bird.size/2,bird.size/3,0,0,Math.PI*2);
-    ctx.fill();
-    
-    // Крылья
-    const wingHeight=Math.sin(bird.wingPhase)*bird.size/3;
-    ctx.fillStyle=bird.color;
-    ctx.beginPath();
-    ctx.ellipse(-bird.size/3,-bird.size/6,bird.size/3,Math.max(2,wingHeight),0,0,Math.PI*2);
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.ellipse(bird.size/3,-bird.size/6,bird.size/3,Math.max(2,Math.abs(wingHeight)),0,0,Math.PI*2);
-    ctx.fill();
-    
-    // Глаз
-    ctx.fillStyle='white';
-    ctx.beginPath();
-    ctx.arc(bird.size/4,-bird.size/8,2,0,Math.PI*2);
-    ctx.fill();
-    
-    ctx.fillStyle='black';
-    ctx.beginPath();
-    ctx.arc(bird.size/4,-bird.size/8,1,0,Math.PI*2);
-    ctx.fill();
-    
-    // Клюв
-    ctx.fillStyle='#FF9800';
-    ctx.beginPath();
-    ctx.moveTo(bird.size/2,0);
-    ctx.lineTo(bird.size/2+4,0);
-    ctx.lineTo(bird.size/2+2,-2);
-    ctx.closePath();
-    ctx.fill();
-    
-    ctx.restore();
-}
-function drawJumpWaves(){
-    jumpWaves.forEach(wave=>{
-        ctx.save();
-        ctx.globalAlpha=wave.alpha;
-        ctx.strokeStyle='rgba(255,255,255,0.7)';
-        ctx.lineWidth=2;
-        ctx.beginPath();
-        ctx.arc(wave.x,wave.y,wave.radius,0,Math.PI*2);
-        ctx.stroke();
-        
-        ctx.strokeStyle='rgba(100,200,255,0.4)';
-        ctx.lineWidth=1;
-        ctx.beginPath();
-        ctx.arc(wave.x,wave.y,wave.radius+2,0,Math.PI*2);
-        ctx.stroke();
-        ctx.restore();
-    });
-}
 function drawPlayer(){
-    const x = player.x - 5;
-    const y = player.y - 8;
-    const size = 40;
-    const cx = x + size / 2;
-    const cy = y + size / 2;
-    const radius = size / 2;
-    const image = characterImages[selectedCharacter];
-
-    ctx.save();
-    
-    // Применение анимаций
-    if(playerAnimations.squash>0){
-        ctx.translate(cx,cy);
-        ctx.scale(1+playerAnimations.squash,1-playerAnimations.squash*0.5);
-        ctx.translate(-cx,-cy);
-    }
-    
-    if(playerAnimations.rotation!==0){
-        ctx.translate(cx,cy);
-        ctx.rotate(playerAnimations.rotation);
-        ctx.translate(-cx,-cy);
-    }
-    
-    // Эффект падения (размытие)
-    if(playerAnimations.fallEffect>0){
-        ctx.filter=`blur(${playerAnimations.fallEffect*2}px)`;
-    }
-    
-    // Эффект реактивного рывка
-    if(playerAnimations.jetDash){
-        const gradient=ctx.createRadialGradient(cx,cy,0,cx,cy,radius*2);
-        gradient.addColorStop(0,'rgba(255,100,100,0.8)');
-        gradient.addColorStop(1,'rgba(255,100,100,0)');
-        ctx.fillStyle=gradient;
-        ctx.beginPath();
-        ctx.arc(cx,cy,radius*2,0,Math.PI*2);
-        ctx.fill();
-    }
-
-    // Мягкая круглая тень.
-    ctx.shadowColor = 'rgba(0, 12, 30, .55)';
-    ctx.shadowBlur = 9;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 4;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius - 1, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(12, 27, 48, .9)';
-    ctx.fill();
-
-    // Картинка персонажа, обрезанная по кругу.
-    ctx.shadowColor = 'transparent';
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius - 3, 0, Math.PI * 2);
-    ctx.clip();
-
-    if(image && image.complete && image.naturalWidth > 0){
-        // Масштабируем квадратное изображение так, чтобы заполнить круг.
-        const imageSize = size - 6;
-        ctx.drawImage(image, x + 3, y + 3, imageSize, imageSize);
-    }else{
-        const gradient = ctx.createLinearGradient(x, y, x + size, y + size);
-        gradient.addColorStop(0, '#ffcf77');
-        gradient.addColorStop(1, '#e63946');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x + 3, y + 3, size - 6, size - 6);
-    }
-
-    // Стеклянный блик на верхней части мяча.
-    const shine = ctx.createLinearGradient(x, y + 3, x, y + size * .65);
-    shine.addColorStop(0, 'rgba(255,255,255,.42)');
-    shine.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = shine;
-    ctx.fillRect(x + 3, y + 3, size - 6, size * .62);
-    ctx.restore();
-
-    // Тёмная обводка и холодный стеклянный контур.
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius - 1, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(5, 13, 27, .95)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius - 2.5, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(190, 225, 255, .78)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Сброс фильтров и трансформаций
-    ctx.filter='none';
-    ctx.restore();
+    const x=player.x-5,y=player.y-8,size=40,cx=x+size/2,cy=y+size/2,radius=size/2,image=characterImages[selectedCharacter];
+    ctx.save();ctx.shadowColor='rgba(0,12,30,.55)';ctx.shadowBlur=9;ctx.shadowOffsetY=4;
+    ctx.beginPath();ctx.arc(cx,cy,radius-1,0,Math.PI*2);ctx.fillStyle='rgba(12,27,48,.9)';ctx.fill();
+    ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.save();ctx.beginPath();ctx.arc(cx,cy,radius-3,0,Math.PI*2);ctx.clip();
+    if(image&&image.complete&&image.naturalWidth>0)ctx.drawImage(image,x+3,y+3,size-6,size-6);
+    else{const gradient=ctx.createLinearGradient(x,y,x+size,y+size);gradient.addColorStop(0,'#ffcf77');gradient.addColorStop(1,'#e63946');ctx.fillStyle=gradient;ctx.fillRect(x+3,y+3,size-6,size-6)}
+    const shine=ctx.createLinearGradient(x,y+3,x,y+size*.65);shine.addColorStop(0,'rgba(255,255,255,.42)');shine.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=shine;ctx.fillRect(x+3,y+3,size-6,size*.62);ctx.restore();
+    ctx.beginPath();ctx.arc(cx,cy,radius-1,0,Math.PI*2);ctx.strokeStyle='rgba(5,13,27,.95)';ctx.lineWidth=2;ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,radius-2.5,0,Math.PI*2);ctx.strokeStyle='rgba(190,225,255,.78)';ctx.lineWidth=1;ctx.stroke();ctx.restore();
 }
 function drawCounters(){
     ctx.save();ctx.fillStyle='rgba(255,255,255,.84)';ctx.shadowColor='rgba(30,50,70,.18)';ctx.shadowBlur=8;ctx.shadowOffsetY=2;roundedRect(8,8,190,78,12);ctx.fill();ctx.restore();
@@ -921,88 +455,25 @@ function drawGameOver(){
     ctx.fillStyle='#475569';ctx.font='13px Arial';ctx.fillText('Нажмите любую клавишу, чтобы сыграть снова',200,468);
 }
 function drawPauseMenu(){
-    ctx.fillStyle='rgba(15,23,42,.68)';ctx.fillRect(0,0,400,600);
-    drawGlassPanel(38,112,324,376,24);
-    
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle='#155576';ctx.font='bold 26px Arial';ctx.fillText('ПАУЗА',200,165);
+    ctx.fillStyle='rgba(15,23,42,.68)';ctx.fillRect(0,0,400,600);drawGlassPanel(38,112,324,376,24);
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#155576';ctx.font='bold 26px Arial';ctx.fillText('ПАУЗА',200,165);
     ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('ТЕКУЩИЙ РЕЗУЛЬТАТ',200,230);
     ctx.fillStyle='#1e293b';ctx.font='bold 34px Arial';ctx.fillText(String(Math.floor(player.score)),200,265);
     ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('РЕКОРД ПОДЪЁМА',200,325);
     ctx.fillStyle='#d99400';ctx.font='bold 26px Arial';ctx.fillText(String(highScore),200,358);
-    
-    // Кнопка "Продолжить"
-    ctx.save();
-    const continueGradient=ctx.createLinearGradient(115,390,285,440);
-    continueGradient.addColorStop(0,'#20d2aa');
-    continueGradient.addColorStop(1,'#1a91dc');
-    roundedRect(115,390,170,50,14);
-    ctx.fillStyle=continueGradient;
-    ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,.85)';
-    ctx.lineWidth=1.5;
-    ctx.stroke();
-    ctx.fillStyle='#fff';
-    ctx.font='bold 16px Arial';
-    ctx.fillText('ПРОДОЛЖИТЬ',200,415);
-    ctx.restore();
-    
-    // Кнопка "В меню"
-    ctx.save();
-    const menuGradient=ctx.createLinearGradient(115,450,285,500);
-    menuGradient.addColorStop(0,'#6c757d');
-    menuGradient.addColorStop(1,'#495057');
-    roundedRect(115,450,170,50,14);
-    ctx.fillStyle=menuGradient;
-    ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,.85)';
-    ctx.lineWidth=1.5;
-    ctx.stroke();
-    ctx.fillStyle='#fff';
-    ctx.font='bold 16px Arial';
-    ctx.fillText('В МЕНЮ',200,475);
-    ctx.restore();
-    
-    ctx.fillStyle='#475569';ctx.font='12px Arial';
-    ctx.fillText('Нажмите ESC или коснитесь кнопки',200,520);
+    ctx.fillStyle='#475569';ctx.font='14px Arial';ctx.fillText('Нажмите ESC, чтобы продолжить',200,430);
 }
-
 function draw(timestamp){
     const dt=lastFrameTime?Math.min((timestamp-lastFrameTime)/(1000/60),2):1;lastFrameTime=timestamp;
     if(currentState===STATE.MENU)drawMenu();
     else{
         drawBackground();
-        if(currentState===STATE.PAUSE){
-            platforms.forEach(drawPlatform);
-            springs.forEach(drawSpring);
-            coins.forEach(drawCoin);
-            birds.forEach(drawBird);
-            drawJumpWaves();
-            drawPlayer();
-            drawCounters();
-            drawPauseMenu();
-        }else if(currentState===STATE.GAMEOVER){
-            platforms.forEach(drawPlatform);
-            springs.forEach(drawSpring);
-            coins.forEach(drawCoin);
-            birds.forEach(drawBird);
-            drawJumpWaves();
-            drawPlayer();
-            drawCounters();
-            drawGameOver();
-        }else{
-            platforms.forEach(drawPlatform);
-            springs.forEach(drawSpring);
-            coins.forEach(drawCoin);
-            birds.forEach(drawBird);
-            drawJumpWaves();
-            drawPlayer();
-            drawCounters();
-        }
+        if(currentState===STATE.PAUSE){platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters();drawPauseMenu()}
+        else if(currentState===STATE.GAMEOVER){platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters();drawGameOver()}
+        else{platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters()}
     }
     update(dt);requestAnimationFrame(draw);
 }
-
 fullscreenButton.addEventListener('click',async()=>{
     try{
         if(!document.fullscreenElement){if(gameStage.requestFullscreen)await gameStage.requestFullscreen();else fullscreenButton.title='Полноэкранный режим не поддерживается этим браузером'}
