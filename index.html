@@ -186,11 +186,26 @@ canvas.addEventListener('pointerdown',event=>{
 				currentState = STATE.PLAYING;
 				lastFrameTime = 0;
 				event.stopPropagation();
-			} else if (currentState === STATE.GAMEOVER) {
-				startGame();
+				return;
+			}
+
+			if (currentState === STATE.GAMEOVER) {
+				const point = canvasPoint(event);
+
+				// Кнопка «Сменить персонажа» открывает меню выбора.
+				if (
+					point.x >= 85 && point.x <= 315 &&
+					point.y >= 395 && point.y <= 455
+				) {
+					currentState = STATE.MENU;
+				} else {
+					// Касание в любом другом месте запускает новую игру.
+					startGame();
+				}
+		
 				event.stopPropagation();
 			}
-		}, true);    
+		}, true);   
 	const point=canvasPoint(event);
     if(currentState===STATE.MENU){
         handleMenuPointer(point);menuButtonDown=point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580;event.preventDefault();return;
