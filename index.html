@@ -14,14 +14,31 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-width:none;max-height:none;border-radius:0}
 #fullscreenButton{width:52px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;font:28px Arial,sans-serif;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 #gameStage:fullscreen #fullscreenButton{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10}
-#touchControls{position:fixed;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;padding:0 22px;pointer-events:none}
+#gameStage {
+    position: relative;
+}
+
+#touchControls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 18px;
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 22px;
+    pointer-events: none;
+}
 .touchButton{width:72px;height:72px;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(255,255,255,.18);color:white;font:bold 34px Arial,sans-serif;pointer-events:auto;touch-action:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .touchButton:active{background:rgba(255,255,255,.35)}
 @media(hover:hover) and (pointer:fine){#touchControls{display:none}}
 /* Мобильные улучшения: стили ПК не меняются */
 @media (max-width:600px) and (pointer:coarse){
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
-    body{padding:max(6px,env(safe-area-inset-top)) 0 max(96px,calc(88px + env(safe-area-inset-bottom)))}
+    body {
+    padding: max(6px, env(safe-area-inset-top)) 0;
+	}
     #gameStage{width:100%;gap:8px}
     #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
 /*    #fullscreenButton{width:46px;height:42px;border-radius:13px;font-size:26px;background:rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(0,0,0,.2)} */
