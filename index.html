@@ -24,7 +24,10 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     body{padding:max(6px,env(safe-area-inset-top)) 0 max(96px,calc(88px + env(safe-area-inset-bottom)))}
     #gameStage{width:100%;gap:8px}
     #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
-    #fullscreenButton{width:46px;height:42px;border-radius:13px;font-size:26px;background:rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+/*    #fullscreenButton{width:46px;height:42px;border-radius:13px;font-size:26px;background:rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(0,0,0,.2)} */
+	#fullscreenButton {
+    display: none;
+	}
 	#touchControls{
 		position:fixed;
 		left:0;
