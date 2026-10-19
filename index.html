@@ -18,6 +18,44 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .touchButton{width:72px;height:72px;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(255,255,255,.18);color:white;font:bold 34px Arial,sans-serif;pointer-events:auto;touch-action:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .touchButton:active{background:rgba(255,255,255,.35)}
 @media(hover:hover) and (pointer:fine){#touchControls{display:none}}
+/* Мобильные улучшения: десктопные стили не меняются */
+@media (max-width: 600px) and (pointer: coarse) {
+    body {
+        padding: 4px 0;
+    }
+
+    #gameStage {
+        gap: 8px;
+    }
+
+    #game {
+        width: min(96vw, calc((100dvh - 90px) * 2 / 3));
+        border-radius: 12px;
+    }
+
+    #touchControls {
+        bottom: max(12px, env(safe-area-inset-bottom));
+        padding: 0 16px;
+    }
+
+    .touchButton {
+        width: 78px;
+        height: 78px;
+        font-size: 36px;
+        background: rgba(20, 35, 60, .48);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .25);
+    }
+
+    .touchButton:active {
+        background: rgba(40, 170, 190, .65);
+        transform: scale(.95);
+    }
+
+    #fullscreenButton {
+        width: 48px;
+        height: 42px;
+    }
+}
 </style>
 </head>
 <body>
@@ -115,8 +153,20 @@ function canvasPoint(event){
     };
 }
 function getCharacterCardRects(){
-    const result=[],cardW=60,cardH=93,gapX=8,startX=34,startY=243;
-    for(let i=0;i<10;i++){const row=Math.floor(i/5),col=i%5;result.push({x:startX+col*(cardW+gapX),y:startY+row*(cardH+9),w:cardW,h:cardH})}
+    const result = [];
+    const cardW = 62, cardH = 91, startX = 30, startY = 243;
+
+    for(let i = 0; i < 10; i++){
+        const row = Math.floor(i / 5);
+        const col = i % 5;
+        result.push({
+            x: startX + col * 70,
+            y: startY + row * 99,
+            w: cardW,
+            h: cardH
+        });
+    }
+
     return result;
 }
 function handleMenuPointer(point){
