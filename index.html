@@ -181,7 +181,17 @@ function handleMenuPointer(point){
     if(point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580)startGame();
 }
 canvas.addEventListener('pointerdown',event=>{
-    const point=canvasPoint(event);
+		document.addEventListener('pointerdown', event => {
+			if (currentState === STATE.PAUSE) {
+				currentState = STATE.PLAYING;
+				lastFrameTime = 0;
+				event.stopPropagation();
+			} else if (currentState === STATE.GAMEOVER) {
+				startGame();
+				event.stopPropagation();
+			}
+		}, true);    
+	const point=canvasPoint(event);
     if(currentState===STATE.MENU){
         handleMenuPointer(point);menuButtonDown=point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580;event.preventDefault();return;
     }
