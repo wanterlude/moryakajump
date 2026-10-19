@@ -25,9 +25,19 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     #gameStage{width:100%;gap:8px}
     #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
     #fullscreenButton{width:46px;height:42px;border-radius:13px;font-size:26px;background:rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(0,0,0,.2)}
-    #touchControls{left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom));padding:0 max(18px,env(safe-area-inset-left)) 0 max(18px,env(safe-area-inset-right));align-items:center;pointer-events:none}
-    .touchButton{width:76px;height:76px;border:1px solid rgba(255,255,255,.72);background:linear-gradient(145deg,rgba(72,110,145,.82),rgba(24,43,70,.88));box-shadow:0 6px 18px rgba(0,0,0,.3),inset 0 1px 2px rgba(255,255,255,.25);font-size:34px;-webkit-tap-highlight-color:transparent}
-    .touchButton:active{background:linear-gradient(145deg,rgba(40,170,190,.95),rgba(20,115,150,.95));transform:scale(.94)}
+    #touchControls {
+        bottom: max(16px, env(safe-area-inset-bottom));
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+
+    .touchButton {
+        width: 82px;
+        height: 82px;
+        font-size: 36px;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+    }
     #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
     #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-height:none;border-radius:0}
     #gameStage:fullscreen #fullscreenButton{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
@@ -205,20 +215,58 @@ canvas.addEventListener('pointerup',event=>{
 });
 canvas.addEventListener('pointercancel',()=>{menuButtonDown=false});
 
-function bindTouchButton(id,keyCode){
-    const button=document.getElementById(id);
-    const press=event=>{event.preventDefault();keys[keyCode]=true;if(button.setPointerCapture&&event.pointerId!==undefined)button.setPointerCapture(event.pointerId)};
-    const release=event=>{event.preventDefault();keys[keyCode]=false};
-    button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);
-    button.addEventListener('lostpointercapture',()=>{keys[keyCode]=false});
+const touchInput = {
+    left: false,
+    right: false
+};
+
+function bindTouchButton(id, direction) {
+    const button = document.getElementById(id);
+
+    const press = event => {
+        event.preventDefault();
+        touchInput[direction] = true;
+
+        if (button.setPointerCapture && event.pointerId !== undefined) {
+            try {
+                button.setPointerCapture(event.pointerId);
+            } catch {}
+        }
+    };
+
+    const release = event => {
+        event.preventDefault();
+        touchInput[direction] = false;
+    };
+
+    button.addEventListener('pointerdown', press);
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('lostpointercapture', release);
+    button.addEventListener('contextmenu', event => event.preventDefault());
 }
-bindTouchButton('leftButton','ArrowLeft');bindTouchButton('rightButton','ArrowRight');
+
+bindTouchButton('leftButton', 'left');
+bindTouchButton('rightButton', 'right');
+
+function clearTouchInput() {
+    touchInput.left = false;
+    touchInput.right = false;
+}
+
+window.addEventListener('blur', clearTouchInput);
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clearTouchInput();
+});
 
 function update(dt){
     if(currentState!==STATE.PLAYING)return;
     dt=Math.min(dt,2);
-    if(keys.ArrowLeft||keys.KeyA)player.vx-=1.2*dt;
-    if(keys.ArrowRight||keys.KeyD)player.vx+=1.2*dt;
+	const moveLeft = keys.ArrowLeft || keys.KeyA || touchInput.left;
+	const moveRight = keys.ArrowRight || keys.KeyD || touchInput.right;
+
+	if (moveLeft) player.vx -= 1.2 * dt;
+	if (moveRight) player.vx += 1.2 * dt;
     player.vx*=Math.pow(.85,dt);player.x+=player.vx*dt;
     player.dy+=.5464*dt;player.y+=player.dy*dt;
     if(player.x<-30)player.x=400;if(player.x>400)player.x=-30;
