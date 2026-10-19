@@ -25,19 +25,48 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     #gameStage{width:100%;gap:8px}
     #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
     #fullscreenButton{width:46px;height:42px;border-radius:13px;font-size:26px;background:rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(0,0,0,.2)}
-    #touchControls {
-        bottom: max(16px, env(safe-area-inset-bottom));
-        padding-left: max(20px, env(safe-area-inset-left));
-        padding-right: max(20px, env(safe-area-inset-right));
-    }
+	#touchControls{
+		position:fixed;
+		left:0;
+		right:0;
+		bottom:max(18px,env(safe-area-inset-bottom));
+		z-index:20;
+		display:flex;
+		justify-content:space-between;
+		align-items:center;
+		padding:0 22px;
+		pointer-events:none;
+	}
 
-    .touchButton {
-        width: 82px;
-        height: 82px;
-        font-size: 36px;
-        touch-action: none;
-        -webkit-tap-highlight-color: transparent;
-    }
+	.touchButton{
+		width:72px;
+		height:72px;
+		border:2px solid rgba(255,255,255,.72);
+		border-radius:50%;
+		background:rgba(255,255,255,.18);
+		color:white;
+		font:bold 34px Arial,sans-serif;
+		pointer-events:auto;
+		touch-action:none;
+		user-select:none;
+		-webkit-user-select:none;
+		-webkit-tap-highlight-color:transparent;
+		backdrop-filter:blur(12px);
+		-webkit-backdrop-filter:blur(12px);
+	}
+
+	.touchButton:active{
+		background:rgba(255,255,255,.35);
+	}
+
+	#jumpButton:disabled{
+		opacity:.45;
+	}
+
+	#jumpButton:not(:disabled){
+		background:rgba(22,163,106,.7);
+		border-color:rgba(255,255,255,.95);
+	}
     #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
     #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-height:none;border-radius:0}
     #gameStage:fullscreen #fullscreenButton{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
@@ -55,10 +84,12 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 <div id="gameStage">
 <canvas id="game" width="1600" height="2400" aria-label="Игра Моряка Jump"></canvas>
 <button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
-</div>
+
 <div id="touchControls" aria-label="Управление">
-<button class="touchButton" id="leftButton" aria-label="Влево">←</button>
-<button class="touchButton" id="rightButton" aria-label="Вправо">→</button>
+    <button class="touchButton" id="leftButton" aria-label="Влево">←</button>
+    <button class="touchButton" id="jumpButton" aria-label="Дополнительный прыжок" disabled>↑</button>
+    <button class="touchButton" id="rightButton" aria-label="Вправо">→</button>
+</div>
 </div>
 <script>
 'use strict';
