@@ -78,7 +78,16 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 	.touchButton:active{
 		background:rgba(255,255,255,.35);
 	}
-
+	
+	#jumpButton {
+    position: absolute;
+    right: 22px;
+    bottom: 94px; /* кнопка → высотой 82 px + зазор 12 px */
+    width: 62px;  /* примерно на 25% меньше 82 px */
+    height: 62px;
+    font-size: 27px;
+	}
+	
 	#jumpButton:disabled{
 		opacity:.45;
 	}
