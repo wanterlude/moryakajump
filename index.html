@@ -251,26 +251,29 @@ const touchInput = {
     right: false
 };
 
+const activePointers = {
+    left: new Set(),
+    right: new Set()
+};
+
 function bindTouchButton(id, direction) {
     const button = document.getElementById(id);
 
-    const press = event => {
+    button.addEventListener('pointerdown', event => {
         event.preventDefault();
+        activePointers[direction].add(event.pointerId);
         touchInput[direction] = true;
 
-        if (button.setPointerCapture && event.pointerId !== undefined) {
-            try {
-                button.setPointerCapture(event.pointerId);
-            } catch {}
-        }
-    };
+        try {
+            button.setPointerCapture(event.pointerId);
+        } catch {}
+    });
 
-    const release = event => {
-        event.preventDefault();
-        touchInput[direction] = false;
-    };
+    function release(event) {
+        activePointers[direction].delete(event.pointerId);
+        touchInput[direction] = activePointers[direction].size > 0;
+    }
 
-    button.addEventListener('pointerdown', press);
     button.addEventListener('pointerup', release);
     button.addEventListener('pointercancel', release);
     button.addEventListener('lostpointercapture', release);
@@ -280,7 +283,23 @@ function bindTouchButton(id, direction) {
 bindTouchButton('leftButton', 'left');
 bindTouchButton('rightButton', 'right');
 
+const jumpButton = document.getElementById('jumpButton');
+
+function tryDoubleJump(event) {
+    event.preventDefault();
+
+    if (currentState === STATE.PLAYING && doubleJumpAvailable) {
+        player.dy = -15;
+        doubleJumpAvailable = false;
+    }
+}
+
+jumpButton.addEventListener('pointerdown', tryDoubleJump);
+jumpButton.addEventListener('contextmenu', event => event.preventDefault());
+
 function clearTouchInput() {
+    activePointers.left.clear();
+    activePointers.right.clear();
     touchInput.left = false;
     touchInput.right = false;
 }
@@ -292,6 +311,7 @@ document.addEventListener('visibilitychange', () => {
 
 function update(dt){
     if(currentState!==STATE.PLAYING)return;
+	jumpButton.disabled = !doubleJumpAvailable;
     dt=Math.min(dt,2);
 	const moveLeft = keys.ArrowLeft || keys.KeyA || touchInput.left;
 	const moveRight = keys.ArrowRight || keys.KeyD || touchInput.right;
@@ -552,6 +572,7 @@ function draw(timestamp){
         else{platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters()}
     }
     update(dt);requestAnimationFrame(draw);
+	jumpButton.disabled = currentState !== STATE.PLAYING || !doubleJumpAvailable;
 }
 fullscreenButton.addEventListener('click',async()=>{
     try{
