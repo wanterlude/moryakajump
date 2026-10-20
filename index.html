@@ -290,7 +290,7 @@ function saveProgress(){
 }
 
 let player={x:185,y:500,vx:0,dy:0,score:0};
-let platforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
+let platforms=[],fallingPlatforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
 
@@ -298,8 +298,9 @@ const currentTheme={bg:'#d8f6ff',plat:'#38cdb4'};
 
 function resetGame(){
     player={x:185,y:500,vx:0,dy:0,score:0};
-    platforms=[{x:120,y:550,w:160,h:15,type:'static'}];
-    springs=[];coins=[];birds=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;
+	platforms=[{x:120,y:550,w:160,h:15,type:'static'}];
+	fallingPlatforms=[];
+	springs=[];coins=[];birds=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;	
     for(let i=0;i<7;i++)platforms.push(spawnPlatform(500-i*100));
 }
 function startGame(){resetGame();lastFrameTime=0;currentState=STATE.PLAYING}
@@ -645,7 +646,12 @@ function update(dt){
         }
     }
     platforms.forEach(platform=>{
-        if(platform.type==='broken'&&platform.breaking&&player.dy<0&&player.y+35<=platform.y)platform.removeAfterBounce=true;
+		if(platform.type==='broken'&&platform.breaking&&player.dy<0&&player.y+35<=platform.y){
+			platform.falling=true;
+			platform.vy=0;
+			fallingPlatforms.push(platform);
+			platform.removeAfterBounce=true;
+		}
         if(player.dy>0&&!platform.breaking&&player.x+25>platform.x&&player.x+10<platform.x+platform.w&&player.y+35>platform.y&&player.y+35<platform.y+platform.h+player.dy){
             player.y=platform.y-35;player.dy=-12.98;doubleJumpAvailable=true;if(platform.type==='broken')platform.breaking=true;
         }
@@ -655,6 +661,18 @@ function update(dt){
         }
     });
     platforms=platforms.filter(platform=>!platform.removeAfterBounce);
+	const fallingGravity = 0.55;
+
+	for(let i=fallingPlatforms.length-1;i>=0;i--){
+		const platform=fallingPlatforms[i];
+		platform.vy+=fallingGravity*dt;
+		platform.y+=platform.vy*dt;
+
+		// Удаляем объект, когда он ушёл за нижний край игрового поля.
+		if(platform.y>640){
+			fallingPlatforms.splice(i,1);
+		}
+	}	
     springs.forEach(spring=>{
         if(player.dy>0&&player.x+25>spring.x&&player.x<spring.x+20&&player.y+35>spring.y&&player.y+35<spring.y+20){player.dy=-32;doubleJumpAvailable=true}
     });
@@ -950,6 +968,7 @@ function draw(timestamp){
         }
 
         if(currentState===STATE.PAUSE){
+			fallingPlatforms.forEach(drawPlatform);
             platforms.forEach(drawPlatform);
             springs.forEach(drawSpring);
             coins.forEach(drawCoin);
@@ -958,6 +977,7 @@ function draw(timestamp){
             drawCounters();
             drawPauseMenu();
         } else if(currentState===STATE.GAMEOVER){
+			fallingPlatforms.forEach(drawPlatform);
             platforms.forEach(drawPlatform);
             springs.forEach(drawSpring);
             coins.forEach(drawCoin);
@@ -966,6 +986,7 @@ function draw(timestamp){
             drawCounters();
             drawGameOver();
         } else {
+			fallingPlatforms.forEach(drawPlatform);
             platforms.forEach(drawPlatform);
             springs.forEach(drawSpring);
             coins.forEach(drawCoin);
