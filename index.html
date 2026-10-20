@@ -131,6 +131,26 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     #touchControls{bottom:max(10px,env(safe-area-inset-bottom));padding-right:max(20px,env(safe-area-inset-right));padding-left:max(20px,env(safe-area-inset-left))}
     .touchButton{width:64px;height:64px;font-size:30px}
 }
+#tiltButton {
+    display: none;
+}
+
+@media (pointer: coarse) {
+    #tiltButton {
+        display: block;
+        position: absolute;
+        top: max(12px, env(safe-area-inset-top));
+        left: max(12px, env(safe-area-inset-left));
+        z-index: 30;
+        padding: 10px 12px;
+        border: 1px solid rgba(255,255,255,.72);
+        border-radius: 12px;
+        background: rgba(15,23,42,.68);
+        color: white;
+        font: bold 13px Arial, sans-serif;
+        touch-action: manipulation;
+    }
+}
 </style>
 </head>
 <body>
@@ -150,6 +170,7 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     <button class="touchButton" id="rightButton" aria-label="Вправо">→</button>
 </div>
 </div>
+<button id="tiltButton" type="button">Включить наклон</button>
 <script>
 'use strict';
 
@@ -203,26 +224,6 @@ let player={x:185,y:500,vx:0,dy:0,score:0};
 let platforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
-let mouseControlActive = false;
-
-canvas.addEventListener('pointermove', event => {
-    if (event.pointerType !== 'mouse' || !mouseControlActive ||
-        currentState !== STATE.PLAYING) return;
-
-    const point = canvasPoint(event);
-    // Персонаж движется в сторону указателя.
-    const playerCenter = player.x + 15;
-    if (point.x < playerCenter - 12) {
-        touchInput.left = true;
-        touchInput.right = false;
-    } else if (point.x > playerCenter + 12) {
-        touchInput.right = true;
-        touchInput.left = false;
-    } else {
-        touchInput.left = false;
-        touchInput.right = false;
-    }
-});
 
 function stopMouseControl() {
     mouseControlActive = false;
@@ -288,7 +289,6 @@ window.addEventListener('blur', () => {
     keys.ArrowRight = false;
     keys.KeyA = false;
     keys.KeyD = false;
-    stopMouseControl();
 });
 
 function setMenuMessage(text){menuMessage=text;menuMessageUntil=performance.now()+2200}
@@ -369,6 +369,63 @@ const touchInput = {
     left: false,
     right: false
 };
+
+const tiltButton = document.getElementById('tiltButton');
+
+let tiltEnabled = false;
+let tiltDirection = 0;
+let neutralGamma = null;
+
+function handleTilt(event) {
+    if (!tiltEnabled || currentState !== STATE.PLAYING) {
+        tiltDirection = 0;
+        return;
+    }
+
+    // gamma — наклон телефона влево/вправо.
+    if (typeof event.gamma !== 'number') return;
+
+    if (neutralGamma === null) neutralGamma = event.gamma;
+
+    const tilt = event.gamma - neutralGamma;
+    const deadZone = 5;
+
+    if (tilt < -deadZone) {
+        tiltDirection = -1;
+    } else if (tilt > deadZone) {
+        tiltDirection = 1;
+    } else {
+        tiltDirection = 0;
+    }
+}
+
+async function enableTilt() {
+    if (!('DeviceOrientationEvent' in window)) {
+        tiltButton.textContent = 'Датчик недоступен';
+        return;
+    }
+
+    // В некоторых версиях iOS разрешение запрашивается по нажатию кнопки.
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+            const permission = await DeviceOrientationEvent.requestPermission();
+            if (permission !== 'granted') {
+                tiltButton.textContent = 'Нет разрешения';
+                return;
+            }
+        } catch {
+            tiltButton.textContent = 'Не удалось включить';
+            return;
+        }
+    }
+
+    tiltEnabled = true;
+    neutralGamma = null;
+    window.addEventListener('deviceorientation', handleTilt);
+    tiltButton.textContent = 'Наклон включён';
+}
+
+tiltButton.addEventListener('click', enableTilt);
 
 const mouseControl = {
     targetX: null,
@@ -473,16 +530,27 @@ function update(dt){
 	const keyboardOrTouchRight =
 		keys.ArrowRight || keys.KeyD || touchInput.right;
 
-	if (keyboardOrTouchLeft || keyboardOrTouchRight) {
-		// Клавиатура и мобильные кнопки сохраняют прежнее управление.
-		if (keyboardOrTouchLeft) player.vx -= 1.2 * dt;
-		if (keyboardOrTouchRight) player.vx += 1.2 * dt;
+	// Наклон влияет на движение, только если датчик включён
+	// и телефон действительно наклонён влево или вправо.
+	const tiltLeft =
+		tiltEnabled && tiltDirection < 0;
+	const tiltRight =
+		tiltEnabled && tiltDirection > 0;
+
+	if (
+		keyboardOrTouchLeft ||
+		keyboardOrTouchRight ||
+		tiltLeft ||
+		tiltRight
+	) {
+		// Клавиатура, сенсорные кнопки и наклон управляют движением.
+		if (keyboardOrTouchLeft || tiltLeft) player.vx -= 1.2 * dt;
+		if (keyboardOrTouchRight || tiltRight) player.vx += 1.2 * dt;
 	} else if (
-		currentState === STATE.PLAYING &&
 		mouseControl.inside &&
 		mouseControl.targetX !== null
 	) {
-		// Мышь задаёт цель, а не просто включает постоянное движение.
+		// Если клавиатура, кнопки и наклон не используются — действует мышь.
 		const playerCenter = player.x + 15;
 		const error = mouseControl.targetX - playerCenter;
 		const deadZone = 8;
@@ -496,7 +564,6 @@ function update(dt){
 				maxMouseSpeed *
 				Math.min(1, Math.abs(error) / 100);
 
-			// Плавно меняем скорость, не телепортируя персонажа к курсору.
 			const response = 1 - Math.pow(0.62, dt);
 			player.vx += (desiredSpeed - player.vx) * response;
 		}
