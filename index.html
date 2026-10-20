@@ -203,6 +203,34 @@ let player={x:185,y:500,vx:0,dy:0,score:0};
 let platforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
+let mouseControlActive = false;
+
+canvas.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || !mouseControlActive ||
+        currentState !== STATE.PLAYING) return;
+
+    const point = canvasPoint(event);
+    // Персонаж движется в сторону указателя.
+    const playerCenter = player.x + 15;
+    if (point.x < playerCenter - 12) {
+        touchInput.left = true;
+        touchInput.right = false;
+    } else if (point.x > playerCenter + 12) {
+        touchInput.right = true;
+        touchInput.left = false;
+    } else {
+        touchInput.left = false;
+        touchInput.right = false;
+    }
+});
+
+function stopMouseControl() {
+    mouseControlActive = false;
+    touchInput.left = false;
+    touchInput.right = false;
+}
+
+
 const currentTheme={bg:'#d8f6ff',plat:'#38cdb4'};
 
 function resetGame(){
@@ -255,7 +283,13 @@ window.addEventListener('keydown',event=>{
     else if(currentState===STATE.PAUSE&&event.code==='Escape'){currentState=STATE.PLAYING;lastFrameTime=0}
 });
 window.addEventListener('keyup',event=>{keys[event.code]=false});
-window.addEventListener('blur',()=>{keys.ArrowLeft=false;keys.ArrowRight=false;keys.KeyA=false;keys.KeyD=false});
+window.addEventListener('blur', () => {
+    keys.ArrowLeft = false;
+    keys.ArrowRight = false;
+    keys.KeyA = false;
+    keys.KeyD = false;
+    stopMouseControl();
+});
 
 function setMenuMessage(text){menuMessage=text;menuMessageUntil=performance.now()+2200}
 function canvasPoint(event){
@@ -336,6 +370,33 @@ const touchInput = {
     right: false
 };
 
+const mouseControl = {
+    targetX: null,
+    inside: false
+};
+
+canvas.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'mouse' || currentState !== STATE.PLAYING) return;
+
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return;
+
+    // Координата курсора в игровых единицах: ширина игрового мира — 400.
+    mouseControl.targetX = Math.max(
+        0,
+        Math.min(400, (event.clientX - rect.left) * 400 / rect.width)
+    );
+    mouseControl.inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right;
+});
+
+canvas.addEventListener('pointerleave', event => {
+    if (event.pointerType === 'mouse') {
+        mouseControl.inside = false;
+    }
+});
+
 const activePointers = {
     left: new Set(),
     right: new Set()
@@ -370,6 +431,15 @@ bindTouchButton('rightButton', 'right');
 
 const jumpButton = document.getElementById('jumpButton');
 
+canvas.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
+    if (currentState !== STATE.PLAYING || !doubleJumpAvailable) return;
+
+    event.preventDefault();
+    player.dy = -15;
+    doubleJumpAvailable = false;
+});
+
 function tryDoubleJump(event) {
     event.preventDefault();
 
@@ -398,11 +468,39 @@ function update(dt){
     if(currentState!==STATE.PLAYING)return;
 	jumpButton.disabled = !doubleJumpAvailable;
     dt=Math.min(dt,2);
-	const moveLeft = keys.ArrowLeft || keys.KeyA || touchInput.left;
-	const moveRight = keys.ArrowRight || keys.KeyD || touchInput.right;
+	const keyboardOrTouchLeft =
+		keys.ArrowLeft || keys.KeyA || touchInput.left;
+	const keyboardOrTouchRight =
+		keys.ArrowRight || keys.KeyD || touchInput.right;
 
-	if (moveLeft) player.vx -= 1.2 * dt;
-	if (moveRight) player.vx += 1.2 * dt;
+	if (keyboardOrTouchLeft || keyboardOrTouchRight) {
+		// Клавиатура и мобильные кнопки сохраняют прежнее управление.
+		if (keyboardOrTouchLeft) player.vx -= 1.2 * dt;
+		if (keyboardOrTouchRight) player.vx += 1.2 * dt;
+	} else if (
+		currentState === STATE.PLAYING &&
+		mouseControl.inside &&
+		mouseControl.targetX !== null
+	) {
+		// Мышь задаёт цель, а не просто включает постоянное движение.
+		const playerCenter = player.x + 15;
+		const error = mouseControl.targetX - playerCenter;
+		const deadZone = 8;
+		const maxMouseSpeed = 7;
+
+		if (Math.abs(error) <= deadZone) {
+			player.vx *= Math.pow(0.65, dt);
+		} else {
+			const desiredSpeed =
+				Math.sign(error) *
+				maxMouseSpeed *
+				Math.min(1, Math.abs(error) / 100);
+
+			// Плавно меняем скорость, не телепортируя персонажа к курсору.
+			const response = 1 - Math.pow(0.62, dt);
+			player.vx += (desiredSpeed - player.vx) * response;
+		}
+	}
     player.vx*=Math.pow(.85,dt);player.x+=player.vx*dt;
     player.dy+=.5464*dt;player.y+=player.dy*dt;
     if(player.x<-30)player.x=400;if(player.x>400)player.x=-30;
