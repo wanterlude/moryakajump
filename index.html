@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Моряка Jump</title>
+<title>РњРѕСЂСЏРєР° Jump</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;min-height:100%;background:#101a35}
@@ -33,7 +33,7 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .touchButton{width:72px;height:72px;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(255,255,255,.18);color:white;font:bold 34px Arial,sans-serif;pointer-events:auto;touch-action:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .touchButton:active{background:rgba(255,255,255,.35)}
 @media(hover:hover) and (pointer:fine){#touchControls{display:none}}
-/* Мобильные улучшения: стили ПК не меняются */
+/* РњРѕР±РёР»СЊРЅС‹Рµ СѓР»СѓС‡С€РµРЅРёСЏ: СЃС‚РёР»Рё РџРљ РЅРµ РјРµРЅСЏСЋС‚СЃСЏ */
 @media (max-width:600px) and (pointer:coarse){
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
     body {
@@ -82,8 +82,8 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 	#jumpButton {
     position: absolute;
     right: 22px;
-    bottom: 94px; /* кнопка → высотой 82 px + зазор 12 px */
-    width: 62px;  /* примерно на 25% меньше 82 px */
+    bottom: 94px; /* РєРЅРѕРїРєР° в†’ РІС‹СЃРѕС‚РѕР№ 82 px + Р·Р°Р·РѕСЂ 12 px */
+    width: 62px;  /* РїСЂРёРјРµСЂРЅРѕ РЅР° 25% РјРµРЅСЊС€Рµ 82 px */
     height: 62px;
     font-size: 27px;
 	}
@@ -111,13 +111,13 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 </head>
 <body>
 <div id="gameStage">
-<canvas id="game" width="1600" height="2400" aria-label="Игра Моряка Jump"></canvas>
-<button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
+<canvas id="game" width="1600" height="2400" aria-label="РРіСЂР° РњРѕСЂСЏРєР° Jump"></canvas>
+<button id="fullscreenButton" type="button" aria-label="Р’РєР»СЋС‡РёС‚СЊ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅС‹Р№ СЂРµР¶РёРј">в›¶</button>
 
-<div id="touchControls" aria-label="Управление">
-    <button class="touchButton" id="leftButton" aria-label="Влево">←</button>
-    <button class="touchButton" id="jumpButton" aria-label="Дополнительный прыжок" disabled>↑</button>
-    <button class="touchButton" id="rightButton" aria-label="Вправо">→</button>
+<div id="touchControls" aria-label="РЈРїСЂР°РІР»РµРЅРёРµ">
+    <button class="touchButton" id="leftButton" aria-label="Р’Р»РµРІРѕ">в†ђ</button>
+    <button class="touchButton" id="jumpButton" aria-label="Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Р№ РїСЂС‹Р¶РѕРє" disabled>в†‘</button>
+    <button class="touchButton" id="rightButton" aria-label="Р’РїСЂР°РІРѕ">в†’</button>
 </div>
 </div>
 <script>
@@ -131,6 +131,10 @@ const gameStage=document.getElementById('gameStage');
 const fullscreenButton=document.getElementById('fullscreenButton');
 const STATE={MENU:0,PLAYING:1,PAUSE:2,GAMEOVER:3};
 let currentState=STATE.MENU,lastFrameTime=0;
+const pauseButtons={
+    resume:{x:52,y:405,w:142,h:52},
+    menu:{x:206,y:405,w:142,h:52}
+};
 
 const CHARACTER_SCORES=Array.from({length:21},(_,index)=>index*2500);
 const characterImages=Array.from({length:21},(_,i)=>{
@@ -156,7 +160,7 @@ function saveProgress(){
         localStorage.setItem('morjakaUnlockedCharacters',JSON.stringify(unlockedCharacters));
         localStorage.setItem('morjakaSelectedCharacter',String(selectedCharacter));
         localStorage.setItem('doodleHighScore',String(highScore));
-    }catch(error){console.warn('Не удалось сохранить прогресс:',error)}
+    }catch(error){console.warn('РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ РїСЂРѕРіСЂРµСЃСЃ:',error)}
 }
 
 let player={x:185,y:500,vx:0,dy:0,score:0};
@@ -187,9 +191,9 @@ function spawnBird(){
     const type=Math.floor(Math.random()*3);
 
     const birdTypes=[
-        {speed:2.2, size:1, color:'#4b5563'}, // обычная
-        {speed:3.4, size:.78, color:'#9b59b6'}, // маленькая и быстрая
-        {speed:1.6, size:1.25, color:'#c0392b'} // крупная и медленная
+        {speed:2.2, size:1, color:'#4b5563'}, // РѕР±С‹С‡РЅР°СЏ
+        {speed:3.4, size:.78, color:'#9b59b6'}, // РјР°Р»РµРЅСЊРєР°СЏ Рё Р±С‹СЃС‚СЂР°СЏ
+        {speed:1.6, size:1.25, color:'#c0392b'} // РєСЂСѓРїРЅР°СЏ Рё РјРµРґР»РµРЅРЅР°СЏ
     ];
     const birdType=birdTypes[type];
 
@@ -245,15 +249,20 @@ function handleMenuPointer(point){
     for(let i=0;i<21;i++){
         const r=getCharacterCardRects()[i];
         if(point.x<r.x||point.x>r.x+r.w||point.y<r.y||point.y>r.y+r.h)continue;
-        if(unlockedCharacters.includes(i)){selectedCharacter=i;saveProgress();setMenuMessage(`Выбран персонаж ${i+1}`)}
-        else setMenuMessage(`Нужен рекорд ${CHARACTER_SCORES[i]} — осталось ${Math.max(0,CHARACTER_SCORES[i]-highScore)}`);
+        if(unlockedCharacters.includes(i)){selectedCharacter=i;saveProgress();setMenuMessage(`Р’С‹Р±СЂР°РЅ РїРµСЂСЃРѕРЅР°Р¶ ${i+1}`)}
+        else setMenuMessage(`РќСѓР¶РµРЅ СЂРµРєРѕСЂРґ ${CHARACTER_SCORES[i]} вЂ” РѕСЃС‚Р°Р»РѕСЃСЊ ${Math.max(0,CHARACTER_SCORES[i]-highScore)}`);
         return;
     }
     if(point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580)startGame();
 }
 canvas.addEventListener('pointerdown',event=>{
     const point=canvasPoint(event);
-    if(currentState===STATE.PAUSE){currentState=STATE.PLAYING;lastFrameTime=0;event.preventDefault();return}
+    if(currentState===STATE.PAUSE){
+        const contains=button=>point.x>=button.x&&point.x<=button.x+button.w&&point.y>=button.y&&point.y<=button.y+button.h;
+        if(contains(pauseButtons.resume)){currentState=STATE.PLAYING;lastFrameTime=0}
+        else if(contains(pauseButtons.menu)){currentState=STATE.MENU}
+        event.preventDefault();return;
+    }
     if(currentState===STATE.GAMEOVER){
         if(point.x>=85&&point.x<=315&&point.y>=395&&point.y<=455)currentState=STATE.MENU;
         else startGame();
@@ -426,7 +435,7 @@ function drawCharacterImage(index,x,y,w,h,locked=false){
         ctx.fillStyle=colors[index%colors.length];ctx.fillRect(x,y,w,h);ctx.fillStyle='rgba(255,255,255,.86)';
         ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 22px Arial';ctx.fillText(String(index+1),x+w/2,y+h/2);
     }
-    if(locked){ctx.fillStyle='rgba(12,25,52,.56)';ctx.fillRect(x,y,w,h);ctx.fillStyle='rgba(255,255,255,.94)';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🔒',x+w/2,y+h/2-8)}
+    if(locked){ctx.fillStyle='rgba(12,25,52,.56)';ctx.fillRect(x,y,w,h);ctx.fillStyle='rgba(255,255,255,.94)';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('рџ”’',x+w/2,y+h/2-8)}
     ctx.restore();
 }
 function drawMenu(){
@@ -434,12 +443,12 @@ function drawMenu(){
     const glow=ctx.createRadialGradient(200,100,10,200,100,250);glow.addColorStop(0,'rgba(255,255,255,.45)');glow.addColorStop(1,'rgba(255,255,255,0)');
     ctx.fillStyle=glow;ctx.fillRect(0,0,400,330);drawGlassPanel(18,17,364,566,30);
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(255,255,255,.7)';ctx.shadowBlur=16;
-    ctx.fillStyle='#174b72';ctx.font='bold 28px Arial';ctx.fillText('Моряка',200,53);ctx.fillStyle='#087fbe';ctx.font='bold 39px Arial';ctx.fillText('JUMP',200,91);ctx.shadowBlur=0;
+    ctx.fillStyle='#174b72';ctx.font='bold 28px Arial';ctx.fillText('РњРѕСЂСЏРєР°',200,53);ctx.fillStyle='#087fbe';ctx.font='bold 39px Arial';ctx.fillText('JUMP',200,91);ctx.shadowBlur=0;
     ctx.fillStyle='rgba(255,255,255,.84)';roundedRect(113,112,174,32,16);ctx.fill();
-    ctx.fillStyle='#155576';ctx.font='bold 14px Arial';ctx.fillText(`🏆 Рекорд: ${highScore}`,200,128);
+    ctx.fillStyle='#155576';ctx.font='bold 14px Arial';ctx.fillText(`рџЏ† Р РµРєРѕСЂРґ: ${highScore}`,200,128);
     drawCharacterImage(selectedCharacter,174,151,52,58,false);
-    ctx.fillStyle='#154c68';ctx.font='bold 13px Arial';ctx.fillText(`Выбран: ${selectedCharacter+1}`,200,222);
-    ctx.fillStyle='#155576';ctx.font='bold 13px Arial';ctx.fillText('ВЫБЕРИ ПЕРСОНАЖА',200,235);
+    ctx.fillStyle='#154c68';ctx.font='bold 13px Arial';ctx.fillText(`Р’С‹Р±СЂР°РЅ: ${selectedCharacter+1}`,200,222);
+    ctx.fillStyle='#155576';ctx.font='bold 13px Arial';ctx.fillText('Р’Р«Р‘Р•Р Р РџР•Р РЎРћРќРђР–Рђ',200,235);
 	getCharacterCardRects().forEach((rect,index)=>{
 		const unlocked=unlockedCharacters.includes(index);
 		const selected=selectedCharacter===index;
@@ -453,11 +462,11 @@ function drawMenu(){
 		if(unlocked){
 			ctx.font='bold 8px Arial';
 			ctx.fillStyle=selected?'#087f62':'#23516a';
-			ctx.fillText(selected?'ВЫБРАН':'ОТКРЫТ',rect.x+rect.w/2,rect.y+58);
+			ctx.fillText(selected?'Р’Р«Р‘Р РђРќ':'РћРўРљР Р«Рў',rect.x+rect.w/2,rect.y+58);
 		}else{
 			ctx.font='bold 7px Arial';
 			ctx.fillStyle='#865100';
-			ctx.fillText(`${CHARACTER_SCORES[index]} очков`,rect.x+rect.w/2,rect.y+58);
+			ctx.fillText(`${CHARACTER_SCORES[index]} РѕС‡РєРѕРІ`,rect.x+rect.w/2,rect.y+58);
 		}
 
 		if(selected){
@@ -471,11 +480,11 @@ function drawMenu(){
 	});
     ctx.save();const gradient=ctx.createLinearGradient(100,524,300,580);gradient.addColorStop(0,'rgba(32,210,170,.92)');gradient.addColorStop(1,'rgba(26,145,220,.92)');
     roundedRect(104,524,192,56,19);ctx.fillStyle=gradient;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ИГРАТЬ',200,552);ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('РР“Р РђРўР¬',200,552);ctx.restore();
     if(performance.now()<menuMessageUntil&&menuMessage){
         ctx.save();ctx.fillStyle='rgba(20,43,70,.86)';roundedRect(45,480,310,34,13);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(menuMessage,200,497);ctx.restore();
     }
-    ctx.fillStyle='#42677b';ctx.font='11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Персонажи открываются за лучший результат',200,594);
+    ctx.fillStyle='#42677b';ctx.font='11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('РџРµСЂСЃРѕРЅР°Р¶Рё РѕС‚РєСЂС‹РІР°СЋС‚СЃСЏ Р·Р° Р»СѓС‡С€РёР№ СЂРµР·СѓР»СЊС‚Р°С‚',200,594);
 }
 function drawPlatform(p){
     if(p.type==='broken'){
@@ -564,32 +573,44 @@ function drawPlayer(){
 }
 function drawCounters(){
     ctx.save();ctx.fillStyle='rgba(255,255,255,.84)';ctx.shadowColor='rgba(30,50,70,.18)';ctx.shadowBlur=8;ctx.shadowOffsetY=2;roundedRect(8,8,190,78,12);ctx.fill();ctx.restore();
-    ctx.save();ctx.textAlign='left';ctx.textBaseline='middle';ctx.font='bold 13px Arial';ctx.fillStyle='#64748b';ctx.fillText('СЧЁТ',20,25);ctx.fillText('ЖИЗНИ',20,49);ctx.fillText('ДОП. ПРЫЖОК',20,73);
+    ctx.save();ctx.textAlign='left';ctx.textBaseline='middle';ctx.font='bold 13px Arial';ctx.fillStyle='#64748b';ctx.fillText('РЎР§РЃРў',20,25);ctx.fillText('Р–РР—РќР',20,49);ctx.fillText('Р”РћРџ. РџР Р«Р–РћРљ',20,73);
     ctx.font='bold 16px Arial';ctx.textAlign='right';ctx.fillStyle='#1e293b';ctx.fillText(String(Math.floor(player.score)),180,25);ctx.fillText(String(lives),125,49);
-    ctx.font='bold 13px Arial';ctx.fillStyle='#d99400';ctx.fillText(`${runCoins%10}/10`,180,49);ctx.font='bold 16px Arial';ctx.fillStyle=doubleJumpAvailable?'#16a36a':'#94a3b8';ctx.fillText(doubleJumpAvailable?'ГОТОВ':'—',180,73);ctx.restore();
-    ctx.save();ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.arc(380,580,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#334155';ctx.font='bold 18px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('⚙',380,580);ctx.restore();
+    ctx.font='bold 13px Arial';ctx.fillStyle='#d99400';ctx.fillText(`${runCoins%10}/10`,180,49);ctx.font='bold 16px Arial';ctx.fillStyle=doubleJumpAvailable?'#16a36a':'#94a3b8';ctx.fillText(doubleJumpAvailable?'Р“РћРўРћР’':'вЂ”',180,73);ctx.restore();
+    ctx.save();ctx.fillStyle='rgba(255,255,255,.9)';ctx.beginPath();ctx.arc(380,580,16,0,Math.PI*2);ctx.fill();ctx.fillStyle='#334155';ctx.font='bold 18px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('вљ™',380,580);ctx.restore();
 }
 function drawGameOver(){
     ctx.fillStyle='rgba(15,23,42,.62)';ctx.fillRect(0,0,400,600);drawGlassPanel(45,125,310,360,22);
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#e63946';ctx.font='bold 34px Arial';ctx.fillText('!',200,170);
-    ctx.fillStyle='#1e293b';ctx.font='bold 25px Arial';ctx.fillText('ИГРА ОКОНЧЕНА',200,215);
-    ctx.fillStyle='#64748b';ctx.font='15px Arial';ctx.fillText('ВАШ РЕЗУЛЬТАТ',200,255);
+    ctx.fillStyle='#1e293b';ctx.font='bold 25px Arial';ctx.fillText('РР“Р Рђ РћРљРћРќР§Р•РќРђ',200,215);
+    ctx.fillStyle='#64748b';ctx.font='15px Arial';ctx.fillText('Р’РђРЁ Р Р•Р—РЈР›Р¬РўРђРў',200,255);
     ctx.fillStyle='#087fbe';ctx.font='bold 36px Arial';ctx.fillText(String(Math.floor(player.score)),200,290);
-    ctx.fillStyle='#64748b';ctx.font='15px Arial';ctx.fillText('ЛУЧШИЙ РЕЗУЛЬТАТ',200,330);
+    ctx.fillStyle='#64748b';ctx.font='15px Arial';ctx.fillText('Р›РЈР§РЁРР™ Р Р•Р—РЈР›Р¬РўРђРў',200,330);
     ctx.fillStyle='#d99400';ctx.font='bold 22px Arial';ctx.fillText(String(highScore),200,358);
     ctx.save();const gradient=ctx.createLinearGradient(85,395,315,455);gradient.addColorStop(0,'#20d2aa');gradient.addColorStop(1,'#1a91dc');
     roundedRect(85,395,230,60,17);ctx.fillStyle=gradient;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 18px Arial';ctx.fillText('СМЕНИТЬ ПЕРСОНАЖА',200,425);ctx.restore();
-    ctx.fillStyle='#475569';ctx.font='13px Arial';ctx.fillText('Нажмите любую клавишу, чтобы сыграть снова',200,468);
+    ctx.fillStyle='#fff';ctx.font='bold 18px Arial';ctx.fillText('РЎРњР•РќРРўР¬ РџР•Р РЎРћРќРђР–Рђ',200,425);ctx.restore();
+    ctx.fillStyle='#475569';ctx.font='13px Arial';ctx.fillText('РќР°Р¶РјРёС‚Рµ Р»СЋР±СѓСЋ РєР»Р°РІРёС€Сѓ, С‡С‚РѕР±С‹ СЃС‹РіСЂР°С‚СЊ СЃРЅРѕРІР°',200,468);
 }
 function drawPauseMenu(){
     ctx.fillStyle='rgba(15,23,42,.68)';ctx.fillRect(0,0,400,600);drawGlassPanel(38,112,324,376,24);
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#155576';ctx.font='bold 26px Arial';ctx.fillText('ПАУЗА',200,165);
-    ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('ТЕКУЩИЙ РЕЗУЛЬТАТ',200,230);
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#155576';ctx.font='bold 26px Arial';ctx.fillText('РџРђРЈР—Рђ',200,165);
+    ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('РўР•РљРЈР©РР™ Р Р•Р—РЈР›Р¬РўРђРў',200,230);
     ctx.fillStyle='#1e293b';ctx.font='bold 34px Arial';ctx.fillText(String(Math.floor(player.score)),200,265);
-    ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('РЕКОРД ПОДЪЁМА',200,325);
+    ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('Р Р•РљРћР Р” РџРћР”РЄРЃРњРђ',200,325);
     ctx.fillStyle='#d99400';ctx.font='bold 26px Arial';ctx.fillText(String(highScore),200,358);
-    ctx.fillStyle='#475569';ctx.font='14px Arial';ctx.fillText('Нажмите ESC, чтобы продолжить',200,430);
+    ctx.save();
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 17px Arial';
+    for(const [name,label] of [['resume','РџСЂРѕРґРѕР»Р¶РёС‚СЊ'],['menu','Р’ РјРµРЅСЋ']]){
+        const button=pauseButtons[name];
+        const gradient=ctx.createLinearGradient(button.x,button.y,button.x+button.w,button.y+button.h);
+        gradient.addColorStop(0,name==='resume'?'#20b99a':'#268bc1');
+        gradient.addColorStop(1,name==='resume'?'#147f92':'#235b99');
+        roundedRect(button.x,button.y,button.w,button.h,14);
+        ctx.fillStyle=gradient;ctx.fill();
+        ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1.5;ctx.stroke();
+        ctx.fillStyle='#fff';ctx.fillText(label,button.x+button.w/2,button.y+button.h/2);
+    }
+    ctx.restore();
 }
 function draw(timestamp){
     const dt=lastFrameTime?Math.min((timestamp-lastFrameTime)/(1000/60),2):1;lastFrameTime=timestamp;
@@ -605,14 +626,14 @@ function draw(timestamp){
 }
 fullscreenButton.addEventListener('click',async()=>{
     try{
-        if(!document.fullscreenElement){if(gameStage.requestFullscreen)await gameStage.requestFullscreen();else fullscreenButton.title='Полноэкранный режим не поддерживается этим браузером'}
+        if(!document.fullscreenElement){if(gameStage.requestFullscreen)await gameStage.requestFullscreen();else fullscreenButton.title='РџРѕР»РЅРѕСЌРєСЂР°РЅРЅС‹Р№ СЂРµР¶РёРј РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ СЌС‚РёРј Р±СЂР°СѓР·РµСЂРѕРј'}
         else await document.exitFullscreen();
-    }catch(error){console.error('Не удалось переключить полноэкранный режим:',error)}
+    }catch(error){console.error('РќРµ СѓРґР°Р»РѕСЃСЊ РїРµСЂРµРєР»СЋС‡РёС‚СЊ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅС‹Р№ СЂРµР¶РёРј:',error)}
 });
 document.addEventListener('fullscreenchange',()=>{
     const isFullscreen=document.fullscreenElement===gameStage;
-    fullscreenButton.textContent=isFullscreen?'×':'⛶';
-    fullscreenButton.setAttribute('aria-label',isFullscreen?'Выйти из полноэкранного режима':'Включить полноэкранный режим');
+    fullscreenButton.textContent=isFullscreen?'Г—':'в›¶';
+    fullscreenButton.setAttribute('aria-label',isFullscreen?'Р’С‹Р№С‚Рё РёР· РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРіРѕ СЂРµР¶РёРјР°':'Р’РєР»СЋС‡РёС‚СЊ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅС‹Р№ СЂРµР¶РёРј');
 });
 requestAnimationFrame(draw);
 </script>
