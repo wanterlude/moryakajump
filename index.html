@@ -290,7 +290,7 @@ function saveProgress(){
 }
 
 let player={x:185,y:500,vx:0,dy:0,score:0};
-let platforms=[],fallingPlatforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
+let platforms=[],fallingPlatforms=[],verticalPlatforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
 
@@ -300,20 +300,55 @@ function resetGame(){
     player={x:185,y:500,vx:0,dy:0,score:0};
 	platforms=[{x:120,y:550,w:160,h:15,type:'static'}];
 	fallingPlatforms=[];
+	verticalPlatforms=[];
 	springs=[];coins=[];birds=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;	
-    for(let i=0;i<7;i++)platforms.push(spawnPlatform(500-i*100));
+	for(let i=0;i<7;i++){
+		const y=500-i*100;
+		platforms.push(spawnPlatform(y));
+		maybeSpawnVerticalPlatform(y);
+	}
 }
 function startGame(){resetGame();lastFrameTime=0;currentState=STATE.PLAYING}
 function spawnPlatform(y){
-    const level=Math.floor(player.score/5000),brokenChance=Math.min(.4,.15+level*.05),movingChance=Math.min(.4,.15+level*.05);
+    const level=Math.floor(player.score/4000),brokenChance=Math.min(.35,.05+level*.05),movingChance=Math.min(.35,.05+level*.05);
     const rand=Math.random(),type=rand<brokenChance?'broken':rand<brokenChance+movingChance?'moving':'static';
     const width=70*Math.max(.7,2-level*.25);
-    const platform={x:Math.random()*(400-width),y,w:width,h:15,type,dir:2*Math.min(10,1+Math.floor(player.score/2500)*.2)};
+    const platform={x:Math.random()*(400-width),y,w:width,h:15,type,dir:2*Math.min(2,1+Math.floor(player.score/2500)*.2)};
     if(type==='static'&&Math.random()>.7)springs.push({x:platform.x+platform.w/2-10,y:y-15});
     if(Math.random()>.92)coins.push({x:platform.x+platform.w/2,y:y-25,r:8});
     if(Math.random()>.985)platform.life={x:platform.x+platform.w/2-10,y:y-35};
     return platform;
 }
+
+function spawnVerticalPlatform(y) {
+    const w = 80;
+    const h = 15;
+    const sideWidth = 70; // ширина зоны у каждого края
+
+    // Случайно выбираем левый или правый край.
+    const x = Math.random() < 0.5
+        ? Math.random() * sideWidth
+        : 400 - w - Math.random() * sideWidth;
+
+    return {
+        x,
+        y,
+        baseY: y,
+        previousY: y,
+        w,
+        h,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.025 + Math.random() * 0.01
+    };
+}
+
+function maybeSpawnVerticalPlatform(y) {
+    // Независимый дополнительный шанс: обычная генерация не меняется.
+    if (Math.random() < 0.01) {
+        verticalPlatforms.push(spawnVerticalPlatform(y));
+    }
+}
+
 function spawnBird(){
     const direction=Math.random()<0.5?1:-1;
     const type=Math.floor(Math.random()*3);
@@ -645,7 +680,80 @@ function update(dt){
             player.vx=pushDirection*9;player.dy=-8;player.x+=pushDirection*12;bird.hitCooldown=45;
         }
     }
-    platforms.forEach(platform=>{
+    // Плавно двигаем платформы в пределах 15 пикселей от исходной высоты.
+    // Скорость задаётся в игровых кадрах, а не через системное время.
+    verticalPlatforms.forEach(platform => {
+        platform.previousY = platform.y;
+        platform.phase += platform.speed * dt;
+        platform.y = platform.baseY + Math.sin(platform.phase) * 200;
+    });
+
+    platforms.forEach(platform => {
+        if (
+            platform.type === 'broken' &&
+            platform.breaking &&
+            player.dy < 0 &&
+            player.y + 35 <= platform.y
+        ) {
+            platform.falling = true;
+            platform.vy = 0;
+            fallingPlatforms.push(platform);
+            platform.removeAfterBounce = true;
+        }
+
+        if (
+            player.dy > 0 &&
+            !platform.breaking &&
+            player.x + 25 > platform.x &&
+            player.x + 10 < platform.x + platform.w &&
+            player.y + 35 > platform.y &&
+            player.y + 35 < platform.y + platform.h + player.dy
+        ) {
+            player.y = platform.y - 35;
+            player.dy = -12.98;
+            doubleJumpAvailable = true;
+
+            if (platform.type === 'broken') {
+                platform.breaking = true;
+            }
+        }
+
+        if (platform.type === 'moving') {
+            platform.x += platform.dir * dt;
+
+            if (platform.x <= 0 || platform.x + platform.w >= 400) {
+                platform.x = Math.max(0, Math.min(400 - platform.w, platform.x));
+                platform.dir *= -1;
+            }
+        }
+    });
+
+    // Проверяем пересечение верхней грани движущейся платформы.
+    // Предыдущие координаты нужны, чтобы не пропускать платформу,
+    // если она сама успела немного сдвинуться между кадрами.
+    const previousPlayerBottom = player.y + 35 - player.dy * dt;
+    const currentPlayerBottom = player.y + 35;
+
+    for (const platform of verticalPlatforms) {
+        const platformTopBefore = platform.previousY;
+        const platformTopNow = platform.y;
+
+        const crossedPlatform =
+            previousPlayerBottom <= platformTopBefore + platform.h &&
+            currentPlayerBottom >= platformTopNow;
+
+        const overlapsPlatform =
+            player.x + 25 > platform.x &&
+            player.x + 10 < platform.x + platform.w;
+
+        if (player.dy > 0 && crossedPlatform && overlapsPlatform) {
+            player.y = platformTopNow - 35;
+            player.dy = -12.98;
+            doubleJumpAvailable = true;
+            break;
+        }
+    }   
+	platforms.forEach(platform=>{
 		if(platform.type==='broken'&&platform.breaking&&player.dy<0&&player.y+35<=platform.y){
 			platform.falling=true;
 			platform.vy=0;
@@ -659,6 +767,25 @@ function update(dt){
             platform.x+=platform.dir*dt;
             if(platform.x<=0||platform.x+platform.w>=400){platform.x=Math.max(0,Math.min(400-platform.w,platform.x));platform.dir*=-1}
         }
+		// Новый отдельный цикл вертикальных платформ.
+		verticalPlatforms.forEach(platform => {
+			const previousBottom = player.y + 35 - player.dy * dt;
+			const currentBottom = player.y + 35;
+
+			const crossedPlatformTop =
+				previousBottom <= platform.y &&
+				currentBottom >= platform.y;
+
+			const overlapsPlatform =
+				player.x + 25 > platform.x &&
+				player.x + 10 < platform.x + platform.w;
+
+			if (player.dy > 0 && crossedPlatformTop && overlapsPlatform) {
+				player.y = platform.y - 35;
+				player.dy = -12.98;
+				doubleJumpAvailable = true;
+			}
+		});		
     });
     platforms=platforms.filter(platform=>!platform.removeAfterBounce);
 	const fallingGravity = 0.55;
@@ -690,10 +817,29 @@ function update(dt){
     if(player.y<250){
         const diff=250-player.y;player.score+=diff;
         while(player.score>=nextLifeScore){lives++;nextLifeScore+=10000}
-        player.y=250;platforms.forEach(platform=>platform.y+=diff);springs.forEach(spring=>spring.y+=diff);coins.forEach(coin=>coin.y+=diff);birds.forEach(bird=>bird.y+=diff);
+        player.y=250;
+		platforms.forEach(platform => platform.y += diff);
+
+        verticalPlatforms.forEach(platform => {
+            platform.y += diff;
+            platform.baseY += diff;
+            platform.previousY += diff;
+        });springs.forEach(spring=>spring.y+=diff);coins.forEach(coin=>coin.y+=diff);birds.forEach(bird=>bird.y+=diff);
     }
-    platforms=platforms.filter(platform=>platform.y<650);springs=springs.filter(spring=>spring.y<650);coins=coins.filter(coin=>coin.y<650);
-    while(platforms.length<8){const lastY=platforms.length?Math.min(...platforms.map(platform=>platform.y)):550;platforms.push(spawnPlatform(lastY-100))}
+    platforms=platforms.filter(platform=>platform.y<650);
+    verticalPlatforms = verticalPlatforms.filter(
+        platform => platform.baseY < 650
+    );
+	springs=springs.filter(spring=>spring.y<650);coins=coins.filter(coin=>coin.y<650);
+	while(platforms.length<8){
+		const lastY=platforms.length
+			? Math.min(...platforms.map(platform=>platform.y))
+			: 550;
+		const y=lastY-100;
+
+		platforms.push(spawnPlatform(y));
+		maybeSpawnVerticalPlatform(y);
+	}
 	if(player.y>600&&lives>0){
 		startScreenShake(3.5, 16);
 		lives--;
@@ -787,6 +933,19 @@ function drawMenu(){
         ctx.save();ctx.fillStyle='rgba(20,43,70,.86)';roundedRect(45,480,310,34,13);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(menuMessage,200,497);ctx.restore();
     }
     ctx.fillStyle='#42677b';ctx.font='11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Персонажи открываются за лучший результат',200,594);
+}
+function drawVerticalPlatform(p) {
+    ctx.save();
+
+    ctx.fillStyle = '#9b6bdf';
+    ctx.shadowColor = 'rgba(0,0,0,.22)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 3;
+
+    roundedRect(p.x, p.y, p.w, p.h, 7);
+    ctx.fill();
+
+    ctx.restore();
 }
 function drawPlatform(p){
     if(p.type==='broken'){
@@ -968,6 +1127,7 @@ function draw(timestamp){
         }
 
         if(currentState===STATE.PAUSE){
+			verticalPlatforms.forEach(drawVerticalPlatform);
 			fallingPlatforms.forEach(drawPlatform);
             platforms.forEach(drawPlatform);
             springs.forEach(drawSpring);
@@ -977,6 +1137,7 @@ function draw(timestamp){
             drawCounters();
             drawPauseMenu();
         } else if(currentState===STATE.GAMEOVER){
+			verticalPlatforms.forEach(drawVerticalPlatform);
 			fallingPlatforms.forEach(drawPlatform);
             platforms.forEach(drawPlatform);
             springs.forEach(drawSpring);
@@ -986,6 +1147,7 @@ function draw(timestamp){
             drawCounters();
             drawGameOver();
         } else {
+			verticalPlatforms.forEach(drawVerticalPlatform);
 			fallingPlatforms.forEach(drawPlatform);
             platforms.forEach(drawPlatform);
             springs.forEach(drawSpring);
