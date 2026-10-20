@@ -325,16 +325,17 @@ let unlockedCharacters=getUnlockedCharacters(highScore);
 let selectedCharacter=readStoredNumber('morjakaSelectedCharacter');
 if(!Number.isInteger(selectedCharacter)||selectedCharacter<0||selectedCharacter>20||!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;
 const FRAMES = [
-    { id: 0, name: 'Без рамки', price: 25, style: 'solid', color: '#ffc928' },
-    { id: 1, name: 'Ледяная', price: 75, style: 'solid', color: '#69dcff' },
-    { id: 2, name: 'Рубиновая', price: 100, style: 'solid', color: '#ef476f' },
-    { id: 3, name: 'Изумрудная', price: 125, style: 'double', color: '#23c483' },
-    { id: 4, name: 'Фиолетовая', price: 150, style: 'double', color: '#a855f7' },
-    { id: 5, name: 'Огненная', price: 175, style: 'dashed', color: '#ff6b35' },
-    { id: 6, name: 'Розовая', price: 200, style: 'dashed', color: '#ff75c3' },
-    { id: 7, name: 'Морская', price: 225, style: 'glow', color: '#00bcd4' },
-    { id: 8, name: 'Солнечная', price: 250, style: 'glow', color: '#ffe066' },
-    { id: 9, name: 'Неоновая', price: 300, style: 'neon', color: '#7cff6b' }
+    { id: 0, name: 'Без рамки', price: 0, style: 'none', color: null },
+    { id: 1, name: 'Золотая', price: 25, style: 'solid', color: '#ffc928' },
+    { id: 2, name: 'Ледяная', price: 75, style: 'solid', color: '#69dcff' },
+    { id: 3, name: 'Рубиновая', price: 100, style: 'solid', color: '#ef476f' },
+    { id: 4, name: 'Изумрудная', price: 125, style: 'double', color: '#23c483' },
+    { id: 5, name: 'Фиолетовая', price: 150, style: 'double', color: '#a855f7' },
+    { id: 6, name: 'Огненная', price: 175, style: 'dashed', color: '#ff6b35' },
+    { id: 7, name: 'Розовая', price: 200, style: 'dashed', color: '#ff75c3' },
+    { id: 8, name: 'Морская', price: 225, style: 'glow', color: '#00bcd4' },
+    { id: 9, name: 'Солнечная', price: 250, style: 'glow', color: '#ffe066' },
+    { id: 10, name: 'Неоновая', price: 300, style: 'neon', color: '#7cff6b' }
 ];
 
 function readStoredArray(key, fallback) {
