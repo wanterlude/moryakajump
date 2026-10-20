@@ -17,6 +17,30 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #gameStage {
     position: relative;
 }
+#pauseButton {
+    display: none; /* показываем только на сенсорных устройствах */
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    z-index: 30;
+
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(255,255,255,.72);
+    border-radius: 14px;
+    background: rgba(15,23,42,.68);
+    color: white;
+    font: bold 22px Arial, sans-serif;
+
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (pointer: coarse) {
+    #pauseButton {
+        display: block;
+    }
+}
 
 #touchControls {
     position: absolute;
@@ -113,6 +137,12 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 <div id="gameStage">
 <canvas id="game" width="1600" height="2400" aria-label="Игра Моряка Jump"></canvas>
 <button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
+<button
+    id="pauseButton"
+    type="button"
+    aria-label="Пауза"
+    title="Пауза"
+>Ⅱ</button>
 
 <div id="touchControls" aria-label="Управление">
     <button class="touchButton" id="leftButton" aria-label="Влево">←</button>
@@ -129,6 +159,16 @@ const RENDER_SCALE=4;
 ctx.scale(RENDER_SCALE,RENDER_SCALE);
 const gameStage=document.getElementById('gameStage');
 const fullscreenButton=document.getElementById('fullscreenButton');
+const pauseButton = document.getElementById('pauseButton');
+
+pauseButton.addEventListener('pointerdown', event => {
+    event.preventDefault();
+
+    if (currentState === STATE.PLAYING) {
+        currentState = STATE.PAUSE;
+        lastFrameTime = 0;
+    }
+});
 const STATE={MENU:0,PLAYING:1,PAUSE:2,GAMEOVER:3};
 let currentState=STATE.MENU,lastFrameTime=0;
 
@@ -253,7 +293,23 @@ function handleMenuPointer(point){
 }
 canvas.addEventListener('pointerdown',event=>{
     const point=canvasPoint(event);
-    if(currentState===STATE.PAUSE){currentState=STATE.PLAYING;lastFrameTime=0;event.preventDefault();return}
+	if(currentState === STATE.PAUSE) {
+		// «Продолжить»
+		if (point.x >= 85 && point.x <= 315 &&
+			point.y >= 370 && point.y <= 412) {
+			currentState = STATE.PLAYING;
+			lastFrameTime = 0;
+		}
+		// «В меню»
+		else if (point.x >= 85 && point.x <= 315 &&
+				 point.y >= 420 && point.y <= 462) {
+			currentState = STATE.MENU;
+			lastFrameTime = 0;
+		}
+
+		event.preventDefault();
+		return;
+	}
     if(currentState===STATE.GAMEOVER){
         if(point.x>=85&&point.x<=315&&point.y>=395&&point.y<=455)currentState=STATE.MENU;
         else startGame();
@@ -583,13 +639,61 @@ function drawGameOver(){
     ctx.fillStyle='#475569';ctx.font='13px Arial';ctx.fillText('Нажмите любую клавишу, чтобы сыграть снова',200,468);
 }
 function drawPauseMenu(){
-    ctx.fillStyle='rgba(15,23,42,.68)';ctx.fillRect(0,0,400,600);drawGlassPanel(38,112,324,376,24);
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#155576';ctx.font='bold 26px Arial';ctx.fillText('ПАУЗА',200,165);
-    ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('ТЕКУЩИЙ РЕЗУЛЬТАТ',200,230);
-    ctx.fillStyle='#1e293b';ctx.font='bold 34px Arial';ctx.fillText(String(Math.floor(player.score)),200,265);
-    ctx.fillStyle='#64748b';ctx.font='bold 12px Arial';ctx.fillText('РЕКОРД ПОДЪЁМА',200,325);
-    ctx.fillStyle='#d99400';ctx.font='bold 26px Arial';ctx.fillText(String(highScore),200,358);
-    ctx.fillStyle='#475569';ctx.font='14px Arial';ctx.fillText('Нажмите ESC, чтобы продолжить',200,430);
+    ctx.fillStyle='rgba(15,23,42,.68)';
+    ctx.fillRect(0,0,400,600);
+    drawGlassPanel(38,112,324,376,24);
+
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+
+    ctx.fillStyle='#155576';
+    ctx.font='bold 26px Arial';
+    ctx.fillText('ПАУЗА',200,155);
+
+    ctx.fillStyle='#64748b';
+    ctx.font='bold 12px Arial';
+    ctx.fillText('ТЕКУЩИЙ РЕЗУЛЬТАТ',200,205);
+
+    ctx.fillStyle='#1e293b';
+    ctx.font='bold 34px Arial';
+    ctx.fillText(String(Math.floor(player.score)),200,238);
+
+    ctx.fillStyle='#64748b';
+    ctx.font='bold 12px Arial';
+    ctx.fillText('РЕКОРД ПОДЪЁМА',200,285);
+
+    ctx.fillStyle='#d99400';
+    ctx.font='bold 26px Arial';
+    ctx.fillText(String(highScore),200,316);
+
+    // Кнопка «Продолжить»
+    ctx.save();
+    let gradient=ctx.createLinearGradient(85,370,315,432);
+    gradient.addColorStop(0,'#20d2aa');
+    gradient.addColorStop(1,'#1a91dc');
+    roundedRect(85,370,230,42,14);
+    ctx.fillStyle=gradient;
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.85)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 16px Arial';
+    ctx.fillText('ПРОДОЛЖИТЬ',200,391);
+    ctx.restore();
+
+    // Кнопка «В меню»
+    ctx.save();
+    roundedRect(85,420,230,42,14);
+    ctx.fillStyle='rgba(255,255,255,.68)';
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.9)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.fillStyle='#155576';
+    ctx.font='bold 16px Arial';
+    ctx.fillText('В МЕНЮ',200,441);
+    ctx.restore();
 }
 function draw(timestamp){
     const dt=lastFrameTime?Math.min((timestamp-lastFrameTime)/(1000/60),2):1;lastFrameTime=timestamp;
