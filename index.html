@@ -102,7 +102,7 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 	.touchButton:active{
 		background:rgba(255,255,255,.35);
 	}
-	
+
 	#jumpButton {
     position: absolute;
     right: 22px;
@@ -111,7 +111,7 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     height: 62px;
     font-size: 27px;
 	}
-	
+
 	#jumpButton:disabled{
 		opacity:.45;
 	}
@@ -151,11 +151,27 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
         touch-action: manipulation;
     }
 }
+#deathGif {
+    display: none;
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    top: 22.0%;
+    width: 24.5%;
+    height: 8.7%;
+    object-fit: contain;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+#gameStage.game-over #deathGif {
+    display: block;
+}
 </style>
 </head>
 <body>
 <div id="gameStage">
 <canvas id="game" width="1600" height="2400" aria-label="Игра Моряка Jump"></canvas>
+<img id="deathGif" src="babazaki.gif" alt="" aria-hidden="true">
 <button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
 <button
     id="pauseButton"
@@ -187,27 +203,56 @@ const backgroundCtx = backgroundCache.getContext('2d');
 
 function buildBackgroundCache() {
     const gradient = backgroundCtx.createLinearGradient(0, 0, 0, 600);
-    gradient.addColorStop(0, '#b7f4ff');
-    gradient.addColorStop(0.55, '#e8f8ff');
-    gradient.addColorStop(1, '#d7eaff');
+    gradient.addColorStop(0, '#8ed8f2');
+    gradient.addColorStop(0.55, '#d9f4ff');
+    gradient.addColorStop(1, '#f7fcff');
 
     backgroundCtx.fillStyle = gradient;
     backgroundCtx.fillRect(0, 0, 400, 600);
 
-    backgroundCtx.fillStyle = 'rgba(255,255,255,.34)';
+    // Снежные холмы на фоне
+    backgroundCtx.fillStyle = 'rgba(255,255,255,.55)';
+    for (let i = 0; i < 5; i++) {
+        backgroundCtx.beginPath();
+        backgroundCtx.ellipse(200, 430 + i * 34, 260, 20, 0, 0, Math.PI * 2);
+        backgroundCtx.fill();
+    }
+
+    // Лёгкие облака
+    backgroundCtx.fillStyle = 'rgba(255,255,255,.42)';
     backgroundCtx.beginPath();
     backgroundCtx.arc(55, 100, 42, 0, Math.PI * 2);
     backgroundCtx.arc(76, 95, 30, 0, Math.PI * 2);
     backgroundCtx.arc(320, 180, 55, 0, Math.PI * 2);
     backgroundCtx.arc(345, 170, 37, 0, Math.PI * 2);
     backgroundCtx.fill();
+}
 
-    backgroundCtx.fillStyle = 'rgba(255,255,255,.18)';
-    for (let i = 0; i < 5; i++) {
-        backgroundCtx.beginPath();
-        backgroundCtx.ellipse(210, 430 + i * 34, 260, 15, 0, 0, Math.PI * 2);
-        backgroundCtx.fill();
+const snowflakes = Array.from({ length: 70 }, () => ({
+    x: Math.random() * 400,
+    y: Math.random() * 600,
+    r: 1 + Math.random() * 2,
+    speed: 0.5 + Math.random() * 1.2
+}));
+
+function drawSnow(dt = 1) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+
+    for (const flake of snowflakes) {
+        flake.y += flake.speed * dt;
+
+        if (flake.y > 600) {
+            flake.y = -5;
+            flake.x = Math.random() * 400;
+        }
+
+        ctx.beginPath();
+        ctx.arc(flake.x, flake.y, flake.r, 0, Math.PI * 2);
+        ctx.fill();
     }
+
+    ctx.restore();
 }
 
 buildBackgroundCache();
@@ -262,10 +307,10 @@ function updateScreenShake(dt) {
     screenShake.y = Math.cos(phase * 2.3) * amount * 0.7;
 }
 
-const CHARACTER_SCORES=Array.from({length:21},(_,index)=>index*2500);
-const characterImages=Array.from({length:21},(_,i)=>{
-    const image=new Image();
-    image.src=`${i+1}.jpg`;
+const CHARACTER_SCORES=Array.from({length:26},(_,index)=>index*2500);
+const characterImages = Array.from({ length: 26 }, (_, i) => {
+    const image = new Image();
+    image.src = `${i + 1}.jpg`;
     return image;
 });
 
@@ -279,6 +324,35 @@ function getUnlockedCharacters(score){return CHARACTER_SCORES.map((required,inde
 let unlockedCharacters=getUnlockedCharacters(highScore);
 let selectedCharacter=readStoredNumber('morjakaSelectedCharacter');
 if(!Number.isInteger(selectedCharacter)||selectedCharacter<0||selectedCharacter>20||!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;
+const FRAMES = [
+    { id: 0, name: 'Без рамки', price: 25, style: 'solid', color: '#ffc928' },
+    { id: 1, name: 'Ледяная', price: 75, style: 'solid', color: '#69dcff' },
+    { id: 2, name: 'Рубиновая', price: 100, style: 'solid', color: '#ef476f' },
+    { id: 3, name: 'Изумрудная', price: 125, style: 'double', color: '#23c483' },
+    { id: 4, name: 'Фиолетовая', price: 150, style: 'double', color: '#a855f7' },
+    { id: 5, name: 'Огненная', price: 175, style: 'dashed', color: '#ff6b35' },
+    { id: 6, name: 'Розовая', price: 200, style: 'dashed', color: '#ff75c3' },
+    { id: 7, name: 'Морская', price: 225, style: 'glow', color: '#00bcd4' },
+    { id: 8, name: 'Солнечная', price: 250, style: 'glow', color: '#ffe066' },
+    { id: 9, name: 'Неоновая', price: 300, style: 'neon', color: '#7cff6b' }
+];
+
+function readStoredArray(key, fallback) {
+    try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(value) ? value : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+let menuPage = 'characters';
+let selectedFrame = Number(localStorage.getItem('morjakaSelectedFrame')) || 0;
+let ownedFrames = readStoredArray('morjakaOwnedFrames', [0]);
+let shopFrameIndex = selectedFrame;
+
+if (!FRAMES.some(frame => frame.id === selectedFrame)) selectedFrame = 0;
+if (!ownedFrames.includes(0)) ownedFrames.unshift(0);
 
 function saveProgress(){
     try{
@@ -286,6 +360,8 @@ function saveProgress(){
         localStorage.setItem('morjakaUnlockedCharacters',JSON.stringify(unlockedCharacters));
         localStorage.setItem('morjakaSelectedCharacter',String(selectedCharacter));
         localStorage.setItem('doodleHighScore',String(highScore));
+		localStorage.setItem('morjakaOwnedFrames', JSON.stringify(ownedFrames));
+		localStorage.setItem('morjakaSelectedFrame', String(selectedFrame));
     }catch(error){console.warn('Не удалось сохранить прогресс:',error)}
 }
 
@@ -294,14 +370,14 @@ let platforms=[],fallingPlatforms=[],verticalPlatforms=[],springs=[],coins=[],bi
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
 
-const currentTheme={bg:'#d8f6ff',plat:'#38cdb4'};
+const currentTheme = { bg: '#dff7ff', plat: '#8bd8f0' };
 
 function resetGame(){
     player={x:185,y:500,vx:0,dy:0,score:0};
 	platforms=[{x:120,y:550,w:160,h:15,type:'static'}];
 	fallingPlatforms=[];
 	verticalPlatforms=[];
-	springs=[];coins=[];birds=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;	
+	springs=[];coins=[];birds=[];lives=0;nextLifeScore=10000;doubleJumpAvailable=false;runCoins=0;
 	for(let i=0;i<7;i++){
 		const y=500-i*100;
 		platforms.push(spawnPlatform(y));
@@ -350,7 +426,7 @@ function maybeSpawnVerticalPlatform(y) {
 }
 
 function spawnBird(){
-    const direction=Math.random()<0.5?1:-1;
+    const direction=Math.random()<.5?1:-1;
     const type=Math.floor(Math.random()*3);
 
     const birdTypes=[
@@ -394,74 +470,293 @@ function canvasPoint(event){
     const rect=canvas.getBoundingClientRect();
     return{x:(event.clientX-rect.left)*400/rect.width,y:(event.clientY-rect.top)*600/rect.height};
 }
-function getCharacterCardRects(){
-    const result=[];
-    const cardW=44,cardH=70,startX=22,startY=243;
-    const colGap=52,rowGap=76;
+const characterGrid = {
+    top: 243,
+    bottom: 500,
+    scrollY: 0,
+    maxScroll: 0
+};
 
-    for(let i=0;i<21;i++){
-        const row=Math.floor(i/7);
-        const col=i%7;
+let menuPointerStart = null;
+
+function getCharacterCardRects() {
+    const result = [];
+    const cardW = 44;
+    const cardH = 70;
+    const startX = 22;
+    const startY = characterGrid.top - characterGrid.scrollY;
+    const colGap = 52;
+    const rowGap = 76;
+    const count = characterImages.length;
+    const rows = Math.ceil(count / 7);
+
+    characterGrid.maxScroll = Math.max(
+        0,
+        rows * rowGap - (characterGrid.bottom - characterGrid.top)
+    );
+    characterGrid.scrollY = Math.min(characterGrid.scrollY, characterGrid.maxScroll);
+
+    for (let i = 0; i < count; i++) {
+        const row = Math.floor(i / 7);
+        const col = i % 7;
+
         result.push({
-            x:startX+col*colGap,
-            y:startY+row*rowGap,
-            w:cardW,
-            h:cardH
+            x: startX + col * colGap,
+            y: startY + row * rowGap,
+            w: cardW,
+            h: cardH
         });
     }
 
     return result;
 }
-function handleMenuPointer(point){
-    if(currentState!==STATE.MENU)return;
-    for(let i=0;i<21;i++){
-        const r=getCharacterCardRects()[i];
-        if(point.x<r.x||point.x>r.x+r.w||point.y<r.y||point.y>r.y+r.h)continue;
-        if(unlockedCharacters.includes(i)){selectedCharacter=i;saveProgress();setMenuMessage(`Выбран персонаж ${i+1}`)}
-        else setMenuMessage(`Нужен рекорд ${CHARACTER_SCORES[i]} — осталось ${Math.max(0,CHARACTER_SCORES[i]-highScore)}`);
+function handleMenuPointer(point) {
+    if (currentState !== STATE.MENU) return;
+
+    // Нижняя правая кнопка переключает страницы.
+    if (point.y >= 516 && point.y <= 572 && point.x >= 205 && point.x <= 365) {
+        menuPage = menuPage === 'characters' ? 'shop' : 'characters';
+        menuMessage = '';
         return;
     }
-    if(point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580)startGame();
-}
-canvas.addEventListener('pointerdown',event=>{
-    const point=canvasPoint(event);
-	if(currentState === STATE.PAUSE) {
-		// «Продолжить»
-		if (point.x >= 85 && point.x <= 315 &&
-			point.y >= 370 && point.y <= 412) {
-			currentState = STATE.PLAYING;
-			lastFrameTime = 0;
-		}
-		// «В меню»
-		else if (point.x >= 85 && point.x <= 315 &&
-				 point.y >= 420 && point.y <= 462) {
-			currentState = STATE.MENU;
-			lastFrameTime = 0;
-		}
 
-		event.preventDefault();
-		return;
-	}
-    if(currentState===STATE.GAMEOVER){
-        if(point.x>=85&&point.x<=315&&point.y>=395&&point.y<=455)currentState=STATE.MENU;
-        else startGame();
-        event.preventDefault();return;
+    if (menuPage === 'shop') {
+        // Выбор одной из карточек в сетке магазина.
+        const columns = 4;
+        const cardW = 82;
+        const cardH = 60;
+        const gapX = 10;
+        const gapY = 7;
+        const startX = 24;
+        const startY = 282;
+
+        for (let i = 0; i < FRAMES.length; i++) {
+            const col = i % columns;
+            const row = Math.floor(i / columns);
+            const x = startX + col * (cardW + gapX);
+            const y = startY + row * (cardH + gapY);
+
+            if (
+                point.x >= x && point.x <= x + cardW &&
+                point.y >= y && point.y <= y + cardH
+            ) {
+                shopFrameIndex = FRAMES[i].id;
+                return;
+            }
+        }
+
+        // Левая нижняя кнопка: купить рамку или надеть купленную.
+        if (point.x >= 35 && point.x <= 195 && point.y >= 516 && point.y <= 572) {
+            const frame = FRAMES.find(item => item.id === shopFrameIndex);
+
+            if (ownedFrames.includes(frame.id)) {
+                selectedFrame = frame.id;
+                saveProgress();
+                setMenuMessage(`Выбрана рамка: ${frame.name}`);
+            } else if (bankCoins >= frame.price) {
+                bankCoins -= frame.price;
+                ownedFrames.push(frame.id);
+                selectedFrame = frame.id;
+                saveProgress();
+                setMenuMessage(`Куплена рамка: ${frame.name}`);
+            } else {
+                setMenuMessage(`Не хватает ${frame.price - bankCoins} монет`);
+            }
+        }
+
+        return;
     }
-    if(currentState===STATE.MENU){
-        handleMenuPointer(point);
-        menuButtonDown=point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580;
-        event.preventDefault();return;
+
+    // Выбор персонажа на странице персонажей.
+    if (point.y >= characterGrid.top && point.y <= characterGrid.bottom) {
+        const rects = getCharacterCardRects();
+
+        for (let i = 0; i < rects.length; i++) {
+            const r = rects[i];
+
+            if (
+                point.x < r.x || point.x > r.x + r.w ||
+                point.y < r.y || point.y > r.y + r.h
+            ) continue;
+
+            if (unlockedCharacters.includes(i)) {
+                selectedCharacter = i;
+                saveProgress();
+                setMenuMessage(`Выбран персонаж ${i + 1}`);
+            } else {
+                setMenuMessage(
+                    `Нужен рекорд ${CHARACTER_SCORES[i]} — осталось ${
+                        Math.max(0, CHARACTER_SCORES[i] - highScore)
+                    }`
+                );
+            }
+
+            return;
+        }
     }
-    if(currentState===STATE.PLAYING&&point.x>350&&point.y>550){currentState=STATE.PAUSE;lastFrameTime=0;event.preventDefault()}
+
+    // Левая нижняя кнопка запускает игру.
+    if (
+        point.x >= 35 && point.x <= 195 &&
+        point.y >= 516 && point.y <= 572
+    ) {
+        startGame();
+    }
+}
+canvas.addEventListener('pointerdown', event => {
+    const point = canvasPoint(event);
+
+    if (currentState === STATE.PAUSE) {
+        if (
+            point.x >= 85 && point.x <= 315 &&
+            point.y >= 370 && point.y <= 412
+        ) {
+            currentState = STATE.PLAYING;
+            lastFrameTime = 0;
+        } else if (
+            point.x >= 85 && point.x <= 315 &&
+            point.y >= 420 && point.y <= 462
+        ) {
+            currentState = STATE.MENU;
+            lastFrameTime = 0;
+        }
+
+        event.preventDefault();
+        return;
+    }
+
+    if (currentState === STATE.GAMEOVER) {
+        if (
+            point.x >= 85 && point.x <= 315 &&
+            point.y >= 395 && point.y <= 455
+        ) {
+            currentState = STATE.MENU;
+        } else {
+            startGame();
+        }
+
+        event.preventDefault();
+        return;
+    }
+
+    if (currentState === STATE.MENU) {
+		menuButtonDown =
+			point.y >= 516 && point.y <= 572 &&
+			(
+				(menuPage === 'characters' && point.x >= 35 && point.x <= 195) ||
+				(point.x >= 205 && point.x <= 365)
+			);
+		if (
+			menuPage === 'characters' &&
+			point.y >= characterGrid.top &&
+			point.y <= characterGrid.bottom
+		) {
+            menuPointerStart = {
+                x: point.x,
+                y: point.y,
+                lastY: point.y,
+                moved: false,
+                pointerId: event.pointerId
+            };
+
+            try {
+                canvas.setPointerCapture(event.pointerId);
+            } catch {}
+
+            event.preventDefault();
+            return;
+        }
+
+        event.preventDefault();
+        return;
+    }
+
+    if (currentState === STATE.PLAYING && point.x > 350 && point.y > 550) {
+        currentState = STATE.PAUSE;
+        lastFrameTime = 0;
+        event.preventDefault();
+    }
 });
-canvas.addEventListener('pointerup',event=>{
-    if(currentState===STATE.MENU&&menuButtonDown){
-        const point=canvasPoint(event);
-        if(point.x>=104&&point.x<=296&&point.y>=524&&point.y<=580)startGame();
+
+canvas.addEventListener('pointermove', event => {
+    if (
+        currentState !== STATE.MENU ||
+        !menuPointerStart ||
+        menuPointerStart.pointerId !== event.pointerId
+    ) return;
+
+    const point = canvasPoint(event);
+    const totalMove = point.y - menuPointerStart.y;
+
+    if (Math.abs(totalMove) > 5) {
+        menuPointerStart.moved = true;
     }
-    menuButtonDown=false;
+
+    if (menuPointerStart.moved) {
+        const delta = point.y - menuPointerStart.lastY;
+
+        // Контент двигается вместе с пальцем; ограничиваем прокрутку.
+        const rects = getCharacterCardRects();
+        const rows = Math.ceil(rects.length / 7);
+        const contentHeight = rows * 76;
+        const viewportHeight = characterGrid.bottom - characterGrid.top;
+        const maxScroll = Math.max(0, contentHeight - viewportHeight);
+
+        characterGrid.scrollY = Math.max(
+            0,
+            Math.min(maxScroll, characterGrid.scrollY - delta)
+        );
+    }
+
+    menuPointerStart.lastY = point.y;
+    event.preventDefault();
 });
-canvas.addEventListener('pointercancel',()=>{menuButtonDown=false});
+
+function finishMenuPointer(event) {
+    if (!menuPointerStart) return;
+
+    const start = menuPointerStart;
+    menuPointerStart = null;
+
+    if (start.pointerId !== event.pointerId) return;
+
+    if (!start.moved && currentState === STATE.MENU) {
+        handleMenuPointer(canvasPoint(event));
+    }
+}
+
+canvas.addEventListener('pointerup', event => {
+    // Если это было нажатие по списку персонажей, завершаем его обработку.
+    // На странице магазина menuPointerStart не устанавливается.
+    finishMenuPointer(event);
+
+    if (currentState === STATE.MENU) {
+        const point = canvasPoint(event);
+
+        const isMenuButton =
+            point.y >= 516 &&
+            point.y <= 572 &&
+            (
+                (menuPage === 'characters' &&
+                    point.x >= 35 && point.x <= 195) ||
+                point.x >= 205 && point.x <= 365
+            );
+
+        // Обрабатываем как нижние кнопки, так и карточки рамок.
+        if (isMenuButton || menuPage === 'shop') {
+            handleMenuPointer(point);
+        }
+    }
+
+    menuButtonDown = false;
+});
+
+canvas.addEventListener('pointercancel', event => {
+    if (menuPointerStart?.pointerId === event.pointerId) {
+        menuPointerStart = null;
+    }
+    menuButtonDown = false;
+});
 
 const touchInput = {
     left: false,
@@ -551,6 +846,26 @@ canvas.addEventListener('pointerleave', event => {
         mouseControl.inside = false;
     }
 });
+
+canvas.addEventListener('wheel', event => {
+    if (currentState !== STATE.MENU) return;
+
+    const point = canvasPoint(event);
+    if (point.y < characterGrid.top || point.y > characterGrid.bottom) return;
+
+    const rects = getCharacterCardRects();
+    const rows = Math.ceil(rects.length / 7);
+    const contentHeight = rows * 76;
+    const viewportHeight = characterGrid.bottom - characterGrid.top;
+    const maxScroll = Math.max(0, contentHeight - viewportHeight);
+
+    characterGrid.scrollY = Math.max(
+        0,
+        Math.min(maxScroll, characterGrid.scrollY + event.deltaY * 0.7)
+    );
+
+    event.preventDefault();
+}, { passive: false });
 
 const activePointers = {
     left: new Set(),
@@ -752,7 +1067,7 @@ function update(dt){
             doubleJumpAvailable = true;
             break;
         }
-    }   
+    }
 	platforms.forEach(platform=>{
 		if(platform.type==='broken'&&platform.breaking&&player.dy<0&&player.y+35<=platform.y){
 			platform.falling=true;
@@ -785,7 +1100,7 @@ function update(dt){
 				player.dy = -12.98;
 				doubleJumpAvailable = true;
 			}
-		});		
+		});
     });
     platforms=platforms.filter(platform=>!platform.removeAfterBounce);
 	const fallingGravity = 0.55;
@@ -799,7 +1114,7 @@ function update(dt){
 		if(platform.y>640){
 			fallingPlatforms.splice(i,1);
 		}
-	}	
+	}
     springs.forEach(spring=>{
         if(player.dy>0&&player.x+25>spring.x&&player.x<spring.x+20&&player.y+35>spring.y&&player.y+35<spring.y+20){player.dy=-32;doubleJumpAvailable=true}
     });
@@ -851,16 +1166,41 @@ function update(dt){
         currentState=STATE.GAMEOVER;
         const finalScore=Math.floor(player.score);
         if(finalScore>highScore){highScore=finalScore;unlockedCharacters=getUnlockedCharacters(highScore);if(!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;saveProgress()}
-    }	
+    }
 	else if(player.y>600){
 		startScreenShake(4, 20);
 		currentState=STATE.GAMEOVER;
-	}	
+	}
 }
 
 function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+const backgroundImage = new Image();
+backgroundImage.src = 'fon.jpg';
+const scarfImage = new Image();
+scarfImage.src = 'sharf.png';
+
 function drawBackground() {
-    ctx.drawImage(backgroundCache, 0, 0);
+    ctx.save();
+
+    if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+        ctx.drawImage(backgroundImage, 0, 0, 400, 600);
+    } else {
+        ctx.fillStyle = '#dff7ff';
+        ctx.fillRect(0, 0, 400, 600);
+    }
+
+    // Полупрозрачный холодный слой — эффект стекла.
+    ctx.fillStyle = 'rgba(220, 245, 255, 0.8)';
+    ctx.fillRect(0, 0, 400, 600);
+
+    // Мягкий стеклянный блик сверху.
+    const highlight = ctx.createLinearGradient(0, 0, 0, 260);
+    highlight.addColorStop(0, 'rgba(255, 255, 255, 0.36)');
+    highlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = highlight;
+    ctx.fillRect(0, 0, 400, 260);
+
+    ctx.restore();
 }
 function drawGlassPanel(x,y,w,h,r=22){
     ctx.save();ctx.shadowColor='rgba(18,70,110,.14)';ctx.shadowBlur=18;ctx.shadowOffsetY=8;
@@ -882,7 +1222,49 @@ function drawCharacterImage(index,x,y,w,h,locked=false){
     ctx.restore();
 }
 
-const playButtonGradient = ctx.createLinearGradient(100, 524, 300, 580);
+function drawFrame(cx, cy, radius, frameId) {
+    const frame = FRAMES.find(item => item.id === frameId);
+    if (!frame || frame.style === 'none' || !frame.color) return;
+
+    ctx.save();
+    ctx.strokeStyle = frame.color;
+    ctx.lineWidth = frame.style === 'double' ? 4 : 5;
+
+    if (frame.style === 'glow' || frame.style === 'neon') {
+        ctx.shadowColor = frame.color;
+        ctx.shadowBlur = frame.style === 'neon' ? 14 : 9;
+    }
+
+    if (frame.style === 'dashed') {
+        ctx.setLineDash([5, 4]);
+    }
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawMenuButton(x, y, w, h, label, color = '#20a9b8') {
+    ctx.save();
+
+    roundedRect(x, y, w, h, 15);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.85)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x + w / 2, y + h / 2);
+
+    ctx.restore();
+}
+
+const playButtonGradient = ctx.createLinearGradient(100, 516, 300, 580);
 playButtonGradient.addColorStop(0, 'rgba(32,210,170,.92)');
 playButtonGradient.addColorStop(1, 'rgba(26,145,220,.92)');
 
@@ -894,70 +1276,326 @@ function drawMenu(){
     ctx.fillStyle='#174b72';ctx.font='bold 28px Arial';ctx.fillText('Моряка',200,53);ctx.fillStyle='#087fbe';ctx.font='bold 39px Arial';ctx.fillText('JUMP',200,91);ctx.shadowBlur=0;
     ctx.fillStyle='rgba(255,255,255,.84)';roundedRect(113,112,174,32,16);ctx.fill();
     ctx.fillStyle='#155576';ctx.font='bold 14px Arial';ctx.fillText(`🏆 Рекорд: ${highScore}`,200,128);
-    drawCharacterImage(selectedCharacter,174,151,52,58,false);
-    ctx.fillStyle='#154c68';ctx.font='bold 13px Arial';ctx.fillText(`Выбран: ${selectedCharacter+1}`,200,222);
-    ctx.fillStyle='#155576';ctx.font='bold 13px Arial';ctx.fillText('ВЫБЕРИ ПЕРСОНАЖА',200,235);
-	getCharacterCardRects().forEach((rect,index)=>{
-		const unlocked=unlockedCharacters.includes(index);
-		const selected=selectedCharacter===index;
+	if (menuPage === 'characters') {
+		drawCharacterImage(selectedCharacter, 174, 151, 52, 58, false);
 
-		drawGlassPanel(rect.x,rect.y,rect.w,rect.h,9);
-		drawCharacterImage(index,rect.x+4,rect.y+4,rect.w-8,43,!unlocked);
+		ctx.fillStyle = '#154c68';
+		ctx.font = 'bold 13px Arial';
+		ctx.fillText(`Выбран: ${selectedCharacter + 1}`, 200, 222);
 
-		ctx.textAlign='center';
-		ctx.textBaseline='middle';
+		ctx.fillStyle = '#155576';
+		ctx.font = 'bold 13px Arial';
+		ctx.fillText('ВЫБЕРИ ПЕРСОНАЖА', 200, 235);
+	}
+    if (menuPage === 'characters') {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, characterGrid.top - 3, 400, characterGrid.bottom - characterGrid.top + 3);
+        ctx.clip();
 
-		if(unlocked){
-			ctx.font='bold 8px Arial';
-			ctx.fillStyle=selected?'#087f62':'#23516a';
-			ctx.fillText(selected?'ВЫБРАН':'ОТКРЫТ',rect.x+rect.w/2,rect.y+58);
-		}else{
-			ctx.font='bold 7px Arial';
-			ctx.fillStyle='#865100';
-			ctx.fillText(`${CHARACTER_SCORES[index]} очков`,rect.x+rect.w/2,rect.y+58);
-		}
+        getCharacterCardRects().forEach((rect, index) => {
+            const unlocked = unlockedCharacters.includes(index);
+            const selected = selectedCharacter === index;
 
-		if(selected){
-			ctx.save();
-			roundedRect(rect.x-1,rect.y-1,rect.w+2,rect.h+2,10);
-			ctx.strokeStyle='#10a981';
-			ctx.lineWidth=2;
-			ctx.stroke();
-			ctx.restore();
-		}
-	});
-    ctx.save();
-    roundedRect(104,524,192,56,19);ctx.fillStyle = playButtonGradient;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ИГРАТЬ',200,552);ctx.restore();
-    if(performance.now()<menuMessageUntil&&menuMessage){
-        ctx.save();ctx.fillStyle='rgba(20,43,70,.86)';roundedRect(45,480,310,34,13);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(menuMessage,200,497);ctx.restore();
+            roundedRect(rect.x, rect.y, rect.w, rect.h, 9);
+            ctx.fillStyle = 'rgba(255,255,255,.48)';
+            ctx.fill();
+            ctx.strokeStyle = selected ? '#10a981' : 'rgba(255,255,255,.78)';
+            ctx.lineWidth = selected ? 2 : 1.4;
+            ctx.stroke();
+
+            drawCharacterImage(index, rect.x + 4, rect.y + 4, rect.w - 8, 43, !unlocked);
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = unlocked ? 'bold 8px Arial' : 'bold 7px Arial';
+            ctx.fillStyle = unlocked
+                ? (selected ? '#087f62' : '#23516a')
+                : '#865100';
+
+            ctx.fillText(
+                unlocked
+                    ? (selected ? 'ВЫБРАН' : 'ОТКРЫТ')
+                    : `${CHARACTER_SCORES[index]} очков`,
+                rect.x + rect.w / 2,
+                rect.y + 58
+            );
+        });
+
+        ctx.restore();
+
+        drawMenuButton(35, 516, 160, 56, 'ИГРАТЬ', '#159f91');
+        drawMenuButton(205, 516, 160, 56, 'РАМКИ →', '#287db4');
+    } else {
+		drawCharacterImage(selectedCharacter, 174, 151, 52, 58, false);
+
+        ctx.fillStyle = '#155576';
+        ctx.font = 'bold 15px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('МАГАЗИН РАМОК', 200, 235);
+
+        ctx.font = 'bold 13px Arial';
+        ctx.fillText(`Монеты: ${bankCoins}`, 200, 262);
+
+        const columns = 4;
+        const cardW = 80;
+        const cardH = 62;
+        const gapX = 10;
+        const gapY = 7;
+        const startX = 25;
+        const startY = 282;
+
+        FRAMES.forEach((frame, index) => {
+            const col = index % columns;
+            const row = Math.floor(index / columns);
+            const x = startX + col * (cardW + gapX);
+            const y = startY + row * (cardH + gapY);
+            const chosen = shopFrameIndex === frame.id;
+            const owned = ownedFrames.includes(frame.id);
+
+            ctx.save();
+
+            roundedRect(x, y, cardW, cardH, 10);
+            ctx.fillStyle = chosen
+                ? 'rgba(32,210,170,.30)'
+                : 'rgba(255,255,255,.55)';
+            ctx.fill();
+
+            ctx.strokeStyle = chosen ? '#10a981' : 'rgba(255,255,255,.8)';
+            ctx.lineWidth = chosen ? 2 : 1;
+            ctx.stroke();
+
+            // Небольшой образец рамки вместо большого превью персонажа.
+            drawFrame(x + cardW / 2, y + 17, 10, frame.id);
+
+            ctx.fillStyle = '#154c68';
+            ctx.font = 'bold 8px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(frame.name, x + cardW / 2, y + 37);
+
+            ctx.font = '8px Arial';
+            ctx.fillText(
+                owned
+                    ? (frame.id === selectedFrame ? 'НАДЕТА' : 'КУПЛЕНА')
+                    : `${frame.price} монет`,
+                x + cardW / 2,
+                y + 51
+            );
+
+            ctx.restore();
+        });
+
+        const selectedShopFrame = FRAMES.find(frame => frame.id === shopFrameIndex);
+        const actionLabel = ownedFrames.includes(shopFrameIndex)
+            ? (selectedFrame === shopFrameIndex ? 'НАДЕТА' : 'НАДЕТЬ')
+            : `КУПИТЬ · ${selectedShopFrame.price}`;
+
+        drawMenuButton(35, 516, 160, 56, actionLabel, '#159f91');
+        drawMenuButton(205, 516, 160, 56, '← ПЕРСОНАЖИ', '#287db4');
     }
-    ctx.fillStyle='#42677b';ctx.font='11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Персонажи открываются за лучший результат',200,594);
+
+    if (performance.now() < menuMessageUntil && menuMessage) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(20,43,70,.86)';
+        roundedRect(45, 480, 310, 24, 10);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(menuMessage, 200, 492);
+        ctx.restore();
+    }
+
+    ctx.fillStyle = '#42677b';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(
+        menuPage === 'shop'
+            ? 'Рамки сохраняются после покупки'
+            : 'Персонажи открываются за лучший результат',
+        200,
+        594
+    );
 }
+function drawPlatform(p) {
+    ctx.save();
+
+    if (p.type === 'broken') {
+        // Тёплые деревянные доски с белой снежной кромкой
+        const wood = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+        wood.addColorStop(0, p.breaking ? '#b96e42' : '#a85c35');
+        wood.addColorStop(1, p.breaking ? '#70402d' : '#6d3929');
+
+        ctx.fillStyle = wood;
+        ctx.shadowColor = 'rgba(20, 38, 55, .3)';
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetY = 3;
+        roundedRect(p.x, p.y, p.w, p.h, 5);
+        ctx.fill();
+
+        // Снег сверху
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = '#f7fdff';
+        roundedRect(p.x, p.y - 3, p.w, 7, 4);
+        ctx.fill();
+
+        // Прожилки древесины
+        ctx.strokeStyle = 'rgba(255, 220, 180, .55)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(p.x + 8, p.y + 7);
+        ctx.lineTo(p.x + p.w * .38, p.y + 6);
+        ctx.moveTo(p.x + p.w * .55, p.y + 11);
+        ctx.lineTo(p.x + p.w - 8, p.y + 10);
+        ctx.stroke();
+
+        // Трещина на ломающейся платформе
+        if (p.breaking) {
+            ctx.strokeStyle = '#f8d6b2';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(p.x + p.w * .48, p.y + 3);
+            ctx.lineTo(p.x + p.w * .42, p.y + 8);
+            ctx.lineTo(p.x + p.w * .53, p.y + 12);
+            ctx.stroke();
+        }
+    } else if (p.type === 'moving') {
+        // Синяя ледяная плита
+        const ice = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+        ice.addColorStop(0, '#e9fcff');
+        ice.addColorStop(.38, '#79dcf5');
+        ice.addColorStop(1, '#268dbd');
+
+        ctx.shadowColor = 'rgba(20, 90, 130, .35)';
+        ctx.shadowBlur = 9;
+        ctx.shadowOffsetY = 4;
+        roundedRect(p.x, p.y, p.w, p.h, 8);
+        ctx.fillStyle = ice;
+        ctx.fill();
+
+        // Грани и блики на льду
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = 'rgba(255, 255, 255, .9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(p.x + 8, p.y + 4);
+        ctx.lineTo(p.x + p.w - 12, p.y + 4);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, .65)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(p.x + p.w * .3, p.y + 5);
+        ctx.lineTo(p.x + p.w * .42, p.y + 11);
+        ctx.lineTo(p.x + p.w * .55, p.y + 6);
+        ctx.stroke();
+    } else {
+        // Обычная платформа — толстый снежный сугроб
+        ctx.shadowColor = 'rgba(35, 80, 110, .25)';
+        ctx.shadowBlur = 7;
+        ctx.shadowOffsetY = 4;
+
+        roundedRect(p.x, p.y + 3, p.w, p.h - 3, 8);
+        const snow = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+        snow.addColorStop(0, '#b7d9e8');
+        snow.addColorStop(1, '#6d9bb2');
+        ctx.fillStyle = snow;
+        ctx.fill();
+
+        // Неровная белая снежная шапка
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(p.x + 2, p.y + 8);
+        ctx.quadraticCurveTo(p.x + p.w * .2, p.y + 2, p.x + p.w * .38, p.y + 6);
+        ctx.quadraticCurveTo(p.x + p.w * .62, p.y - 1, p.x + p.w - 2, p.y + 6);
+        ctx.lineTo(p.x + p.w - 2, p.y + 11);
+        ctx.lineTo(p.x + 2, p.y + 11);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    ctx.restore();
+
+    // Бонусная жизнь остаётся заметной
+    if (p.life) {
+        ctx.fillStyle = '#e63946';
+        ctx.beginPath();
+        ctx.arc(p.life.x + 8, p.life.y + 8, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 11px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('+', p.life.x + 8, p.life.y + 8);
+    }
+}
+
 function drawVerticalPlatform(p) {
     ctx.save();
 
-    ctx.fillStyle = '#9b6bdf';
-    ctx.shadowColor = 'rgba(0,0,0,.22)';
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetY = 3;
+    // Гранёная ледяная основа
+    const ice = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+    ice.addColorStop(0, '#b7f1ff');
+    ice.addColorStop(0.5, '#55b9dc');
+    ice.addColorStop(1, '#287fa8');
 
-    roundedRect(p.x, p.y, p.w, p.h, 7);
+    ctx.shadowColor = 'rgba(25, 80, 115, .35)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 4;
+
+    ctx.beginPath();
+    ctx.moveTo(p.x + 8, p.y);
+    ctx.lineTo(p.x + p.w - 8, p.y);
+    ctx.lineTo(p.x + p.w, p.y + p.h / 2);
+    ctx.lineTo(p.x + p.w - 8, p.y + p.h);
+    ctx.lineTo(p.x + 8, p.y + p.h);
+    ctx.lineTo(p.x, p.y + p.h / 2);
+    ctx.closePath();
+    ctx.fillStyle = ice;
     ctx.fill();
+
+    // Светлая грань кристалла
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = 'rgba(230, 251, 255, .85)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p.x + 10, p.y + 4);
+    ctx.lineTo(p.x + p.w * .35, p.y + p.h / 2);
+    ctx.lineTo(p.x + 10, p.y + p.h - 4);
+    ctx.stroke();
+
+    // Снег сверху: неровная шапка с небольшими свисающими краями
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(p.x + 5, p.y + 3);
+    ctx.quadraticCurveTo(p.x + p.w * .22, p.y - 3, p.x + p.w * .42, p.y + 2);
+    ctx.quadraticCurveTo(p.x + p.w * .68, p.y - 3, p.x + p.w - 5, p.y + 3);
+    ctx.lineTo(p.x + p.w - 8, p.y + 7);
+    ctx.lineTo(p.x + p.w * .72, p.y + 6);
+    ctx.lineTo(p.x + p.w * .55, p.y + 8);
+    ctx.lineTo(p.x + p.w * .34, p.y + 6);
+    ctx.lineTo(p.x + 8, p.y + 8);
+    ctx.closePath();
+    ctx.fill();
+
+    // Снежные блики на боковых гранях
+    ctx.strokeStyle = 'rgba(255, 255, 255, .75)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p.x + 3, p.y + p.h / 2);
+    ctx.lineTo(p.x + 8, p.y + p.h - 3);
+    ctx.moveTo(p.x + p.w - 3, p.y + p.h / 2);
+    ctx.lineTo(p.x + p.w - 8, p.y + p.h - 3);
+    ctx.stroke();
 
     ctx.restore();
 }
-function drawPlatform(p){
-    if(p.type==='broken'){
-        const wood=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);wood.addColorStop(0,p.breaking?'#ff9b7a':'#ff6b5e');wood.addColorStop(1,p.breaking?'#b83b3b':'#d94141');
-        ctx.fillStyle=wood;ctx.shadowColor='rgba(0,0,0,.22)';ctx.shadowBlur=5;ctx.shadowOffsetY=3;roundedRect(p.x,p.y,p.w,p.h,5);ctx.fill();ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-        ctx.strokeStyle='rgba(120,35,35,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p.x+5,p.y+5);ctx.lineTo(p.x+p.w-5,p.y+5);ctx.moveTo(p.x+8,p.y+11);ctx.lineTo(p.x+p.w-8,p.y+11);ctx.stroke();
-        ctx.strokeStyle='#702b2b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x+p.w*.35,p.y);ctx.lineTo(p.x+p.w*.42,p.y+5);ctx.lineTo(p.x+p.w*.37,p.y+9);ctx.lineTo(p.x+p.w*.48,p.y+15);ctx.stroke();
-    }else{
-        ctx.fillStyle=p.type==='moving'?'#4d96ff':currentTheme.plat;ctx.shadowColor='rgba(0,0,0,.22)';ctx.shadowBlur=6;ctx.shadowOffsetY=3;roundedRect(p.x,p.y,p.w,p.h,7);ctx.fill();ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-    }
-    if(p.life){ctx.fillStyle='#3498db';ctx.beginPath();ctx.arc(p.life.x+8,p.life.y+8,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 11px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('+',p.life.x+8,p.life.y+8)}
-}
+
 function drawBird(bird){
     ctx.save();
     ctx.translate(bird.x,bird.y);
@@ -1006,13 +1644,66 @@ function drawBird(bird){
 
     ctx.restore();
 }
-function drawSpring(s){
-    ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(s.x+10,s.y+16,11,3,0,0,Math.PI*2);ctx.fill();
-    const base=ctx.createLinearGradient(s.x,s.y+11,s.x,s.y+16);base.addColorStop(0,'#48566a');base.addColorStop(1,'#202a38');ctx.fillStyle=base;roundedRect(s.x+1,s.y+11,18,5,2);ctx.fill();
-    ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#34495e';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(s.x+4,s.y+11);ctx.lineTo(s.x+7,s.y+8);ctx.lineTo(s.x+13,s.y+8);ctx.lineTo(s.x+16,s.y+5);ctx.lineTo(s.x+13,s.y+2);ctx.lineTo(s.x+7,s.y+2);ctx.stroke();
-    ctx.strokeStyle='#d9f2ff';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(s.x+4,s.y+10);ctx.lineTo(s.x+7,s.y+8);ctx.lineTo(s.x+13,s.y+8);ctx.lineTo(s.x+16,s.y+5);ctx.stroke();
-    const top=ctx.createLinearGradient(s.x,s.y-2,s.x,s.y+3);top.addColorStop(0,'#ffb1a8');top.addColorStop(.45,'#ff5548');top.addColorStop(1,'#b9272e');ctx.fillStyle=top;roundedRect(s.x+2,s.y-2,16,5,2);ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,.65)';roundedRect(s.x+4,s.y-1,5,1.5,1);ctx.fill();
+function drawSpring(s) {
+    ctx.save();
+
+    // Мягкая тень под пружиной
+    ctx.fillStyle = 'rgba(20, 65, 90, .22)';
+    ctx.beginPath();
+    ctx.ellipse(s.x + 10, s.y + 17, 11, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Серебристое основание
+    const base = ctx.createLinearGradient(s.x, s.y + 12, s.x, s.y + 17);
+    base.addColorStop(0, '#f5fdff');
+    base.addColorStop(0.45, '#9ec8d8');
+    base.addColorStop(1, '#527b91');
+
+    ctx.fillStyle = base;
+    ctx.strokeStyle = '#527b91';
+    ctx.lineWidth = 1;
+    roundedRect(s.x + 1, s.y + 12, 18, 5, 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Голубая металлическая спираль с тёмным контуром
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = '#387d9b';
+    ctx.beginPath();
+    ctx.moveTo(s.x + 4, s.y + 12);
+    ctx.lineTo(s.x + 7, s.y + 9);
+    ctx.lineTo(s.x + 13, s.y + 9);
+    ctx.lineTo(s.x + 16, s.y + 6);
+    ctx.lineTo(s.x + 13, s.y + 3);
+    ctx.lineTo(s.x + 7, s.y + 3);
+    ctx.stroke();
+
+    // Светлый блик на витках
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = 'rgba(239, 253, 255, .95)';
+    ctx.beginPath();
+    ctx.moveTo(s.x + 4, s.y + 11);
+    ctx.lineTo(s.x + 7, s.y + 9);
+    ctx.lineTo(s.x + 13, s.y + 9);
+    ctx.lineTo(s.x + 16, s.y + 6);
+    ctx.stroke();
+
+    // Снежная верхушка
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(110, 205, 235, .7)';
+    ctx.shadowBlur = 4;
+    roundedRect(s.x + 2, s.y - 2, 16, 5, 2);
+    ctx.fill();
+
+    // Маленький голубой ледяной блик на снегу
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(115, 205, 235, .65)';
+    roundedRect(s.x + 5, s.y - 1, 5, 1.5, 1);
+    ctx.fill();
+
+    ctx.restore();
 }
 function drawCoin(c){
     ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.ellipse(c.x+1,c.y+c.r+3,c.r*.8,3,0,0,Math.PI*2);ctx.fill();
@@ -1021,17 +1712,80 @@ function drawCoin(c){
     ctx.fillStyle='#d88900';ctx.font=`bold ${c.r+3}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('$',c.x,c.y+1);ctx.textAlign='start';ctx.textBaseline='alphabetic';
     ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(c.x-3,c.y-4,2,3.5,-.5,0,Math.PI*2);ctx.fill();
 }
-function drawPlayer(){
-    const x=player.x-5,y=player.y-8,size=40,cx=x+size/2,cy=y+size/2,radius=size/2,image=characterImages[selectedCharacter];
-    ctx.save();ctx.shadowColor='rgba(0,12,30,.55)';ctx.shadowBlur=9;ctx.shadowOffsetY=4;
-    ctx.beginPath();ctx.arc(cx,cy,radius-1,0,Math.PI*2);ctx.fillStyle='rgba(12,27,48,.9)';ctx.fill();
-    ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.save();ctx.beginPath();ctx.arc(cx,cy,radius-3,0,Math.PI*2);ctx.clip();
-    if(image&&image.complete&&image.naturalWidth>0)ctx.drawImage(image,x+3,y+3,size-6,size-6);
-    else{const gradient=ctx.createLinearGradient(x,y,x+size,y+size);gradient.addColorStop(0,'#ffcf77');gradient.addColorStop(1,'#e63946');ctx.fillStyle=gradient;ctx.fillRect(x+3,y+3,size-6,size-6)}
-    const shine=ctx.createLinearGradient(x,y+3,x,y+size*.65);shine.addColorStop(0,'rgba(255,255,255,.42)');shine.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=shine;ctx.fillRect(x+3,y+3,size-6,size*.62);ctx.restore();
-    ctx.beginPath();ctx.arc(cx,cy,radius-1,0,Math.PI*2);ctx.strokeStyle='rgba(5,13,27,.95)';ctx.lineWidth=2;ctx.stroke();
-    ctx.beginPath();ctx.arc(cx,cy,radius-2.5,0,Math.PI*2);ctx.strokeStyle='rgba(190,225,255,.78)';ctx.lineWidth=1;ctx.stroke();ctx.restore();
+function drawPlayer() {
+    const x = player.x - 5;
+    const y = player.y - 8;
+    const size = 40;
+    const cx = x + size / 2;
+    const cy = y + size / 2;
+    const radius = size / 2;
+    const image = characterImages[selectedCharacter];
+
+    // Внешнее состояние персонажа, включая тень.
+    ctx.save();
+
+    ctx.shadowColor = 'rgba(0,12,30,.55)';
+    ctx.shadowBlur = 9;
+    ctx.shadowOffsetY = 4;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius - 1, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(12,27,48,.9)';
+    ctx.fill();
+
+    // Изображение персонажа и блик обрезаются по кругу.
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius - 3, 0, Math.PI * 2);
+    ctx.clip();
+
+    if (image && image.complete && image.naturalWidth > 0) {
+        ctx.drawImage(image, x + 3, y + 3, size - 6, size - 6);
+    } else {
+        const gradient = ctx.createLinearGradient(x, y, x + size, y + size);
+        gradient.addColorStop(0, '#ffcf77');
+        gradient.addColorStop(1, '#e63946');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x + 3, y + 3, size - 6, size - 6);
+    }
+
+    const shine = ctx.createLinearGradient(x, y + 3, x, y + size * 0.65);
+    shine.addColorStop(0, 'rgba(255,255,255,.42)');
+    shine.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = shine;
+    ctx.fillRect(x + 3, y + 3, size - 6, size * 0.62);
+
+    ctx.restore();
+
+    // Контуры персонажа и выбранная рамка.
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius - 1, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(5,13,27,.95)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius - 2.5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(190,225,255,.78)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+	if (currentState !== STATE.MENU || menuPage !== 'characters') {
+		drawFrame(cx, cy, radius - 1, selectedFrame);
+	}
+
+    ctx.restore();
+
+    // Шарфик рисуется поверх персонажа и рамки.
+    if (scarfImage.complete && scarfImage.naturalWidth > 0) {
+        ctx.drawImage(scarfImage, x + 45, y + 17, size - 90, 35);
+    }
 }
+
 function drawCounters(){
     ctx.save();ctx.fillStyle='rgba(255,255,255,.84)';ctx.shadowColor='rgba(30,50,70,.18)';ctx.shadowBlur=8;ctx.shadowOffsetY=2;roundedRect(8,8,190,78,12);ctx.fill();ctx.restore();
     ctx.save();ctx.textAlign='left';ctx.textBaseline='middle';ctx.font='bold 13px Arial';ctx.fillStyle='#64748b';ctx.fillText('СЧЁТ',20,25);ctx.fillText('ЖИЗНИ',20,49);ctx.fillText('ДОП. ПРЫЖОК',20,73);
@@ -1041,7 +1795,7 @@ function drawCounters(){
 }
 function drawGameOver(){
     ctx.fillStyle='rgba(15,23,42,.62)';ctx.fillRect(0,0,400,600);drawGlassPanel(45,125,310,360,22);
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#e63946';ctx.font='bold 34px Arial';ctx.fillText('!',200,170);
+    ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillStyle='#1e293b';ctx.font='bold 25px Arial';ctx.fillText('ИГРА ОКОНЧЕНА',200,215);
     ctx.fillStyle='#64748b';ctx.font='15px Arial';ctx.fillText('ВАШ РЕЗУЛЬТАТ',200,255);
     ctx.fillStyle='#087fbe';ctx.font='bold 36px Arial';ctx.fillText(String(Math.floor(player.score)),200,290);
@@ -1120,6 +1874,7 @@ function draw(timestamp){
         drawMenu();
     } else {
         drawBackground();
+		drawSnow(dt);
 
         ctx.save();
         if (currentState !== STATE.PAUSE) {
@@ -1160,6 +1915,7 @@ function draw(timestamp){
         ctx.restore();
     }
 
+    gameStage.classList.toggle('game-over', currentState === STATE.GAMEOVER);
     update(dt);
     requestAnimationFrame(draw);
     jumpButton.disabled = currentState !== STATE.PLAYING || !doubleJumpAvailable;
