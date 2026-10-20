@@ -226,6 +226,42 @@ pauseButton.addEventListener('pointerdown', event => {
 const STATE={MENU:0,PLAYING:1,PAUSE:2,GAMEOVER:3};
 let currentState=STATE.MENU,lastFrameTime=0;
 
+const screenShake = {
+    time: 0,
+    duration: 0,
+    intensity: 0,
+    x: 0,
+    y: 0
+};
+
+function startScreenShake(intensity = 2.5, duration = 12) {
+    screenShake.time = Math.max(screenShake.time, duration);
+    screenShake.duration = Math.max(screenShake.duration, duration);
+    screenShake.intensity = Math.max(screenShake.intensity, intensity);
+}
+
+function updateScreenShake(dt) {
+    if (screenShake.time <= 0) {
+        screenShake.time = 0;
+        screenShake.x = 0;
+        screenShake.y = 0;
+        return;
+    }
+
+    screenShake.time = Math.max(0, screenShake.time - dt);
+
+    const fade = screenShake.duration > 0
+        ? screenShake.time / screenShake.duration
+        : 0;
+
+    // Плавно ослабевающая тряска. Координаты заданы в игровых единицах.
+    const amount = screenShake.intensity * fade;
+    const phase = (screenShake.duration - screenShake.time) * 2.4;
+
+    screenShake.x = Math.sin(phase * 1.7) * amount;
+    screenShake.y = Math.cos(phase * 2.3) * amount * 0.7;
+}
+
 const CHARACTER_SCORES=Array.from({length:21},(_,index)=>index*2500);
 const characterImages=Array.from({length:21},(_,i)=>{
     const image=new Image();
@@ -603,7 +639,8 @@ function update(dt){
         if(bird.x<-55||bird.x>455){birds.splice(i,1);continue}
         const playerCenterX=player.x+15,playerCenterY=player.y+15;
         if(bird.hitCooldown<=0&&Math.abs(playerCenterX-bird.x)<29&&Math.abs(playerCenterY-bird.y)<25){
-            const pushDirection=playerCenterX<bird.x?-1:1;
+            startScreenShake(2.5, 12);
+			const pushDirection=playerCenterX<bird.x?-1:1;
             player.vx=pushDirection*9;player.dy=-8;player.x+=pushDirection*12;bird.hitCooldown=45;
         }
     }
@@ -639,12 +676,22 @@ function update(dt){
     }
     platforms=platforms.filter(platform=>platform.y<650);springs=springs.filter(spring=>spring.y<650);coins=coins.filter(coin=>coin.y<650);
     while(platforms.length<8){const lastY=platforms.length?Math.min(...platforms.map(platform=>platform.y)):550;platforms.push(spawnPlatform(lastY-100))}
-    if(player.y>600&&lives>0){lives--;player.y=500;player.dy=-8.5;doubleJumpAvailable=true}
+	if(player.y>600&&lives>0){
+		startScreenShake(3.5, 16);
+		lives--;
+		player.y=500;
+		player.dy=-8.5;
+		doubleJumpAvailable=true;
+	}
     else if(player.y>600){
         currentState=STATE.GAMEOVER;
         const finalScore=Math.floor(player.score);
         if(finalScore>highScore){highScore=finalScore;unlockedCharacters=getUnlockedCharacters(highScore);if(!unlockedCharacters.includes(selectedCharacter))selectedCharacter=0;saveProgress()}
-    }
+    }	
+	else if(player.y>600){
+		startScreenShake(4, 20);
+		currentState=STATE.GAMEOVER;
+	}	
 }
 
 function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
@@ -886,16 +933,53 @@ function drawPauseMenu(){
     ctx.restore();
 }
 function draw(timestamp){
-    const dt=lastFrameTime?Math.min((timestamp-lastFrameTime)/(1000/60),2):1;lastFrameTime=timestamp;
-    if(currentState===STATE.MENU)drawMenu();
-    else{
+    const dt=lastFrameTime
+        ? Math.min((timestamp-lastFrameTime)/(1000/60),2)
+        : 1;
+    lastFrameTime=timestamp;
+    updateScreenShake(dt);
+
+    if(currentState===STATE.MENU) {
+        drawMenu();
+    } else {
         drawBackground();
-        if(currentState===STATE.PAUSE){platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters();drawPauseMenu()}
-        else if(currentState===STATE.GAMEOVER){platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters();drawGameOver()}
-        else{platforms.forEach(drawPlatform);springs.forEach(drawSpring);coins.forEach(drawCoin);birds.forEach(drawBird);drawPlayer();drawCounters()}
+
+        ctx.save();
+        if (currentState !== STATE.PAUSE) {
+            ctx.translate(screenShake.x, screenShake.y);
+        }
+
+        if(currentState===STATE.PAUSE){
+            platforms.forEach(drawPlatform);
+            springs.forEach(drawSpring);
+            coins.forEach(drawCoin);
+            birds.forEach(drawBird);
+            drawPlayer();
+            drawCounters();
+            drawPauseMenu();
+        } else if(currentState===STATE.GAMEOVER){
+            platforms.forEach(drawPlatform);
+            springs.forEach(drawSpring);
+            coins.forEach(drawCoin);
+            birds.forEach(drawBird);
+            drawPlayer();
+            drawCounters();
+            drawGameOver();
+        } else {
+            platforms.forEach(drawPlatform);
+            springs.forEach(drawSpring);
+            coins.forEach(drawCoin);
+            birds.forEach(drawBird);
+            drawPlayer();
+            drawCounters();
+        }
+
+        ctx.restore();
     }
-    update(dt);requestAnimationFrame(draw);
-	jumpButton.disabled = currentState !== STATE.PLAYING || !doubleJumpAvailable;
+
+    update(dt);
+    requestAnimationFrame(draw);
+    jumpButton.disabled = currentState !== STATE.PLAYING || !doubleJumpAvailable;
 }
 fullscreenButton.addEventListener('click',async()=>{
     try{
