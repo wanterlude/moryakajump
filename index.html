@@ -178,6 +178,39 @@ const canvas=document.getElementById('game');
 const ctx=canvas.getContext('2d');
 const RENDER_SCALE=4;
 ctx.scale(RENDER_SCALE,RENDER_SCALE);
+// Размер игрового мира в координатах рисования — 400 × 600.
+const backgroundCache = document.createElement('canvas');
+backgroundCache.width = 400;
+backgroundCache.height = 600;
+
+const backgroundCtx = backgroundCache.getContext('2d');
+
+function buildBackgroundCache() {
+    const gradient = backgroundCtx.createLinearGradient(0, 0, 0, 600);
+    gradient.addColorStop(0, '#b7f4ff');
+    gradient.addColorStop(0.55, '#e8f8ff');
+    gradient.addColorStop(1, '#d7eaff');
+
+    backgroundCtx.fillStyle = gradient;
+    backgroundCtx.fillRect(0, 0, 400, 600);
+
+    backgroundCtx.fillStyle = 'rgba(255,255,255,.34)';
+    backgroundCtx.beginPath();
+    backgroundCtx.arc(55, 100, 42, 0, Math.PI * 2);
+    backgroundCtx.arc(76, 95, 30, 0, Math.PI * 2);
+    backgroundCtx.arc(320, 180, 55, 0, Math.PI * 2);
+    backgroundCtx.arc(345, 170, 37, 0, Math.PI * 2);
+    backgroundCtx.fill();
+
+    backgroundCtx.fillStyle = 'rgba(255,255,255,.18)';
+    for (let i = 0; i < 5; i++) {
+        backgroundCtx.beginPath();
+        backgroundCtx.ellipse(210, 430 + i * 34, 260, 15, 0, 0, Math.PI * 2);
+        backgroundCtx.fill();
+    }
+}
+
+buildBackgroundCache();
 const gameStage=document.getElementById('gameStage');
 const fullscreenButton=document.getElementById('fullscreenButton');
 const pauseButton = document.getElementById('pauseButton');
@@ -224,13 +257,6 @@ let player={x:185,y:500,vx:0,dy:0,score:0};
 let platforms=[],springs=[],coins=[],birds=[],lives=0,nextLifeScore=10000,doubleJumpAvailable=false,runCoins=0;
 let menuMessage='',menuMessageUntil=0,menuButtonDown=false;
 const keys={};
-
-function stopMouseControl() {
-    mouseControlActive = false;
-    touchInput.left = false;
-    touchInput.right = false;
-}
-
 
 const currentTheme={bg:'#d8f6ff',plat:'#38cdb4'};
 
@@ -622,14 +648,8 @@ function update(dt){
 }
 
 function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
-function drawBackground(){
-    const gradient=ctx.createLinearGradient(0,0,0,600);
-    gradient.addColorStop(0,'#b7f4ff');gradient.addColorStop(.55,'#e8f8ff');gradient.addColorStop(1,'#d7eaff');
-    ctx.fillStyle=gradient;ctx.fillRect(0,0,400,600);
-    ctx.fillStyle='rgba(255,255,255,.34)';ctx.beginPath();
-    ctx.arc(55,100,42,0,Math.PI*2);ctx.arc(76,95,30,0,Math.PI*2);ctx.arc(320,180,55,0,Math.PI*2);ctx.arc(345,170,37,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='rgba(255,255,255,.18)';
-    for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(210,430+i*34,260,15,0,0,Math.PI*2);ctx.fill()}
+function drawBackground() {
+    ctx.drawImage(backgroundCache, 0, 0);
 }
 function drawGlassPanel(x,y,w,h,r=22){
     ctx.save();ctx.shadowColor='rgba(18,70,110,.14)';ctx.shadowBlur=18;ctx.shadowOffsetY=8;
@@ -650,6 +670,11 @@ function drawCharacterImage(index,x,y,w,h,locked=false){
     if(locked){ctx.fillStyle='rgba(12,25,52,.56)';ctx.fillRect(x,y,w,h);ctx.fillStyle='rgba(255,255,255,.94)';ctx.font='bold 15px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🔒',x+w/2,y+h/2-8)}
     ctx.restore();
 }
+
+const playButtonGradient = ctx.createLinearGradient(100, 524, 300, 580);
+playButtonGradient.addColorStop(0, 'rgba(32,210,170,.92)');
+playButtonGradient.addColorStop(1, 'rgba(26,145,220,.92)');
+
 function drawMenu(){
     drawBackground();
     const glow=ctx.createRadialGradient(200,100,10,200,100,250);glow.addColorStop(0,'rgba(255,255,255,.45)');glow.addColorStop(1,'rgba(255,255,255,0)');
@@ -690,8 +715,8 @@ function drawMenu(){
 			ctx.restore();
 		}
 	});
-    ctx.save();const gradient=ctx.createLinearGradient(100,524,300,580);gradient.addColorStop(0,'rgba(32,210,170,.92)');gradient.addColorStop(1,'rgba(26,145,220,.92)');
-    roundedRect(104,524,192,56,19);ctx.fillStyle=gradient;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.save();
+    roundedRect(104,524,192,56,19);ctx.fillStyle = playButtonGradient;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle='#fff';ctx.font='bold 20px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('ИГРАТЬ',200,552);ctx.restore();
     if(performance.now()<menuMessageUntil&&menuMessage){
         ctx.save();ctx.fillStyle='rgba(20,43,70,.86)';roundedRect(45,480,310,34,13);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(menuMessage,200,497);ctx.restore();
