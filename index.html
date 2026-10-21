@@ -2093,21 +2093,9 @@ const EXTRAS_LABELS = {
     halo: 'ореол', crown: 'корона'
 };
 
+// Кнопка действия нужна только вкладке аватаров: у рамок свой экран.
 function menuPrimary() {
     const i = menuCursor();
-
-    if (menuState.tab === 'shop') {
-        const frame = FRAMES[i];
-        if (!frame) return { label: '—', color: '#8a97a8', enabled: false };
-
-        if (selectedFrame === frame.id) return { label: 'НАДЕТА', color: '#0f8a76', enabled: false };
-        if (ownedFrames.includes(frame.id)) return { label: 'НАДЕТЬ', color: '#287db4', enabled: true };
-
-        // Незакрытые рамки выбиваются из гачи, а не покупаются напрямую.
-        if (bankCoins >= GACHA_COST) return { label: 'КРУТИТЬ ЗА ' + GACHA_COST, color: '#a855f7', enabled: true };
-
-        return { label: 'НЕ ХВАТАЕТ', color: '#8a97a8', enabled: false };
-    }
 
     if (!unlockedAvatars.includes(i)) return { label: 'ЗАКРЫТО', color: '#8a97a8', enabled: false };
     if (selectedAvatar === i) return { label: 'ВЫБРАНА', color: '#0f8a76', enabled: false };
@@ -2117,43 +2105,6 @@ function menuPrimary() {
 
 function runPrimary() {
     const i = menuCursor();
-
-    if (menuState.tab === 'shop') {
-        const frame = FRAMES[i];
-        if (!frame) return;
-
-        if (ownedFrames.includes(frame.id)) {
-            if (selectedFrame === frame.id) { sfx.click(); return; }
-
-            selectedFrame = frame.id;
-            saveProgress();
-            setMenuMessage('Рамка надета', '«' + frame.name + '»');
-            sfx.click();
-            return;
-        }
-
-        if (bankCoins >= GACHA_COST) {
-            startGacha();
-            return;
-        }
-
-        if (bankCoins >= frame.price) {
-            bankCoins -= frame.price;
-            ownedFrames.push(frame.id);
-            selectedFrame = frame.id;
-            saveProgress();
-            setMenuMessage('Рамка куплена', '«' + frame.name + '» · −' + fmt(frame.price));
-            sfx.coin();
-            return;
-        }
-
-        setMenuMessage(
-            'Не хватает монет',
-            'Нужно ещё ' + fmt(frame.price - bankCoins) + ' · на счету ' + fmt(bankCoins)
-        );
-        sfx.click();
-        return;
-    }
 
     if (!unlockedAvatars.includes(i)) {
         const need = AVATAR_SCORES[i];
@@ -2588,8 +2539,8 @@ function drawMenuCard(index, x, y) {
     if (isShop) {
         if (active) { label = 'ВЫБРАНА'; color = '#0f8a76'; }
         else if (worn) { label = 'НАДЕТА'; color = '#0f8a76'; }
-        else if (unlocked) { label = 'КУПЛЕНА'; }
-        else { label = fmt(FRAMES[index].price); color = '#c28000'; }
+        else if (unlocked) { label = 'ЕСТЬ'; }
+        else { label = '—'; color = 'rgba(21,85,118,.34)'; }
     } else {
         label = '№ ' + (index + 1);
         if (active) color = '#0f8a76';
@@ -2759,9 +2710,16 @@ function drawMenu() {
 
     drawMenuHeader();
     drawMenuTabs();
-    drawShowcase();
-    drawMenuGrid();
-    drawMenuActions();
+
+    // Вкладка рамок — полноценный экран гачи, без сетки и нижней панели.
+    if (menuState.tab === 'shop') {
+        drawGachaShop();
+    } else {
+        drawShowcase();
+        drawMenuGrid();
+        drawMenuActions();
+    }
+
     drawMenuToast();
 }
 
@@ -5095,8 +5053,14 @@ window.addEventListener('keydown', event => {
 
         if (event.code === 'Enter' || event.code === 'Space') {
             event.preventDefault();
-            if (event.code === 'Enter') runPrimary();
+
+            // У вкладки рамок нет сетки: Enter/Space крутит гачу.
+            if (menuState.tab === 'shop') {
+                if (gachaState.phase === 'reveal') gachaState.phase = 'idle';
+                startGacha();
+            } else if (event.code === 'Enter') runPrimary();
             else startGame();
+
             return;
         }
 
@@ -5110,6 +5074,16 @@ window.addEventListener('keydown', event => {
         if (event.code === 'Escape') {
             event.preventDefault();
             startGame();
+            return;
+        }
+
+        // На экране гачи навигации по сетке нет — стрелки только переключают вкладку.
+        if (menuState.tab === 'shop' && dirByCode[event.code] !== undefined) {
+            event.preventDefault();
+            if (dirByCode[event.code] === -MENU.cols) {
+                switchMenuTab('avatars');
+                revealCursor(menuCursor());
+            }
             return;
         }
 
@@ -5243,19 +5217,27 @@ canvas.addEventListener('pointerdown', event => {
     }
 
     if (currentState === STATE.MENU) {
-        if (gachaState.phase !== 'idle') {
-            const action = gachaHitTest(point);
+        // Экран гачи забирает ввод целиком (кроме табов).
+        if (menuState.tab === 'shop') {
+            const onTabs = point.y >= MENU.tabsY && point.y <= MENU.tabsY + MENU.tabsH &&
+                point.x >= MENU.padX && point.x <= 400 - MENU.padX;
 
-            if (action === 'close' && gachaState.phase === 'reveal') {
-                gachaState.phase = 'idle';
-                gachaState.result = null;
-            } else if (action === 'again' && gachaState.phase !== 'spin') {
-                gachaState.phase = 'idle';
-                startGacha();
+            if (!onTabs) {
+                const action = gachaShopHitTest(point);
+
+                if (action === 'spin') {
+                    if (gachaState.phase === 'reveal') gachaState.phase = 'idle';
+                    startGacha();
+                } else if (action === 'equip' && gachaState.result) {
+                    selectedFrame = gachaState.result.id;
+                    saveProgress();
+                    setMenuMessage('Рамка надета', '«' + gachaState.result.name + '»');
+                    sfx.click();
+                }
+
+                event.preventDefault();
+                return;
             }
-
-            event.preventDefault();
-            return;
         }
 
         // Табы.
@@ -5328,6 +5310,12 @@ canvas.addEventListener('pointerdown', event => {
 // Колесо мыши: сетка меню должна крутиться и им, не только пальцем.
 // passive:false — иначе браузер прокрутит страницу вместо сетки.
 canvas.addEventListener('wheel', event => {
+    // Экран гачи не скроллится: колесо ему не нужно.
+    if (menuState.tab === 'shop' && currentState === STATE.MENU && gachaState.phase === 'idle') {
+        event.preventDefault();
+        return;
+    }
+
     if (currentState !== STATE.MENU) return;
 
     const point = canvasPoint(event);
@@ -5378,6 +5366,18 @@ canvas.addEventListener('pointermove', event => {
 
     // Подсветка кнопок паузы и gameover.
     if (event.pointerType !== 'mouse') return;
+
+    // Экран гачи: курсор-рука над кнопкой крутки и подиумом.
+    if (currentState === STATE.MENU && menuState.tab === 'shop') {
+        const action = gachaShopHitTest(point);
+        const next = action ? 'gacha-' + action : null;
+
+        if (next !== pauseState.hover) {
+            pauseState.hover = next;
+            canvas.style.cursor = next ? 'pointer' : 'default';
+        }
+        return;
+    }
 
     if (perkState.offering) {
         const index = perkCardAt(point);
@@ -5671,173 +5671,470 @@ function finishGacha() {
     }
 }
 
-// Лента прокрутки: набор рамок, который «проезжает» под окошком.
-function gachaStripFrames() {
-    // Детерминированный набор вокруг результата — без Math.random,
-    // иначе лента мерцала бы каждый кадр.
+
+
+/* ============================================================
+   ЭКРАН ГАЧИ (вкладка «рамки»)
+   ============================================================ */
+
+const GACHA_UI = {
+    panel:      { x: 20, y: 82, w: 360, h: 208 },
+    reel:       { x: 34, y: 96, w: 332, h: 150 },
+    collectY:   298,
+    ratesY:     330,
+    spinY:      372,
+    spinH:      52,
+    hintY:      444,
+    cellW:      76
+};
+
+const GACHA_TIER_ORDER = ['common', 'rare', 'epic', 'legendary', 'divine'];
+
+function gachaEquippedFrame() {
+    return FRAMES.find(f => f.id === selectedFrame) || FRAMES[0];
+}
+
+// Сколько рамок уже собрано (базовую не считаем — она у всех есть).
+function gachaCollected() {
+    return ownedFrames.filter(id => id !== 0).length;
+}
+
+function gachaTotal() {
+    return FRAMES.length - 1;
+}
+
+function gachaTierColor(frame) {
+    return GACHA_TIER_COLORS[GACHA_TIER(frame)] || '#5a7f9c';
+}
+
+// Лента прокрутки: детерминированный набор вокруг результата.
+function gachaReelFrames() {
     const list = [];
     const seed = gachaState.result ? gachaState.result.id : 1;
 
-    for (let i = 0; i < 24; i++) {
-        list.push(FRAMES[(seed * 7 + i * 3) % FRAMES.length]);
+    for (let i = 0; i < 22; i++) {
+        const frame = FRAMES[(seed * 7 + i * 5) % FRAMES.length];
+        list.push(frame.id === 0 ? FRAMES[1] : frame);
     }
-    // Результат ставим ровно в центральную позицию.
-    list[20] = gachaState.result || FRAMES[1];
+
+    // Результат ставим ровно в позицию указателя.
+    list[18] = gachaState.result || FRAMES[1];
     return list;
 }
 
-function drawGacha() {
-    if (gachaState.phase === 'idle') return;
+function drawGachaPanelGlow(color, alpha) {
+    const { x, y, w, h } = GACHA_UI.panel;
 
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    const glow = ctx.createRadialGradient(200, y + h * 0.42, 10, 200, y + h * 0.42, 190);
+    glow.addColorStop(0, color);
+    glow.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(x, y, w, h);
+
+    ctx.restore();
+}
+
+function drawGachaRates() {
+    const y = GACHA_UI.ratesY;
+    const w = 64;
+    const gap = 6;
+    const total = w * 5 + gap * 4;
+    const left = (400 - total) / 2;
+
+    for (let i = 0; i < GACHA_TIER_ORDER.length; i++) {
+        const tier = GACHA_TIER_ORDER[i];
+        const color = GACHA_TIER_COLORS[tier];
+        const x = left + i * (w + gap);
+
+        roundedRect(x, y, w, 30, 9);
+        ctx.fillStyle = 'rgba(255,255,255,.52)';
+        ctx.fill();
+
+        ctx.save();
+        roundedRect(x, y, w, 30, 9);
+        ctx.clip();
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.16;
+        ctx.fillRect(x, y, w, 30);
+        ctx.restore();
+
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        setFont(6, 'bold');
+        ctx.fillStyle = color;
+        trackedText(GACHA_TIER_LABELS[tier], x + w / 2, y + 10, 0.8);
+
+        setFont(9.5, 'bold');
+        ctx.fillStyle = 'rgba(21,85,118,.82)';
+        trackedText(Math.round(GACHA_RATES[tier] * 100) + '%', x + w / 2, y + 21, 0.4);
+
+        ctx.restore();
+    }
+}
+
+function drawGachaCollection() {
+    const y = GACHA_UI.collectY;
+    const collected = gachaCollected();
+    const total = gachaTotal();
+    const ratio = total ? collected / total : 0;
+
+    ctx.save();
+    ctx.textBaseline = 'middle';
+
+    setFont(7, 'bold');
+    ctx.fillStyle = 'rgba(21,85,118,.55)';
+    trackedText('СОБРАНО', 20, y + 5, 1.4, 'left');
+
+    setFont(8.5, 'bold');
+    ctx.fillStyle = '#0f3d5c';
+    trackedText(collected + ' / ' + total, 380, y + 5, 0.8, 'right');
+
+    ctx.restore();
+
+    // Полоса прогресса коллекции.
+    const barY = y + 16;
+    roundedRect(20, barY, 360, 7, 3.5);
+    ctx.fillStyle = 'rgba(21,85,118,.12)';
+    ctx.fill();
+
+    if (ratio > 0) {
+        ctx.save();
+        roundedRect(20, barY, Math.max(7, 360 * ratio), 7, 3.5);
+        ctx.clip();
+        const fill = ctx.createLinearGradient(20, 0, 380, 0);
+        fill.addColorStop(0, '#3fb8d8');
+        fill.addColorStop(0.6, '#a855f7');
+        fill.addColorStop(1, '#ff4d6d');
+        ctx.fillStyle = fill;
+        ctx.fillRect(20, barY, 360, 7);
+        ctx.restore();
+    }
+}
+
+function drawGachaReel() {
+    const { x, y, w, h } = GACHA_UI.reel;
     const now = performance.now();
     const elapsed = now - gachaState.startedAt;
-
-    if (gachaState.phase === 'spin' && elapsed >= gachaState.duration) {
-        finishGacha();
-    }
-
-    const strip = gachaStripFrames();
+    const strip = gachaReelFrames();
     const centerX = 200;
-    const cellW = 74;
-    const cardY = 150;
-    const cardH = 150;
-
-    // Окно прокрутки.
-    ctx.save();
-    ctx.fillStyle = 'rgba(6,26,44,.58)';
-    ctx.fillRect(0, 0, 400, 600);
-    ctx.restore();
 
     ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    setFont(9, 'bold');
-    ctx.fillStyle = 'rgba(255,255,255,.72)';
-    trackedText(gachaState.phase === 'spin' ? 'ОТКРЫВАЕМ...' : 'ТВОЯ РАМКА', 200, 112, 2.4);
-    ctx.restore();
-
-    // Маска окна: рамки видны только в центральной полосе.
-    ctx.save();
-    roundedRect(40, cardY, 320, cardH, 18);
+    roundedRect(x, y, w, h, 16);
     ctx.clip();
-    ctx.fillStyle = 'rgba(255,255,255,.06)';
-    ctx.fillRect(40, cardY, 320, cardH);
 
-    // Смещение: быстрое в начале, плавное торможение к концу.
+    ctx.fillStyle = 'rgba(10,36,58,.96)';
+    ctx.fillRect(x, y, w, h);
+
+    // Мягкая подсветка по краям окна.
+    const edge = ctx.createLinearGradient(x, 0, x + w, 0);
+    edge.addColorStop(0, 'rgba(10,36,58,.95)');
+    edge.addColorStop(0.22, 'rgba(10,36,58,0)');
+    edge.addColorStop(0.78, 'rgba(10,36,58,0)');
+    edge.addColorStop(1, 'rgba(10,36,58,.95)');
+    ctx.fillStyle = edge;
+    ctx.fillRect(x, y, w, h);
+
     let offset;
     if (gachaState.phase === 'spin') {
         const p = Math.min(1, elapsed / gachaState.duration);
-        const eased = 1 - Math.pow(1 - p, 3.4);
-        offset = eased * 20 * cellW;
+        offset = (1 - Math.pow(1 - p, 3.4)) * 18 * GACHA_UI.cellW;
     } else {
-        offset = 20 * cellW;
+        offset = 18 * GACHA_UI.cellW;
     }
+
+    const cy = y + h / 2;
 
     for (let i = 0; i < strip.length; i++) {
         const frame = strip[i];
         if (!frame) continue;
 
-        const x = centerX + i * cellW - offset - cellW / 2;
+        const cellX = centerX + (i - 18) * GACHA_UI.cellW - offset;
+        if (cellX + GACHA_UI.cellW < x - 20 || cellX > x + w + 20) continue;
 
-        // Рисуем только то, что попадает в окно.
-        if (x < 20 || x > 380) continue;
-
-        const cy = cardY + cardH / 2;
-        const look = frame.look;
-        const tierColor = GACHA_TIER_COLORS[GACHA_TIER(frame)];
+        const cx = cellX + GACHA_UI.cellW / 2;
+        const color = gachaTierColor(frame);
 
         ctx.save();
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.55;
         ctx.beginPath();
-        ctx.arc(x + cellW / 2, cy, 26, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,.9)';
+        ctx.arc(cx, cy, 34, 0, Math.PI * 2);
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.restore();
 
-        drawAvatarCircle(x + cellW / 2, cy, 22, selectedAvatar);
-        if (look) drawFrame(x + cellW / 2, cy, 22, frame.id, true);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,.94)';
+        ctx.fill();
+        ctx.restore();
+
+        drawAvatarCircle(cx, cy, 25, selectedAvatar);
+        drawFrame(cx, cy, 25, frame.id, true);
 
         ctx.save();
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        setFont(6.5, 'bold');
-        ctx.fillStyle = tierColor;
-        trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], x + cellW / 2, cy + 44, 1.0);
+        setFont(6, 'bold');
+        ctx.fillStyle = color;
+        trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, cy + 46, 0.8);
         ctx.restore();
     }
 
     ctx.restore();
 
-    // Рамка окна и центральный маркер.
-    ctx.save();
-    roundedRect(40, cardY, 320, cardH, 18);
-    ctx.strokeStyle = 'rgba(255,255,255,.34)';
-    ctx.lineWidth = 1.6;
+    // Рамка окна.
+    roundedRect(x + 0.75, y + 0.75, w - 1.5, h - 1.5, 16);
+    ctx.strokeStyle = 'rgba(255,255,255,.30)';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
-    ctx.fillRect(40, cardY, 320, 2);
-
-    // Центральная стрелка-указатель.
+    // Указатель по центру.
+    ctx.save();
     ctx.fillStyle = '#ffd54a';
     ctx.beginPath();
-    ctx.moveTo(196, cardY - 10);
-    ctx.lineTo(204, cardY - 10);
-    ctx.lineTo(200, cardY - 3);
+    ctx.moveTo(193, y - 9);
+    ctx.lineTo(207, y - 9);
+    ctx.lineTo(200, y + 1);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(193, y + h + 9);
+    ctx.lineTo(207, y + h + 9);
+    ctx.lineTo(200, y + h - 1);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-
-    // Итог после остановки.
-    if (gachaState.phase === 'reveal' && gachaState.result) {
-        const frame = gachaState.result;
-        const tier = GACHA_TIER(frame);
-        const color = GACHA_TIER_COLORS[tier];
-        const appear = Math.min(1, (now - gachaState.startedAt) / 260);
-
-        ctx.save();
-        ctx.globalAlpha = appear;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        setFont(15, 'bold');
-        ctx.fillStyle = color;
-        trackedText(frame.name.toUpperCase(), 200, 340, 1.0);
-
-        setFont(8, 'bold');
-        ctx.fillStyle = 'rgba(255,255,255,.7)';
-        trackedText(GACHA_TIER_LABELS[tier], 200, 360, 2.0);
-
-        if (gachaState.duplicate) {
-            setFont(8, 'bold');
-            ctx.fillStyle = '#ffd54a';
-            trackedText('ДУБЛИКАТ · +' + gachaState.refund + ' МОНЕТ', 200, 382, 1.4);
-        }
-
-        ctx.restore();
-    }
-
-    // Кнопки.
-    const canClose = gachaState.phase === 'reveal';
-    const btnY = 452;
-
-    drawMenuButton(40, btnY, 150, 42, canClose ? 'ЗАКРЫТЬ' : '...', '#287db4', {
-        size: 11,
-        dim: !canClose
-    });
-
-    drawMenuButton(210, btnY, 150, 42,
-        gachaState.phase === 'spin' ? '...' : 'ЕЩЁ ЗА ' + GACHA_COST, '#12a08c', {
-        size: 10,
-        dim: gachaState.phase === 'spin' || bankCoins < GACHA_COST
-    });
 }
 
-function gachaHitTest(point) {
-    if (gachaState.phase === 'idle') return null;
-    if (point.y < 452 || point.y > 494) return null;
-    if (point.x >= 40 && point.x <= 190) return 'close';
-    if (point.x >= 210 && point.x <= 360) return 'again';
+// Подиум в спокойном состоянии: показывает надетую рамку.
+function drawGachaEquipped() {
+    const { x, y, w, h } = GACHA_UI.panel;
+    const frame = gachaEquippedFrame();
+    const color = gachaTierColor(frame);
+    const now = performance.now();
+
+    drawGachaPanelGlow(color, 0.34);
+
+    const cx = 200;
+    const cy = y + 78;
+    const pulse = 0.5 + 0.5 * Math.sin(now / 520);
+
+    ctx.save();
+    ctx.globalAlpha = 0.30 + pulse * 0.14;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 52 + pulse * 3, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 44, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.fill();
+    ctx.restore();
+
+    drawAvatarCircle(cx, cy, 36, selectedAvatar);
+    drawFrame(cx, cy, 36, frame.id, false);
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    setFont(12, 'bold');
+    ctx.fillStyle = '#0f3d5c';
+    trackedText(frame.name.toUpperCase(), cx, y + 148, 1.0);
+
+    setFont(7, 'bold');
+    ctx.fillStyle = color;
+    trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, y + 168, 2.0);
+
+    setFont(6.5, 'bold');
+    ctx.fillStyle = 'rgba(21,85,118,.42)';
+    trackedText('СЕЙЧАС НАДЕТА', cx, y + 186, 1.2);
+
+    ctx.restore();
+}
+
+function drawGachaReveal() {
+    const { y } = GACHA_UI.panel;
+    const frame = gachaState.result;
+    if (!frame) return;
+
+    const color = gachaTierColor(frame);
+    const tier = GACHA_TIER(frame);
+    const now = performance.now();
+    const appear = Math.min(1, (now - gachaState.startedAt) / 240);
+
+    drawGachaPanelGlow(color, 0.5 * appear);
+
+    ctx.save();
+    ctx.globalAlpha = appear;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    setFont(13, 'bold');
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+    trackedText(frame.name.toUpperCase(), 200, y + 172, 1.0);
+    ctx.shadowBlur = 0;
+
+    setFont(7, 'bold');
+    ctx.fillStyle = 'rgba(21,85,118,.62)';
+    trackedText(GACHA_TIER_LABELS[tier], 200, y + 190, 2.0);
+
+    ctx.restore();
+}
+
+function drawGachaSpinButton() {
+    const y = GACHA_UI.spinY;
+    const h = GACHA_UI.spinH;
+    const now = performance.now();
+
+    const spinning = gachaState.phase === 'spin';
+    const canSpin = !spinning && bankCoins >= GACHA_COST;
+
+    // Пульс доступной крутки — мягко зовёт нажать.
+    const pulse = canSpin ? 0.5 + 0.5 * Math.sin(now / 460) : 0;
+
+    ctx.save();
+
+    if (canSpin) {
+        ctx.shadowColor = 'rgba(168,85,247,.55)';
+        ctx.shadowBlur = 16 + pulse * 10;
+        ctx.shadowOffsetY = 6;
+    }
+
+    roundedRect(20, y, 360, h, 16);
+    const fill = ctx.createLinearGradient(0, y, 0, y + h);
+
+    if (spinning) {
+        fill.addColorStop(0, '#8b93a3');
+        fill.addColorStop(1, '#6b7383');
+    } else if (canSpin) {
+        fill.addColorStop(0, '#b06cf5');
+        fill.addColorStop(0.5, '#a855f7');
+        fill.addColorStop(1, '#7c3aed');
+    } else {
+        fill.addColorStop(0, '#c8ccd6');
+        fill.addColorStop(1, '#aeb4c0');
+    }
+
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    // Верхний блик.
+    roundedRect(26, y + 5, 348, h * 0.40, 12);
+    ctx.fillStyle = 'rgba(255,255,255,.16)';
+    ctx.fill();
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    if (spinning) {
+        setFont(12, 'bold');
+        ctx.fillStyle = 'rgba(255,255,255,.92)';
+        trackedText('ОТКРЫВАЕМ', 200, y + h / 2, 2.2);
+    } else {
+        setFont(12, 'bold');
+        ctx.fillStyle = canSpin ? '#ffffff' : 'rgba(255,255,255,.86)';
+        trackedText('КРУТИТЬ', 152, y + h / 2 - 1, 1.6);
+
+        setFont(11, 'bold');
+        ctx.fillStyle = canSpin ? '#ffe9a8' : 'rgba(255,255,255,.72)';
+        trackedText(GACHA_COST + '', 268, y + h / 2 - 1, 0.6);
+
+        drawCoinBadge(251, y + h / 2 - 1, 6.6, 0);
+    }
+
+    ctx.restore();
+}
+
+function drawGachaHint() {
+    const now = performance.now();
+    let text = 'ДУБЛИКАТ ВОЗВРАЩАЕТ ' + Math.round(GACHA_COST * 0.5) + ' МОНЕТ';
+
+    if (gachaState.phase === 'reveal' && gachaState.result) {
+        text = gachaState.duplicate
+            ? 'ДУБЛИКАТ · +' + gachaState.refund + ' МОНЕТ'
+            : 'НОВАЯ РАМКА · НАДЕТА';
+
+        if (gachaState.duplicate) {
+            ctx.save();
+            ctx.globalAlpha = 0.55 + 0.45 * Math.sin(now / 300);
+            ctx.restore();
+        }
+    }
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    setFont(7, 'bold');
+    ctx.fillStyle = gachaState.phase === 'reveal'
+        ? (gachaState.duplicate ? '#c28000' : '#0f8a76')
+        : 'rgba(21,85,118,.45)';
+    trackedText(text, 200, GACHA_UI.hintY, 1.4);
+    ctx.restore();
+}
+
+function drawGachaShop() {
+    const now = performance.now();
+
+    if (gachaState.phase === 'spin' && now - gachaState.startedAt >= gachaState.duration) {
+        finishGacha();
+    }
+
+    drawGachaCollection();
+
+    roundedRect(GACHA_UI.panel.x, GACHA_UI.panel.y, GACHA_UI.panel.w, GACHA_UI.panel.h, 18);
+    ctx.fillStyle = 'rgba(255,255,255,.58)';
+    ctx.fill();
+
+    roundedRect(GACHA_UI.panel.x + 0.75, GACHA_UI.panel.y + 0.75,
+        GACHA_UI.panel.w - 1.5, GACHA_UI.panel.h - 1.5, 18);
+    ctx.strokeStyle = 'rgba(21,85,118,.10)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    if (gachaState.phase === 'idle') {
+        drawGachaEquipped();
+    } else {
+        drawGachaReel();
+        if (gachaState.phase === 'reveal') drawGachaReveal();
+    }
+
+    drawGachaRates();
+    drawGachaSpinButton();
+    drawGachaHint();
+}
+
+function gachaShopHitTest(point) {
+    const { x, y, w } = { x: 20, y: GACHA_UI.spinY, w: 360 };
+
+    if (point.x >= x && point.x <= x + w &&
+        point.y >= y && point.y <= y + GACHA_UI.spinH) {
+        return 'spin';
+    }
+
+    if (gachaState.phase === 'reveal' && gachaState.result) {
+        const panel = GACHA_UI.panel;
+        if (point.x >= panel.x && point.x <= panel.x + panel.w &&
+            point.y >= panel.y && point.y <= panel.y + panel.h) {
+            return 'equip';
+        }
+    }
+
     return null;
 }
 
@@ -6248,8 +6545,6 @@ function draw(timestamp) {
         if (currentState === STATE.PAUSE) drawPauseMenu();
         else if (currentState === STATE.GAMEOVER) drawGameOver();
         else drawPerkOffer();
-
-        if (gachaState.phase !== 'idle') drawGacha();
     }
 
     update(dt);
