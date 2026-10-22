@@ -21,25 +21,33 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #soundButton.muted .spkCross{display:inline}
 #soundButton.muted{color:rgba(255,255,255,.55)}
 #soundButton:hover,#fullscreenButton:hover{background:rgba(255,255,255,.22)}
-#soundButton:active,#fullscreenButton:active{transform:scale(.96)}
+#soundButton:active,#fullscreenButton:active,#resetButton:active{transform:scale(.96)}
+#resetButton{width:52px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,110,110,.55);border-radius:14px;background:rgba(200,50,60,.20);color:#ffb3b8;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:0;transition:background .15s ease,color .15s ease}
+#resetButton svg{display:block}
+#resetButton:hover{background:rgba(220,60,70,.38);color:#fff}
+#resetButton:active{transform:scale(.96)}
 #gameStage:fullscreen #toolbar{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10}
+#resetOverlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#resetOverlay.open{display:flex}
+#resetCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
+@keyframes resetIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+#resetCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
+#resetCard p{margin:0 0 18px;font-size:12.5px;line-height:1.5;color:rgba(210,228,246,.78)}
+#resetCard .warn{display:block;margin-top:6px;font-size:11px;color:#ffb3b8}
+#resetActions{display:flex;gap:10px}
+#resetActions button{flex:1;padding:12px 10px;border-radius:13px;border:1px solid transparent;font:bold 12.5px Arial,sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
+#resetActions button:active{transform:scale(.97)}
+#resetCancel{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#resetCancel:hover{background:rgba(255,255,255,.18)}
+#resetConfirm{background:linear-gradient(180deg,#e85a63,#c8323c);color:#fff}
+#resetConfirm:hover{filter:brightness(1.08)}
 #pauseButton,#tiltButton{display:none!important}
-#touchControls{position:absolute;left:0;right:0;bottom:18px;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:0 22px;pointer-events:none}
-.touchButton{width:72px;height:72px;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(255,255,255,.18);color:white;font:bold 34px Arial,sans-serif;pointer-events:auto;touch-action:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.touchButton:active{background:rgba(255,255,255,.35)}
-@media(hover:hover) and (pointer:fine){#touchControls{display:none}}
 @media (max-width:600px) and (pointer:coarse){
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
     body{padding:max(6px, env(safe-area-inset-top)) 0}
     #gameStage{width:100%;gap:8px}
     #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
     #fullscreenButton{display:none}
-    #touchControls{position:fixed;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));z-index:20;display:flex;justify-content:space-between;align-items:center;padding:0 22px;pointer-events:none}
-    .touchButton{width:72px;height:72px;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(255,255,255,.18);color:white;font:bold 34px Arial,sans-serif;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-    .touchButton:active{background:rgba(255,255,255,.35)}
-    #jumpButton{position:absolute;right:22px;bottom:94px;width:62px;height:62px;font-size:27px}
-    #jumpButton:disabled{opacity:.45}
-    #jumpButton:not(:disabled){background:rgba(22,163,106,.7);border-color:rgba(255,255,255,.95)}
     #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
     #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-height:none;border-radius:0}
     #gameStage:fullscreen #toolbar{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
@@ -48,8 +56,6 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     body{padding:0}
     #gameStage{height:100dvh;gap:4px}
     #game{width:auto;height:calc(100dvh - 54px);max-width:68vw;border-radius:10px}
-    #touchControls{bottom:max(10px,env(safe-area-inset-bottom));padding-right:max(20px,env(safe-area-inset-right));padding-left:max(20px,env(safe-area-inset-left))}
-    .touchButton{width:64px;height:64px;font-size:30px}
 }
 </style>
 </head>
@@ -66,11 +72,25 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
         </svg>
     </button>
     <button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
+    <button id="resetButton" type="button" aria-label="Сбросить прогресс" title="Сбросить прогресс">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+            <path d="M5 7h14M10 7V5.4c0-.5.4-.9.9-.9h2.2c.5 0 .9.4.9.9V7M7.2 7l.8 11.2c.05.7.63 1.2 1.33 1.2h5.34c.7 0 1.28-.5 1.33-1.2L16.8 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10.4 10.6v6M13.6 10.6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".75"/>
+        </svg>
+    </button>
 </div>
-<div id="touchControls" aria-label="Управление">
-    <button class="touchButton" id="leftButton" aria-label="Влево">←</button>
-    <button class="touchButton" id="jumpButton" aria-label="Дополнительный прыжок" disabled>↑</button>
-    <button class="touchButton" id="rightButton" aria-label="Вправо">→</button>
+<div id="resetOverlay" role="dialog" aria-modal="true" aria-labelledby="resetTitle" aria-hidden="true">
+    <div id="resetCard">
+        <h2 id="resetTitle">Сбросить прогресс?</h2>
+        <p>
+            Вы уверены что хотите сбросить прогресс?
+            <span class="warn">Рекорд, монеты, рамки и аватары будут удалены безвозвратно.</span>
+        </p>
+        <div id="resetActions">
+            <button id="resetCancel" type="button">ОТМЕНА</button>
+            <button id="resetConfirm" type="button">СБРОСИТЬ</button>
+        </div>
+    </div>
 </div>
 </div>
 <script>
@@ -595,6 +615,20 @@ function updateScreenShake(dt) {
    ============================================================ */
 
 const AVATAR_SCORES = Array.from({ length: 26 }, (_, index) => index * 2500);
+
+// Подпись закрытого аватара: сколько очков нужно набрать.
+// Крупные пороги в карточку шириной 64 px не влезают, поэтому
+// от 10 000 переходим на компактный вид: 12 500 -> «12.5К».
+function avatarUnlockLabel(index) {
+    const need = AVATAR_SCORES[index] || 0;
+
+    if (need >= 10000) {
+        const k = need / 1000;
+        return (Number.isInteger(k) ? String(k) : k.toFixed(1)) + 'К';
+    }
+
+    return fmt(need);
+}
 
 const avatarImages = Array.from({ length: 26 }, (_, i) => {
     const image = new Image();
@@ -1176,6 +1210,11 @@ function resetGame() {
     resetQuests();
     fallCooldown = 0;
     squash = 0;
+    runStartedAt = performance.now();
+
+    // Палец мог остаться зажатым с прошлого забега — иначе игрок
+    // поедет в сторону сразу после старта.
+    clearTouchInput();
 
     for (let i = 0; i < 7; i++) {
         const y = 500 - i * 100;
@@ -1205,6 +1244,10 @@ function pauseGame() {
     currentState = STATE.PAUSE;
     lastFrameTime = 0;
     pauseState.openedAt = performance.now();
+
+    // На паузе удержание сбрасываем: иначе после возврата игрок
+    // продолжит ехать в сторону, которую уже отпустил.
+    clearTouchInput();
 }
 
 // Удаляет элементы на месте (без нового массива) и сохраняет порядок.
@@ -1448,6 +1491,18 @@ function setFont(size, weight = 'bold') {
 }
 
 const charWidthCache = new Map();
+
+// Подбирает наибольший кегль, при котором текст влезает в maxWidth.
+// Кэш ширин привязан к ctx.font, поэтому размер выставляем перед каждым замером.
+function fitTextSize(text, maxWidth, tracking = 0, maxSize = 6.5, minSize = 4.4) {
+    for (let size = maxSize; size > minSize; size -= 0.3) {
+        setFont(size, 'bold');
+        if (trackedWidth(text, tracking) <= maxWidth) return size;
+    }
+
+    setFont(minSize, 'bold');
+    return minSize;
+}
 
 function charWidth(ch) {
     const key = ctx.font + '\u0000' + ch;
@@ -2042,6 +2097,10 @@ function switchMenuTab(tab) {
     menuState.scroll = 0;
     menuState.fadeT = 0;
     clampScroll();
+
+    // На вкладке рамок подводим панель к надетой рамке.
+    if (tab === 'shop') gachaPickerRevealSelected();
+
     sfx.click();
 }
 
@@ -2541,10 +2600,20 @@ function drawMenuCard(index, x, y) {
         else if (worn) { label = 'НАДЕТА'; color = '#0f8a76'; }
         else if (unlocked) { label = 'ЕСТЬ'; }
         else { label = '—'; color = 'rgba(21,85,118,.34)'; }
+    } else if (!unlocked) {
+        // Закрытый аватар: номер ничего не говорит игроку. Показываем,
+        // сколько очков нужно набрать, — иначе непонятно, к чему стремиться.
+        label = 'РЕКОРД ' + avatarUnlockLabel(index);
+        color = active ? '#8a5a00' : '#a86b00';
+        fitTextSize(label, w - 8, 0.5);
     } else {
         label = '№ ' + (index + 1);
         if (active) color = '#0f8a76';
     }
+
+    // Для закрытого аватара кегль уже выставлен в fitTextSize,
+    // для остальных ветвей возвращаем стандартный.
+    if (isShop || unlocked) setFont(6.5, 'bold');
 
     ctx.fillStyle = color;
     trackedText(label, cx, y + h - 13, 0.5);
@@ -2650,7 +2719,10 @@ function drawMenuToast() {
 
     const hasSub = Boolean(menuMessageSub);
     const h = hasSub ? 34 : 26;
-    const top = MENU.barY - 10 - h;
+    // На вкладке рамок низ занят панелью выбора — тост уходит под неё.
+    const top = menuState.tab === 'shop'
+        ? GACHA_UI.picker.y + GACHA_UI.picker.h + 6
+        : MENU.barY - 10 - h;
 
     ctx.save();
     ctx.globalAlpha = Math.min(1, (menuMessageUntil - performance.now()) / 280);
@@ -3514,6 +3586,7 @@ function drawPlayer() {
    ============================================================ */
 
 const touchInput = { left: false, right: false };
+let runStartedAt = 0;
 const activePointers = { left: new Set(), right: new Set() };
 
 let tiltEnabled = false;
@@ -4119,6 +4192,57 @@ function drawTiltGlyph(cx, cy, s, color) {
     ctx.restore();
 }
 
+// Первые секунды забега мягко подсказываем, что края экрана — это движение.
+// Дальше подсказка не нужна и только мешает.
+const TOUCH_HINT_MS = 4200;
+
+function drawTouchHints(now) {
+    if (!isCoarsePointer() || currentState !== STATE.PLAYING) return;
+    if (!runStartedAt) return;
+
+    const elapsed = now - runStartedAt;
+    if (elapsed > TOUCH_HINT_MS) return;
+
+    // Плавно появляется и гаснет, без резкого среза в конце.
+    const fadeIn = Math.min(1, elapsed / 320);
+    const fadeOut = Math.min(1, (TOUCH_HINT_MS - elapsed) / 700);
+    const alpha = Math.min(fadeIn, fadeOut) * 0.55;
+    if (alpha <= 0.01) return;
+
+    const edge = 400 * TOUCH_EDGE;
+    const cy = 300;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    for (const side of ['left', 'right']) {
+        const active = touchInput[side];
+        const cx = side === 'left' ? edge * 0.5 : 400 - edge * 0.5;
+        const dir = side === 'left' ? -1 : 1;
+
+        const glow = ctx.createRadialGradient(cx, cy, 4, cx, cy, 120);
+        glow.addColorStop(0, active ? 'rgba(255,255,255,.30)' : 'rgba(255,255,255,.16)');
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(cx - 120, cy - 130, 240, 260);
+
+        ctx.strokeStyle = 'rgba(255,255,255,.92)';
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        const offset = active ? 3 * dir : 0;
+
+        ctx.beginPath();
+        ctx.moveTo(cx + 9 * dir + offset, cy - 13);
+        ctx.lineTo(cx - 8 * dir + offset, cy);
+        ctx.lineTo(cx + 9 * dir + offset, cy + 13);
+        ctx.stroke();
+    }
+
+    ctx.restore();
+}
+
 function drawHudButtons() {
     const playing = currentState === STATE.PLAYING;
     ctx.save();
@@ -4249,6 +4373,8 @@ function drawHud() {
 
     chipX += coinW + 6;
 
+    // Чип показывает, готов ли двойной прыжок. Тапнуть можно по всему экрану,
+    // поэтому подсказка говорит именно об этом.
     const jumpReady = doubleJumpAvailable && currentState === STATE.PLAYING;
     const jumpW = 62;
     drawHudChip(chipX, chipY, jumpW, chipH,
@@ -4257,6 +4383,15 @@ function drawHud() {
     ctx.save();
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
+
+    // На тач-устройстве подсказываем тап, на ПК — клик или клавишу.
+    if (jumpReady) {
+        setFont(5.6, 'bold');
+        ctx.fillStyle = 'rgba(21,85,118,.55)';
+        ctx.textAlign = 'right';
+        trackedText(isCoarsePointer() ? 'ТАП' : 'КЛИК', chipX + jumpW - 7, chipY + chipH / 2, 0.8, 'right');
+        ctx.textAlign = 'left';
+    }
 
     const arrowColor = jumpReady ? HUD_COLORS.green : 'rgba(21,85,118,.30)';
     ctx.strokeStyle = arrowColor;
@@ -4382,6 +4517,7 @@ function drawHud() {
         ctx.restore();
     }
 
+    drawTouchHints(performance.now());
     drawHudPops();
 }
 
@@ -5027,6 +5163,13 @@ function canvasPoint(event) {
 window.addEventListener('keydown', event => {
     keys[event.code] = true;
 
+    // Окно сброса перехватывает Escape: иначе он увёл бы в другой экран.
+    if (resetOpen && event.code === 'Escape') {
+        event.preventDefault();
+        closeResetDialog();
+        return;
+    }
+
     if (perkState.offering) {
         const byCode = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 };
         if (event.code in byCode) {
@@ -5037,11 +5180,8 @@ window.addEventListener('keydown', event => {
     }
 
     if ((event.code === 'ArrowUp' || event.code === 'KeyW' || event.code === 'Space') &&
-        currentState === STATE.PLAYING && doubleJumpAvailable) {
+        doDoubleJump()) {
         event.preventDefault();
-        player.dy = -15;
-        doubleJumpAvailable = false;
-        sfx.jump();
         return;
     }
 
@@ -5077,13 +5217,29 @@ window.addEventListener('keydown', event => {
             return;
         }
 
-        // На экране гачи навигации по сетке нет — стрелки только переключают вкладку.
+        // На экране гачи сетки нет: ←/→ листают выпавшие рамки, ↑ уводит на аватары.
         if (menuState.tab === 'shop' && dirByCode[event.code] !== undefined) {
             event.preventDefault();
-            if (dirByCode[event.code] === -MENU.cols) {
+
+            const step = dirByCode[event.code];
+
+            if (step === -MENU.cols) {
                 switchMenuTab('avatars');
                 revealCursor(menuCursor());
+                return;
             }
+
+            if (step === 1 || step === -1) {
+                const list = gachaOwnedList();
+                const current = list.findIndex(f => f.id === selectedFrame);
+                const next = Math.max(0, Math.min(list.length - 1, (current < 0 ? 0 : current) + step));
+
+                if (list[next]) {
+                    equipFrameById(list[next].id);
+                    gachaPickerRevealSelected();
+                }
+            }
+
             return;
         }
 
@@ -5223,16 +5379,28 @@ canvas.addEventListener('pointerdown', event => {
                 point.x >= MENU.padX && point.x <= 400 - MENU.padX;
 
             if (!onTabs) {
+                // Панель рамок: тап надевает, протяжка прокручивает.
+                // Решение «тап или свайп» принимаем на отпускании.
+                if (isInsideGachaPicker(point)) {
+                    gachaState.pickerDrag = true;
+                    gachaState.pickerPointerId = event.pointerId;
+                    gachaState.pickerStartX = point.x;
+                    gachaState.pickerScrollStart = gachaState.pickerScroll;
+                    gachaState.pickerMoved = 0;
+
+                    try { canvas.setPointerCapture(event.pointerId); } catch { /* ignore */ }
+
+                    event.preventDefault();
+                    return;
+                }
+
                 const action = gachaShopHitTest(point);
 
                 if (action === 'spin') {
                     if (gachaState.phase === 'reveal') gachaState.phase = 'idle';
                     startGacha();
                 } else if (action === 'equip' && gachaState.result) {
-                    selectedFrame = gachaState.result.id;
-                    saveProgress();
-                    setMenuMessage('Рамка надета', '«' + gachaState.result.name + '»');
-                    sfx.click();
+                    equipFrameById(gachaState.result.id);
                 }
 
                 event.preventDefault();
@@ -5297,12 +5465,27 @@ canvas.addEventListener('pointerdown', event => {
             return;
         }
 
-        // Мышь: двойной прыжок кликом.
-        if (event.pointerType === 'mouse' && event.button === 0 && doubleJumpAvailable) {
+        // Тач: левый край — влево, правый — вправо, центр — двойной прыжок.
+        // Движение работает удержанием, поэтому указатель захватываем:
+        // палец может уехать за край канваса, а направление не потеряется.
+        if (event.pointerType !== 'mouse') {
+            const zone = touchZoneAt(point.x);
+
+            if (zone === 'center') {
+                doDoubleJump();
+            } else {
+                pressTouchDirection(zone, event.pointerId);
+
+                try { canvas.setPointerCapture(event.pointerId); } catch { /* ignore */ }
+            }
+
             event.preventDefault();
-            player.dy = -15;
-            doubleJumpAvailable = false;
-            sfx.jump();
+            return;
+        }
+
+        // Мышь: двойной прыжок кликом по любому месту.
+        if (event.button === 0) {
+            if (doDoubleJump()) event.preventDefault();
         }
     }
 });
@@ -5336,6 +5519,19 @@ canvas.addEventListener('wheel', event => {
 
 canvas.addEventListener('pointermove', event => {
     const point = canvasPoint(event);
+
+    // Горизонтальная протяжка панели рамок.
+    if (currentState === STATE.MENU && menuState.tab === 'shop' &&
+        gachaState.pickerDrag && gachaState.pickerPointerId === event.pointerId) {
+
+        const dx = point.x - gachaState.pickerStartX;
+        gachaState.pickerMoved = Math.max(gachaState.pickerMoved, Math.abs(dx));
+        gachaState.pickerScroll = gachaState.pickerScrollStart - dx;
+
+        clampGachaPicker();
+        event.preventDefault();
+        return;
+    }
 
     // Скролл сетки.
     if (currentState === STATE.MENU && menuState.dragging &&
@@ -5454,12 +5650,41 @@ function finishMenuPointer(event) {
 }
 
 canvas.addEventListener('pointerup', event => {
+    // Отпускание пальца снимает движение, даже если палец уехал за край.
+    if (event.pointerType !== 'mouse') releaseTouchDirection(event.pointerId);
+
+    // Отпускание на панели рамок: короткое движение — это тап.
+    if (gachaState.pickerDrag && gachaState.pickerPointerId === event.pointerId) {
+        const point = canvasPoint(event);
+        const moved = gachaState.pickerMoved;
+
+        gachaState.pickerDrag = false;
+        gachaState.pickerPointerId = null;
+
+        if (moved < 6) {
+            const index = gachaPickerIndexAt(point);
+            const list = gachaOwnedList();
+
+            if (index >= 0 && list[index]) equipFrameById(list[index].id);
+        }
+
+        event.preventDefault();
+        return;
+    }
+
     finishMenuPointer(event);
     menuState.dragging = false;
     menuState.pointerId = null;
 });
 
 canvas.addEventListener('pointercancel', event => {
+    releaseTouchDirection(event.pointerId);
+
+    if (gachaState.pickerPointerId === event.pointerId) {
+        gachaState.pickerDrag = false;
+        gachaState.pickerPointerId = null;
+    }
+
     if (menuState.pointerId === event.pointerId) {
         menuState.dragging = false;
         menuState.pointerId = null;
@@ -5478,44 +5703,43 @@ canvas.addEventListener('pointerleave', event => {
 
 /* ---------- тач-кнопки ---------- */
 
-function bindTouchButton(id, direction) {
-    const button = document.getElementById(id);
+// Двойной прыжок. Один вход для клавиатуры, клика мышью и тапа по экрану:
+// так поведение не разъезжается между платформами.
+function doDoubleJump() {
+    if (currentState !== STATE.PLAYING || !doubleJumpAvailable) return false;
 
-    button.addEventListener('pointerdown', event => {
-        event.preventDefault();
-        activePointers[direction].add(event.pointerId);
-        touchInput[direction] = true;
-
-        try { button.setPointerCapture(event.pointerId); } catch { /* ignore */ }
-    });
-
-    function release(event) {
-        activePointers[direction].delete(event.pointerId);
-        touchInput[direction] = activePointers[direction].size > 0;
-    }
-
-    button.addEventListener('pointerup', release);
-    button.addEventListener('pointercancel', release);
-    button.addEventListener('lostpointercapture', release);
-    button.addEventListener('contextmenu', event => event.preventDefault());
+    player.dy = -15;
+    doubleJumpAvailable = false;
+    sfx.jump();
+    return true;
 }
 
-bindTouchButton('leftButton', 'left');
-bindTouchButton('rightButton', 'right');
+// Края экрана — движение, центр — прыжок. Кнопок нет:
+// палец ставится туда, куда игрок и так смотрит.
+const TOUCH_EDGE = 0.30;
 
-const jumpButton = document.getElementById('jumpButton');
+function touchZoneAt(x) {
+    const edge = 400 * TOUCH_EDGE;
 
-function tryDoubleJump(event) {
-    event.preventDefault();
-    if (currentState === STATE.PLAYING && doubleJumpAvailable) {
-        player.dy = -15;
-        doubleJumpAvailable = false;
-        sfx.jump();
-    }
+    if (x < edge) return 'left';
+    if (x > 400 - edge) return 'right';
+    return 'center';
 }
 
-jumpButton.addEventListener('pointerdown', tryDoubleJump);
-jumpButton.addEventListener('contextmenu', event => event.preventDefault());
+function pressTouchDirection(zone, pointerId) {
+    if (!activePointers[zone]) return;
+
+    activePointers[zone].add(pointerId);
+    touchInput[zone] = true;
+}
+
+function releaseTouchDirection(pointerId) {
+    activePointers.left.delete(pointerId);
+    activePointers.right.delete(pointerId);
+
+    touchInput.left = activePointers.left.size > 0;
+    touchInput.right = activePointers.right.size > 0;
+}
 
 function clearTouchInput() {
     activePointers.left.clear();
@@ -5579,7 +5803,13 @@ const gachaState = {
     result: null,        // выпавшая рамка
     duplicate: false,    // выпала уже имеющаяся
     refund: 0,           // компенсация за дубликат
-    scroll: 0            // текущий сдвиг ленты для отрисовки
+    scroll: 0,           // текущий сдвиг ленты для отрисовки
+    pickerScroll: 0,     // горизонтальный сдвиг панели выбора
+    pickerDrag: false,
+    pickerPointerId: null,
+    pickerStartX: 0,
+    pickerScrollStart: 0,
+    pickerMoved: 0
 };
 
 // Взвешенный выбор редкости по ставкам.
@@ -5600,10 +5830,10 @@ function pickFrameOfTier(tier) {
     const pool = FRAMES.filter(f => GACHA_TIER(f) === tier);
     if (!pool.length) return null;
 
-    const fresh = pool.filter(f => !ownedFrames.includes(f.id));
-    const source = fresh.length ? fresh : pool;
-
-    return source[Math.floor(Math.random() * source.length)];
+    // Выбор честно случайный внутри редкости. Раньше здесь был приоритет
+    // ещё не выпавших рамок, и дубликаты почти не появлялись,
+    // пока вся редкость не собрана — это ломало экономику возврата.
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function startGacha() {
@@ -5678,14 +5908,25 @@ function finishGacha() {
    ============================================================ */
 
 const GACHA_UI = {
-    panel:      { x: 20, y: 82, w: 360, h: 208 },
-    reel:       { x: 34, y: 96, w: 332, h: 150 },
-    collectY:   298,
-    ratesY:     330,
-    spinY:      372,
-    spinH:      52,
-    hintY:      444,
+    panel:      { x: 20, y: 82, w: 360, h: 200 },
+    reel:       { x: 34, y: 94, w: 332, h: 146 },
+    collectY:   288,
+    ratesY:     322,
+    spinY:      358,
+    spinH:      44,
+    hintY:      408,
+    picker:     { x: 0, y: 420, w: 400, h: 112 },
     cellW:      76
+};
+
+// Панель выбора уже выпавших рамок.
+const GACHA_PICKER = {
+    cellW:   62,
+    cellH:   84,
+    gap:     8,
+    rowTop:  22,        // отступ от верха панели до ряда ячеек
+    viewX:   16,
+    viewW:   368
 };
 
 const GACHA_TIER_ORDER = ['common', 'rare', 'epic', 'legendary', 'divine'];
@@ -5708,17 +5949,22 @@ function gachaTierColor(frame) {
 }
 
 // Лента прокрутки: детерминированный набор вокруг результата.
+// Длина ленты и позиция остановки. Лента длиннее, чем сдвиг прокрутки,
+// иначе она целиком уезжает за край окна и оставляет пустоту.
+const GACHA_REEL_LENGTH = 40;
+const GACHA_REEL_STOP = 18;
+
 function gachaReelFrames() {
     const list = [];
     const seed = gachaState.result ? gachaState.result.id : 1;
 
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < GACHA_REEL_LENGTH; i++) {
         const frame = FRAMES[(seed * 7 + i * 5) % FRAMES.length];
         list.push(frame.id === 0 ? FRAMES[1] : frame);
     }
 
     // Результат ставим ровно в позицию указателя.
-    list[18] = gachaState.result || FRAMES[1];
+    list[GACHA_REEL_STOP] = gachaState.result || FRAMES[1];
     return list;
 }
 
@@ -5818,10 +6064,19 @@ function drawGachaCollection() {
 
 function drawGachaReel() {
     const { x, y, w, h } = GACHA_UI.reel;
-    const now = performance.now();
-    const elapsed = now - gachaState.startedAt;
+    const cellW = GACHA_UI.cellW;
     const strip = gachaReelFrames();
+    const L = strip.length;
     const centerX = 200;
+    const cy = y + h / 2 - 6;
+
+    const elapsed = performance.now() - gachaState.startedAt;
+    const p = Math.min(1, elapsed / gachaState.duration);
+
+    // Торможение: быстро в начале, мягко к концу. Останавливаемся ровно
+    // на позиции указателя, поэтому результат всегда оказывается под ним.
+    const eased = 1 - Math.pow(1 - p, 3.2);
+    const offset = eased * GACHA_REEL_STOP * cellW;
 
     ctx.save();
     roundedRect(x, y, w, h, 16);
@@ -5830,71 +6085,79 @@ function drawGachaReel() {
     ctx.fillStyle = 'rgba(10,36,58,.96)';
     ctx.fillRect(x, y, w, h);
 
-    // Мягкая подсветка по краям окна.
-    const edge = ctx.createLinearGradient(x, 0, x + w, 0);
-    edge.addColorStop(0, 'rgba(10,36,58,.95)');
-    edge.addColorStop(0.22, 'rgba(10,36,58,0)');
-    edge.addColorStop(0.78, 'rgba(10,36,58,0)');
-    edge.addColorStop(1, 'rgba(10,36,58,.95)');
-    ctx.fillStyle = edge;
-    ctx.fillRect(x, y, w, h);
+    // Ячейки рисуются по модулю длины ленты: окно никогда не остаётся пустым,
+    // сколько бы ни прокрутилось.
+    const from = Math.floor((x - 40 - centerX + offset) / cellW) - 1;
+    const to = Math.ceil((x + w + 40 - centerX + offset) / cellW) + 1;
 
-    let offset;
-    if (gachaState.phase === 'spin') {
-        const p = Math.min(1, elapsed / gachaState.duration);
-        offset = (1 - Math.pow(1 - p, 3.4)) * 18 * GACHA_UI.cellW;
-    } else {
-        offset = 18 * GACHA_UI.cellW;
-    }
-
-    const cy = y + h / 2;
-
-    for (let i = 0; i < strip.length; i++) {
-        const frame = strip[i];
+    for (let k = from; k <= to; k++) {
+        const index = ((k % L) + L) % L;
+        const frame = strip[index];
         if (!frame) continue;
 
-        const cellX = centerX + (i - 18) * GACHA_UI.cellW - offset;
-        if (cellX + GACHA_UI.cellW < x - 20 || cellX > x + w + 20) continue;
-
-        const cx = cellX + GACHA_UI.cellW / 2;
+        const cx = centerX + k * cellW - offset;
         const color = gachaTierColor(frame);
 
+        // Чем дальше от указателя, тем бледнее — фокус на центре.
+        const distance = Math.min(1, Math.abs(cx - centerX) / (w / 2));
+        const fade = 1 - distance * 0.55;
+
         ctx.save();
-        ctx.globalAlpha = 0.55;
+        ctx.globalAlpha = 0.30 * fade;
         ctx.beginPath();
-        ctx.arc(cx, cy, 34, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 32, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
         ctx.restore();
 
         ctx.save();
+        ctx.globalAlpha = fade;
         ctx.beginPath();
-        ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 27, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255,255,255,.94)';
         ctx.fill();
         ctx.restore();
 
-        drawAvatarCircle(cx, cy, 25, selectedAvatar);
-        drawFrame(cx, cy, 25, frame.id, true);
+        ctx.save();
+        ctx.globalAlpha = fade;
+        drawAvatarCircle(cx, cy, 22, selectedAvatar);
+        drawFrame(cx, cy, 22, frame.id, true);
+        ctx.restore();
 
         ctx.save();
+        ctx.globalAlpha = fade;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        setFont(6, 'bold');
+        setFont(5.6, 'bold');
         ctx.fillStyle = color;
-        trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, cy + 46, 0.8);
+        trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, cy + 42, 0.6);
         ctx.restore();
     }
 
+    // Затемнение по краям окна — лента уходит в темноту, а не обрезается.
+    const edge = ctx.createLinearGradient(x, 0, x + w, 0);
+    edge.addColorStop(0, 'rgba(10,36,58,1)');
+    edge.addColorStop(0.20, 'rgba(10,36,58,0)');
+    edge.addColorStop(0.80, 'rgba(10,36,58,0)');
+    edge.addColorStop(1, 'rgba(10,36,58,1)');
+    ctx.fillStyle = edge;
+    ctx.fillRect(x, y, w, h);
+
+    // Центральная подсветка под указателем.
+    const spot = ctx.createRadialGradient(centerX, cy, 4, centerX, cy, 62);
+    spot.addColorStop(0, 'rgba(255,255,255,.20)');
+    spot.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = spot;
+    ctx.fillRect(x, y, w, h);
+
     ctx.restore();
 
-    // Рамка окна.
     roundedRect(x + 0.75, y + 0.75, w - 1.5, h - 1.5, 16);
     ctx.strokeStyle = 'rgba(255,255,255,.30)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Указатель по центру.
+    // Указатель сверху и снизу от окна.
     ctx.save();
     ctx.fillStyle = '#ffd54a';
     ctx.beginPath();
@@ -5923,7 +6186,7 @@ function drawGachaEquipped() {
     drawGachaPanelGlow(color, 0.34);
 
     const cx = 200;
-    const cy = y + 78;
+    const cy = y + 72;
     const pulse = 0.5 + 0.5 * Math.sin(now / 520);
 
     ctx.save();
@@ -5950,46 +6213,107 @@ function drawGachaEquipped() {
 
     setFont(12, 'bold');
     ctx.fillStyle = '#0f3d5c';
-    trackedText(frame.name.toUpperCase(), cx, y + 148, 1.0);
+    trackedText(frame.name.toUpperCase(), cx, y + 140, 1.0);
 
     setFont(7, 'bold');
     ctx.fillStyle = color;
-    trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, y + 168, 2.0);
+    trackedText(GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, y + 158, 2.0);
 
     setFont(6.5, 'bold');
     ctx.fillStyle = 'rgba(21,85,118,.42)';
-    trackedText('СЕЙЧАС НАДЕТА', cx, y + 186, 1.2);
+    trackedText('СЕЙЧАС НАДЕТА', cx, y + 174, 1.2);
 
     ctx.restore();
 }
 
 function drawGachaReveal() {
-    const { y } = GACHA_UI.panel;
+    const { x, y, w, h } = GACHA_UI.reel;
     const frame = gachaState.result;
     if (!frame) return;
 
     const color = gachaTierColor(frame);
     const tier = GACHA_TIER(frame);
-    const now = performance.now();
-    const appear = Math.min(1, (now - gachaState.startedAt) / 240);
+    const elapsed = performance.now() - gachaState.startedAt;
 
-    drawGachaPanelGlow(color, 0.5 * appear);
+    // Появление: лёгкий «выход» из масштаба, как будто карточка встала на место.
+    const appear = Math.min(1, elapsed / 260);
+    const scale = 0.82 + appear * 0.18;
+    const pop = Math.max(0, 1 - elapsed / 420);
+
+    const cx = x + w / 2;
+    const cy = y + h / 2 - 4;
+
+    ctx.save();
+    roundedRect(x, y, w, h, 16);
+    ctx.clip();
+
+    ctx.fillStyle = 'rgba(10,36,58,.96)';
+    ctx.fillRect(x, y, w, h);
+
+    // Вспышка в момент остановки.
+    if (pop > 0) {
+        ctx.save();
+        ctx.globalAlpha = pop * 0.55;
+        const flash = ctx.createRadialGradient(cx, cy, 6, cx, cy, 150);
+        flash.addColorStop(0, 'rgba(255,255,255,.95)');
+        flash.addColorStop(0.4, color);
+        flash.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = flash;
+        ctx.fillRect(x, y, w, h);
+        ctx.restore();
+    }
+
+    ctx.save();
+    ctx.globalAlpha = appear;
+    ctx.translate(cx, cy);
+    ctx.scale(scale, scale);
+    ctx.translate(-cx, -cy);
+
+    // Ореол в цвете редкости.
+    const halo = ctx.createRadialGradient(cx, cy, 10, cx, cy, 92);
+    halo.addColorStop(0, color);
+    halo.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.save();
+    ctx.globalAlpha = appear * 0.42;
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 92, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, 44, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,.96)';
+    ctx.fill();
+
+    drawAvatarCircle(cx, cy, 36, selectedAvatar);
+    drawFrame(cx, cy, 36, frame.id, false);
+
+    ctx.restore();
+
+    ctx.restore();
+
+    roundedRect(x + 0.75, y + 0.75, w - 1.5, h - 1.5, 16);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
 
     ctx.save();
     ctx.globalAlpha = appear;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    setFont(13, 'bold');
+    // Название крупно и прямо под окном — его видно сразу.
+    setFont(12.5, 'bold');
     ctx.fillStyle = color;
     ctx.shadowColor = color;
     ctx.shadowBlur = 12;
-    trackedText(frame.name.toUpperCase(), 200, y + 172, 1.0);
+    trackedText(frame.name.toUpperCase(), 200, y + h + 18, 1.0);
     ctx.shadowBlur = 0;
 
-    setFont(7, 'bold');
+    setFont(6.6, 'bold');
     ctx.fillStyle = 'rgba(21,85,118,.62)';
-    trackedText(GACHA_TIER_LABELS[tier], 200, y + 190, 2.0);
+    trackedText(GACHA_TIER_LABELS[tier], 200, y + h + 32, 2.0);
 
     ctx.restore();
 }
@@ -6107,20 +6431,239 @@ function drawGachaShop() {
     ctx.lineWidth = 1.2;
     ctx.stroke();
 
-    if (gachaState.phase === 'idle') {
-        drawGachaEquipped();
-    } else {
+    if (gachaState.phase === 'spin') {
         drawGachaReel();
-        if (gachaState.phase === 'reveal') drawGachaReveal();
+    } else if (gachaState.phase === 'reveal') {
+        drawGachaReveal();
+    } else {
+        drawGachaEquipped();
     }
 
     drawGachaRates();
     drawGachaSpinButton();
     drawGachaHint();
+    drawGachaPicker();
+}
+
+/* ---------- панель выбора из уже выпавших рамок ---------- */
+
+// Только выпавшие рамки, по возрастанию id. Базовая (0) тоже здесь —
+// она позволяет снять рамку совсем.
+function gachaOwnedList() {
+    const list = FRAMES.filter(f => ownedFrames.includes(f.id));
+    return list.length ? list : [FRAMES[0]];
+}
+
+function gachaPickerCellX(index) {
+    return GACHA_PICKER.viewX + index * (GACHA_PICKER.cellW + GACHA_PICKER.gap)
+        - gachaState.pickerScroll;
+}
+
+function gachaPickerMaxScroll() {
+    const count = gachaOwnedList().length;
+    const content = count * (GACHA_PICKER.cellW + GACHA_PICKER.gap) - GACHA_PICKER.gap;
+    return Math.max(0, content - GACHA_PICKER.viewW);
+}
+
+function clampGachaPicker() {
+    gachaState.pickerScroll = Math.max(0, Math.min(gachaPickerMaxScroll(), gachaState.pickerScroll));
+}
+
+// Индекс ячейки под точкой или -1.
+function gachaPickerIndexAt(point) {
+    const top = GACHA_UI.picker.y + GACHA_PICKER.rowTop;
+    const bottom = top + GACHA_PICKER.cellH;
+
+    if (point.y < top - 4 || point.y > bottom + 4) return -1;
+    if (point.x < GACHA_PICKER.viewX || point.x > GACHA_PICKER.viewX + GACHA_PICKER.viewW) return -1;
+
+    const local = point.x - GACHA_PICKER.viewX + gachaState.pickerScroll;
+    const index = Math.floor(local / (GACHA_PICKER.cellW + GACHA_PICKER.gap));
+
+    if (index < 0 || index >= gachaOwnedList().length) return -1;
+
+    // Попадание внутри самой ячейки, а не в промежуток между ними.
+    const withinCell = local - index * (GACHA_PICKER.cellW + GACHA_PICKER.gap);
+    if (withinCell > GACHA_PICKER.cellW) return -1;
+
+    return index;
+}
+
+function isInsideGachaPicker(point) {
+    const { y, h } = GACHA_UI.picker;
+    return point.y >= y && point.y <= y + h;
+}
+
+function equipFrameById(id) {
+    if (selectedFrame === id) {
+        sfx.click();
+        return;
+    }
+
+    selectedFrame = id;
+    saveProgress();
+
+    const frame = FRAMES.find(f => f.id === id);
+    setMenuMessage('Рамка надета', '«' + (frame ? frame.name : '—') + '»');
+    sfx.click();
+}
+
+// Держим надетую рамку в поле зрения при открытии вкладки.
+function gachaPickerRevealSelected() {
+    const list = gachaOwnedList();
+    const index = list.findIndex(f => f.id === selectedFrame);
+    if (index < 0) return;
+
+    const cellLeft = index * (GACHA_PICKER.cellW + GACHA_PICKER.gap);
+    const cellRight = cellLeft + GACHA_PICKER.cellW;
+
+    if (cellLeft < gachaState.pickerScroll) {
+        gachaState.pickerScroll = cellLeft;
+    } else if (cellRight > gachaState.pickerScroll + GACHA_PICKER.viewW) {
+        gachaState.pickerScroll = cellRight - GACHA_PICKER.viewW;
+    }
+
+    clampGachaPicker();
+}
+
+function drawGachaPicker() {
+    const { y, h } = GACHA_UI.picker;
+    const list = gachaOwnedList();
+    const top = y + GACHA_PICKER.rowTop;
+    const cy = top + 30;
+
+    ctx.save();
+    ctx.textBaseline = 'middle';
+
+    setFont(7, 'bold');
+    ctx.fillStyle = 'rgba(21,85,118,.55)';
+    trackedText('ТВОИ РАМКИ', GACHA_PICKER.viewX, y + 8, 1.6, 'left');
+
+    setFont(6.5, 'bold');
+    ctx.fillStyle = 'rgba(21,85,118,.38)';
+    trackedText('НАЖМИ, ЧТОБЫ НАДЕТЬ', GACHA_PICKER.viewX + GACHA_PICKER.viewW, y + 8, 1.0, 'right');
+
+    ctx.restore();
+
+    // Область прокрутки с мягкими краями.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(GACHA_PICKER.viewX - 2, top - 6, GACHA_PICKER.viewW + 4, GACHA_PICKER.cellH + 14);
+    ctx.clip();
+
+    for (let i = 0; i < list.length; i++) {
+        const frame = list[i];
+        const x = gachaPickerCellX(i);
+
+        if (x + GACHA_PICKER.cellW < GACHA_PICKER.viewX - 10) continue;
+        if (x > GACHA_PICKER.viewX + GACHA_PICKER.viewW + 10) continue;
+
+        const worn = frame.id === selectedFrame;
+        const color = frame.look ? gachaTierColor(frame) : 'rgba(21,85,118,.30)';
+        const cx = x + GACHA_PICKER.cellW / 2;
+
+        // Подложка ячейки: у надетой явная подсветка в цвет редкости.
+        roundedRect(x, top, GACHA_PICKER.cellW, GACHA_PICKER.cellH, 12);
+        ctx.fillStyle = worn ? 'rgba(255,255,255,.96)' : 'rgba(255,255,255,.52)';
+        ctx.fill();
+
+        if (worn) {
+            roundedRect(x + 0.75, top + 0.75, GACHA_PICKER.cellW - 1.5, GACHA_PICKER.cellH - 1.5, 12);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Портрет с рамкой.
+        ctx.save();
+        if (!worn) ctx.globalAlpha = 0.9;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 21, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,.9)';
+        ctx.fill();
+
+        drawAvatarCircle(cx, cy, 17, selectedAvatar);
+        drawFrame(cx, cy, 17, frame.id, true);
+        ctx.restore();
+
+        // Название: у надетой оно подсвечено, у остальных приглушено.
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        setFont(5.8, 'bold');
+        ctx.fillStyle = worn ? '#0f3d5c' : 'rgba(21,85,118,.55)';
+        const label = frame.id === 0 ? 'НЕТ' : frame.name.toUpperCase();
+        trackedText(label, cx, cy + 32, 0.4);
+
+        setFont(5.2, 'bold');
+        ctx.fillStyle = color;
+        trackedText(frame.id === 0 ? 'БАЗОВАЯ' : GACHA_TIER_LABELS[GACHA_TIER(frame)], cx, cy + 43, 0.5);
+
+        ctx.restore();
+
+        // Галочка на надетой.
+        if (worn) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x + GACHA_PICKER.cellW - 10, top + 10, 7, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x + GACHA_PICKER.cellW - 12.6, top + 10);
+            ctx.lineTo(x + GACHA_PICKER.cellW - 10.4, top + 12.3);
+            ctx.lineTo(x + GACHA_PICKER.cellW - 7.2, top + 7.6);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // Края уходят в фон, чтобы список читался как прокручиваемый.
+    const fadeL = ctx.createLinearGradient(GACHA_PICKER.viewX, 0, GACHA_PICKER.viewX + 18, 0);
+    fadeL.addColorStop(0, 'rgba(247,252,255,.95)');
+    fadeL.addColorStop(1, 'rgba(247,252,255,0)');
+    ctx.fillStyle = fadeL;
+    ctx.fillRect(GACHA_PICKER.viewX - 2, top - 6, 20, GACHA_PICKER.cellH + 14);
+
+    const fadeR = ctx.createLinearGradient(
+        GACHA_PICKER.viewX + GACHA_PICKER.viewW - 18, 0,
+        GACHA_PICKER.viewX + GACHA_PICKER.viewW, 0);
+    fadeR.addColorStop(0, 'rgba(247,252,255,0)');
+    fadeR.addColorStop(1, 'rgba(247,252,255,.95)');
+    ctx.fillStyle = fadeR;
+    ctx.fillRect(GACHA_PICKER.viewX + GACHA_PICKER.viewW - 20, top - 6, 22, GACHA_PICKER.cellH + 14);
+
+    ctx.restore();
+
+    // Индикатор горизонтальной прокрутки.
+    if (gachaPickerMaxScroll() > 0) {
+        const trackW = 120;
+        const trackX = 200 - trackW / 2;
+        const trackY = y + h - 6;
+        const ratio = GACHA_PICKER.viewW / (GACHA_PICKER.viewW + gachaPickerMaxScroll());
+        const thumbW = Math.max(24, trackW * ratio);
+        const t = gachaState.pickerScroll / gachaPickerMaxScroll();
+
+        ctx.save();
+        roundedRect(trackX, trackY, trackW, 3, 1.5);
+        ctx.fillStyle = 'rgba(21,85,118,.12)';
+        ctx.fill();
+
+        roundedRect(trackX + t * (trackW - thumbW), trackY, thumbW, 3, 1.5);
+        ctx.fillStyle = 'rgba(21,85,118,.42)';
+        ctx.fill();
+        ctx.restore();
+    }
 }
 
 function gachaShopHitTest(point) {
-    const { x, y, w } = { x: 20, y: GACHA_UI.spinY, w: 360 };
+    const x = 20;
+    const y = GACHA_UI.spinY;
+    const w = 360;
 
     if (point.x >= x && point.x <= x + w &&
         point.y >= y && point.y <= y + GACHA_UI.spinH) {
@@ -6498,6 +7041,130 @@ function drawPerkOffer() {
 }
 
 /* ============================================================
+   СБРОС ПРОГРЕССА
+   ============================================================ */
+
+const resetButton = document.getElementById('resetButton');
+const resetOverlay = document.getElementById('resetOverlay');
+const resetCancel = document.getElementById('resetCancel');
+const resetConfirm = document.getElementById('resetConfirm');
+
+// Ключи прогресса. Настройки (звук, чувствительность) сюда намеренно
+// не входят: сброс прогресса не должен сбивать управление игроку.
+const PROGRESS_KEYS = [
+    'morjakaBankCoins',
+    'morjakaUnlockedCharacters',
+    'morjakaSelectedCharacter',
+    'morjakaSelectedFrame',
+    'morjakaOwnedFrames',
+    'doodleHighScore'
+];
+
+let resetOpen = false;
+
+function openResetDialog() {
+    if (!resetOverlay || resetOpen) return;
+
+    resetOpen = true;
+    resetOverlay.classList.add('open');
+    resetOverlay.setAttribute('aria-hidden', 'false');
+
+    // Игра на паузе, пока висит вопрос: иначе забег идёт за спиной.
+    if (currentState === STATE.PLAYING) pauseGame();
+
+    sfx.click();
+    if (resetCancel && resetCancel.focus) resetCancel.focus();
+}
+
+function closeResetDialog() {
+    if (!resetOverlay || !resetOpen) return;
+
+    resetOpen = false;
+    resetOverlay.classList.remove('open');
+    resetOverlay.setAttribute('aria-hidden', 'true');
+
+    sfx.click();
+}
+
+// Полный сброс: чистим хранилище и возвращаем все значения к стартовым.
+function resetAllProgress() {
+    try {
+        for (const key of PROGRESS_KEYS) localStorage.removeItem(key);
+    } catch (error) {
+        console.warn('Не удалось очистить сохранения:', error);
+    }
+
+    // Кэш записанных значений тоже сбрасываем, иначе saveProgress
+    // решит, что писать нечего, и старые числа вернутся при следующем сохранении.
+    savedProgress.clear();
+
+    bankCoins = 0;
+    highScore = 0;
+    unlockedAvatars = getUnlockedAvatars(0);
+    selectedAvatar = 0;
+    selectedFrame = 0;
+    ownedFrames = [0];
+
+    menuCursors.avatars = 0;
+    menuCursors.shop = 0;
+    menuState.scroll = 0;
+    menuState.tab = 'avatars';
+
+    perkState.lastOfferScore = 0;
+    resetPerks();
+
+    gameOverState.newRecord = false;
+    gameOverState.openedAt = 0;
+    gameOverCache.key = null;
+
+    resetGame();
+    resetHud();
+
+    currentState = STATE.MENU;
+    lastFrameTime = 0;
+    pauseState.hover = null;
+
+    // Пустая лента гачи: иначе остался бы прошлый результат.
+    gachaState.phase = 'idle';
+    gachaState.result = null;
+    gachaState.duplicate = false;
+    gachaState.refund = 0;
+    gachaState.pickerScroll = 0;
+
+    closeResetDialog();
+    setMenuMessage('Прогресс сброшен', 'Всё начинается заново');
+    saveProgress();
+}
+
+if (resetButton) {
+    resetButton.addEventListener('click', event => {
+        event.preventDefault();
+        openResetDialog();
+    });
+}
+
+if (resetCancel) {
+    resetCancel.addEventListener('click', event => {
+        event.preventDefault();
+        closeResetDialog();
+    });
+}
+
+if (resetConfirm) {
+    resetConfirm.addEventListener('click', event => {
+        event.preventDefault();
+        resetAllProgress();
+    });
+}
+
+// Тап мимо карточки закрывает окно — привычное поведение модалок.
+if (resetOverlay) {
+    resetOverlay.addEventListener('pointerdown', event => {
+        if (event.target === resetOverlay) closeResetDialog();
+    });
+}
+
+/* ============================================================
    ГЛАВНЫЙ ЦИКЛ
    ============================================================ */
 
@@ -6548,8 +7215,6 @@ function draw(timestamp) {
     }
 
     update(dt);
-
-    jumpButton.disabled = currentState !== STATE.PLAYING || !doubleJumpAvailable;
 
     requestAnimationFrame(draw);
 }
