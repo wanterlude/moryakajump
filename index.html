@@ -12021,6 +12021,13 @@ html, body, body * {
     }
     if (currentState !== STATE.PLAYING) return;
     dt = Math.min(dt, 2);
+    // Переход на арену босса: пока висит баннер, мир замирает. Раньше забег
+    // продолжался под баннером, и можно было потерять жизнь от падения или
+    // птицы ещё до начала боя — особенно на маленьком запасе жизней.
+    if (bossState.phase === "warn") {
+      updateBoss();
+      return;
+    }
     if (duelIsActive()) {
       const end = duelUpdate(dt, {
         left: !!(keys.ArrowLeft || keys.KeyA || touchInput.left || tiltEnabled && tiltDirection < 0),
