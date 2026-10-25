@@ -115,6 +115,36 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .lbList li .sc{color:#b07a00;font-weight:bold;flex:0 0 auto}
 .lbList li.me{outline:2px solid rgba(15,138,118,.55);background:rgba(219,250,244,.92)}
 .lbNote{font-size:11px;color:rgba(15,61,92,.55);margin-top:6px;min-height:14px}
+.sheetCard .lbList{max-height:360px;overflow-y:auto;padding-right:2px}
+/* Боковые панели на широком экране: рейтинг слева, настройки справа. */
+#stageWrap{display:flex;align-items:center;justify-content:center;gap:0;width:100%;padding:0}
+.sidePanel{display:none;flex:0 0 240px;width:240px;height:min(900px,calc(100dvh - 75px));flex-direction:column;padding:14px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(232,246,255,.9));border:1px solid rgba(255,255,255,.95);box-shadow:0 18px 44px rgba(8,30,60,.28);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#0f3d5c;overflow:hidden;transition:flex-basis .18s ease,width .18s ease,padding .18s ease}
+@media (min-width:1180px) and (pointer:fine){
+    #stageWrap{gap:22px;padding:0 16px}
+    .sidePanel{display:flex}
+}
+.sidePanel.collapsed{flex-basis:46px;width:46px;height:46px;padding:10px 6px;align-self:center}
+.sidePanel.collapsed .sideTitle,.sidePanel.collapsed .sideBody{display:none}
+.sidePanel.collapsed .sideHead{justify-content:center;height:auto;margin:0}
+.sideHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex:0 0 auto}
+.sideTitle{font:bold 11px Arial,sans-serif;letter-spacing:1.6px;color:#0f3d5c;white-space:nowrap}
+.sideToggle{width:26px;height:26px;flex:0 0 auto;border-radius:9px;border:1px solid rgba(15,61,92,.18);background:rgba(255,255,255,.82);color:#0f3d5c;font:bold 15px/1 Arial,sans-serif;cursor:pointer;padding:0;touch-action:manipulation}
+.sideToggle:hover{background:#fff}
+.sideToggle:active{transform:scale(.95)}
+.sideBody{display:flex;flex-direction:column;flex:1;min-height:0;gap:8px}
+#sideLbList{flex:1;min-height:0;overflow-y:auto;padding-right:2px}
+.sideSettings{overflow-y:auto;padding-right:2px}
+.sideField{display:flex;align-items:center;justify-content:space-between;gap:8px;font:bold 9.5px Arial,sans-serif;letter-spacing:.6px;color:rgba(15,61,92,.66);margin-top:2px}
+.sideInput{width:100%;padding:8px 10px;border-radius:10px;border:1px solid rgba(15,61,92,.2);background:rgba(255,255,255,.9);color:#0f3d5c;font:bold 13px 'Trebuchet MS',Arial,sans-serif;text-align:center;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation}
+.sideInput:focus{border-color:rgba(35,150,190,.55);box-shadow:0 0 0 3px rgba(80,190,240,.15)}
+.sideRange{width:100%;accent-color:#12a08c;margin:0 0 4px}
+.sideCheck{display:flex;align-items:center;gap:8px;font-size:12px;color:#0f3d5c;padding:4px 0}
+.sideCheck input{width:18px;height:18px;accent-color:#12a08c;flex:0 0 auto}
+.sideBtn{padding:9px 8px;border-radius:10px;border:1px solid rgba(15,61,92,.18);background:rgba(255,255,255,.86);color:#0f3d5c;font:bold 10.5px Arial,sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:manipulation}
+.sideBtn:hover{background:#fff}
+.sideBtn:active{transform:scale(.97)}
+.sideBtn.primary{background:linear-gradient(180deg,#22a884,#0f8a76);border-color:transparent;color:#fff}
+.sideBtn.danger{background:rgba(255,235,236,.9);border-color:rgba(200,50,60,.35);color:#b02a34}
 #tutCard{width:min(330px,92vw)}
 #tutStep{display:flex;gap:6px;justify-content:center;margin:4px 0 10px}
 #tutStep i{width:7px;height:7px;border-radius:50%;background:rgba(15,61,92,.18)}
@@ -131,6 +161,18 @@ html, body, body * {
 </style>
 </head>
 <body>
+<div id="stageWrap">
+<aside id="sideLb" class="sidePanel" aria-label="Глобальный рейтинг">
+    <div class="sideHead">
+        <span class="sideTitle">РЕЙТИНГ</span>
+        <button id="sideLbToggle" class="sideToggle" type="button" aria-label="Свернуть рейтинг" aria-expanded="true">‹</button>
+    </div>
+    <div class="sideBody">
+        <ol id="sideLbList" class="lbList"></ol>
+        <div id="sideLbNote" class="lbNote"></div>
+        <button id="sideLbRefresh" class="sideBtn" type="button">ОБНОВИТЬ</button>
+    </div>
+</aside>
 <div id="gameStage">
 <canvas id="game" width="1600" height="2400" aria-label="Игра «Моряка Jump»"></canvas>
 <div id="toolbar">
@@ -187,6 +229,27 @@ html, body, body * {
         </div>
     </div>
 </div>
+</div>
+<aside id="sideSet" class="sidePanel" aria-label="Настройки">
+    <div class="sideHead">
+        <button id="sideSetToggle" class="sideToggle" type="button" aria-label="Свернуть настройки" aria-expanded="true">›</button>
+        <span class="sideTitle">НАСТРОЙКИ</span>
+    </div>
+    <div class="sideBody sideSettings">
+        <div class="sideField">НИК</div>
+        <input id="sideNick" class="sideInput" type="text" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Моряка">
+        <button id="sideNickSave" class="sideBtn primary" type="button">СОХРАНИТЬ НИК</button>
+        <div class="sideField">ЧУВСТВИТЕЛЬНОСТЬ КЛАВИШ <b id="sideKeyVal">100%</b></div>
+        <input id="sideKeySens" class="sideRange" type="range" min="0.4" max="2" step="0.2" value="1">
+        <div class="sideField">ЧУВСТВИТЕЛЬНОСТЬ МЫШИ <b id="sideMouseVal">100%</b></div>
+        <input id="sideMouseSens" class="sideRange" type="range" min="0.4" max="2" step="0.2" value="1">
+        <div class="sideField">ГРОМКОСТЬ <b id="sideVolVal">100%</b></div>
+        <input id="sideVolRange" class="sideRange" type="range" min="0" max="100" step="1" value="100">
+        <label class="sideCheck"><input id="sideVibToggle" type="checkbox" checked> Вибрация</label>
+        <label class="sideCheck"><input id="sideTiltToggle" type="checkbox"> Наклон</label>
+        <button id="sideReset" class="sideBtn danger" type="button">СБРОСИТЬ ПРОГРЕСС</button>
+    </div>
+</aside>
 </div>
 <div id="settingsOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="setTitle" aria-hidden="true">
     <div class="sheetCard">
@@ -7156,6 +7219,7 @@ html, body, body * {
       else localStorage.removeItem("morjakaNick");
     } catch {
     }
+    if (typeof syncSideSettings === "function") syncSideSettings();
   }
   function getUnlockedAvatars(score) {
     return AVATAR_SCORES.map((required, index) => ({ required, index })).filter((item) => score >= item.required).map((item) => item.index);
@@ -15993,7 +16057,7 @@ html, body, body * {
     endpoint: "",  // для provider:"worker"
     game: "moryaka-jump"
   };
-  var LB_LIMIT = 5;
+  var LB_MAX = 50;
   function lbReadLocal() {
     try {
       const raw = JSON.parse(localStorage.getItem("morjakaTopScores") || "[]");
@@ -16001,7 +16065,7 @@ html, body, body * {
     } catch { return []; }
   }
   function lbWriteLocal(list) {
-    try { localStorage.setItem("morjakaTopScores", JSON.stringify(list.slice(0, 20))); } catch {}
+    try { localStorage.setItem("morjakaTopScores", JSON.stringify(list.slice(0, LB_MAX))); } catch {}
   }
   function lbRecordLocal(score, name) {
     if (!(score > 0)) return;
@@ -16020,7 +16084,7 @@ html, body, body * {
     if (!lbFirebaseReady()) return { scores: [], note: "Firebase не настроен: укажите URL базы в LB_CONFIG.url (см. LEADERBOARD.md)." };
     const base = lbFirebaseBase() + ".json";
     try {
-      let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_LIMIT, { cache: "no-store" });
+      let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_MAX, { cache: "no-store" });
       if (!res.ok) res = await fetch(base, { cache: "no-store" });
       if (res.status === 401 || res.status === 403) throw new Error("нет доступа — опубликуйте правила из firebase-rules.json");
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -16029,7 +16093,7 @@ html, body, body * {
         ? Object.keys(data).map((k) => data[k]).filter((v) => v && typeof v === "object")
         : [];
       list.sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0));
-      return { scores: list.slice(0, LB_LIMIT), note: "" };
+      return { scores: list.slice(0, LB_MAX), note: "" };
     } catch (e) {
       return { scores: [], note: "Ошибка загрузки Firebase (" + (e && e.message ? e.message : "сеть") + ")." };
     }
@@ -16048,7 +16112,11 @@ html, body, body * {
     if (!(score > 0)) return;
     lbRecordLocal(score, playerNick);
     const name = (playerNick || "Моряка").slice(0, 20);
-    if (lbFirebaseReady()) { lbFirebaseSubmit(name, Math.floor(score)); return; }
+    if (lbFirebaseReady()) {
+      const sent = lbFirebaseSubmit(name, Math.floor(score));
+      if (sent && sent.then) sent.then(() => lbRefreshGlobal(true)).catch(() => {});
+      return;
+    }
     if (LB_CONFIG.provider !== "worker" || !LB_CONFIG.endpoint) return;
     try {
       fetch(LB_CONFIG.endpoint, {
@@ -16062,7 +16130,7 @@ html, body, body * {
     if (lbFirebaseReady()) return lbFirebaseFetch();
     if (LB_CONFIG.provider === "worker" && LB_CONFIG.endpoint) {
       try {
-        const res = await fetch(LB_CONFIG.endpoint + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_LIMIT, { cache: "no-store" });
+        const res = await fetch(LB_CONFIG.endpoint + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_MAX, { cache: "no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
         return { scores: Array.isArray(data) ? data : (data.scores || []), note: "" };
@@ -16073,28 +16141,40 @@ html, body, body * {
     return { scores: [], note: "Глобальный рейтинг не подключён. Укажите Firebase Realtime Database URL в LB_CONFIG (см. LEADERBOARD.md)." };
   }
   var lbState = { tab: "global", global: null, globalNote: "", loading: false };
+  function lbFillRows(list, rows, markMe, loading) {
+    list.innerHTML = "";
+    if (!rows.length) {
+      const li = document.createElement("li");
+      li.textContent = loading ? "Загрузка…" : "Пока пусто";
+      list.appendChild(li);
+      return;
+    }
+    rows.forEach((r, i) => {
+      const li = document.createElement("li");
+      const nm = document.createElement("span"); nm.className = "nm";
+      nm.textContent = (i + 1) + ". " + ((r.n || r.name) || "Игрок");
+      const sc = document.createElement("span"); sc.className = "sc";
+      sc.textContent = fmt(Number(r.s != null ? r.s : r.score) || 0);
+      if (markMe && (r.n || r.name) === playerNick) li.className = "me";
+      li.appendChild(nm); li.appendChild(sc); list.appendChild(li);
+    });
+  }
+  function lbRenderSide() {
+    const list = document.getElementById("sideLbList");
+    const note = document.getElementById("sideLbNote");
+    if (!list) return;
+    lbFillRows(list, (lbState.global || []).slice(0, LB_MAX), false, lbState.loading);
+    if (note) note.textContent = lbState.loading ? "Загрузка…" : (lbState.globalNote || "");
+  }
   function lbRender() {
     const list = document.getElementById("lbList");
     const note = document.getElementById("lbNote");
     if (!list) return;
-    const rows = lbState.tab === "local" ? lbReadLocal().slice(0, LB_LIMIT) : (lbState.global || []);
-    list.innerHTML = "";
-    if (!rows.length) {
-      const li = document.createElement("li");
-      li.textContent = lbState.loading ? "Загрузка…" : "Пока пусто";
-      list.appendChild(li);
-    } else {
-      rows.forEach((r, i) => {
-        const li = document.createElement("li");
-        const nm = document.createElement("span"); nm.className = "nm";
-        nm.textContent = (i + 1) + ". " + ((r.n || r.name) || "Игрок");
-        const sc = document.createElement("span"); sc.className = "sc";
-        sc.textContent = fmt(Number(r.s != null ? r.s : r.score) || 0);
-        if (lbState.tab === "local" && (r.n || r.name) === playerNick) li.className = "me";
-        li.appendChild(nm); li.appendChild(sc); list.appendChild(li);
-      });
-    }
-    if (note) note.textContent = lbState.tab === "global" ? (lbState.loading ? "Загрузка…" : (lbState.globalNote || "")) : "Локальный топ-5 на этом устройстве.";
+    const local = lbState.tab === "local";
+    const rows = (local ? lbReadLocal() : (lbState.global || [])).slice(0, LB_MAX);
+    lbFillRows(list, rows, local, local ? false : lbState.loading);
+    if (note) note.textContent = lbState.tab === "global" ? (lbState.loading ? "Загрузка…" : (lbState.globalNote || "")) : "Локальный топ-10, прокрутка до 50.";
+    lbRenderSide();
   }
   function lbSyncTabs() {
     document.getElementById("lbTabLocal").classList.toggle("cur", lbState.tab === "local");
@@ -16113,8 +16193,8 @@ html, body, body * {
     const ov = document.getElementById("leaderboardOverlay");
     if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
   }
-  async function lbRefreshGlobal() {
-    if (lbState.tab !== "global") return;
+  async function lbRefreshGlobal(force) {
+    if (!force && lbState.tab !== "global") return;
     lbState.loading = true; lbState.globalNote = ""; lbRender();
     const r = await lbFetchGlobal();
     lbState.loading = false; lbState.global = r.scores; lbState.globalNote = r.note;
@@ -16131,21 +16211,33 @@ html, body, body * {
     if (sound.master) sound.master.gain.value = 0.05 * (v / 100);
     sound.enabled = v > 0;
     syncSoundButton();
+    const side = document.getElementById("sideVolRange");
+    if (side && document.activeElement !== side) side.value = String(v);
+    const label = document.getElementById("sideVolVal");
+    if (label) label.textContent = Math.round(v) + "%";
   }
   function loadVolume() {
     const range = document.getElementById("volRange");
     if (range) range.value = String(storedVolume());
     if (sound.master) sound.master.gain.value = 0.05 * (storedVolume() / 100);
+    const side = document.getElementById("sideVolRange");
+    if (side) side.value = String(storedVolume());
+    const label = document.getElementById("sideVolVal");
+    if (label) label.textContent = storedVolume() + "%";
   }
   var vibrationEnabled = true;
   function loadVibration() {
     try { vibrationEnabled = localStorage.getItem("morjakaVib") !== "0"; } catch {}
     const cb = document.getElementById("vibToggle");
     if (cb) cb.checked = vibrationEnabled;
+    const side = document.getElementById("sideVibToggle");
+    if (side) side.checked = vibrationEnabled;
   }
   function setVibration(on) {
     vibrationEnabled = !!on;
     try { localStorage.setItem("morjakaVib", on ? "1" : "0"); } catch {}
+    const side = document.getElementById("sideVibToggle");
+    if (side) side.checked = vibrationEnabled;
   }
   function sensText(v) { return Math.round(v * 100) + "%"; }
   function refreshSensUI() {
@@ -16153,6 +16245,14 @@ html, body, body * {
     const mv = document.getElementById("sensMouseVal");
     if (kv) kv.textContent = sensText(controls.key);
     if (mv) mv.textContent = sensText(controls.mouse);
+    const sk = document.getElementById("sideKeySens");
+    const sm = document.getElementById("sideMouseSens");
+    if (sk && document.activeElement !== sk) sk.value = String(controls.key);
+    if (sm && document.activeElement !== sm) sm.value = String(controls.mouse);
+    const skv = document.getElementById("sideKeyVal");
+    const smv = document.getElementById("sideMouseVal");
+    if (skv) skv.textContent = sensText(controls.key);
+    if (smv) smv.textContent = sensText(controls.mouse);
   }
   function openSettings() {
     const ov = document.getElementById("settingsOverlay"); if (!ov) return;
@@ -16207,7 +16307,92 @@ html, body, body * {
     const range = document.getElementById("volRange"); if (range) range.addEventListener("input", () => applyVolume(range.value));
     const vib = document.getElementById("vibToggle"); if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
     const tilt = document.getElementById("tiltToggle");
-    if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; });
+    if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; if (typeof syncSideSettings === "function") syncSideSettings(); });
+  }
+  function syncSideSettings() {
+    const nick = document.getElementById("sideNick");
+    if (nick && document.activeElement !== nick) nick.value = playerNick || "";
+    const sk = document.getElementById("sideKeySens");
+    const sm = document.getElementById("sideMouseSens");
+    if (sk && document.activeElement !== sk) sk.value = String(controls.key);
+    if (sm && document.activeElement !== sm) sm.value = String(controls.mouse);
+    const skv = document.getElementById("sideKeyVal");
+    const smv = document.getElementById("sideMouseVal");
+    if (skv) skv.textContent = sensText(controls.key);
+    if (smv) smv.textContent = sensText(controls.mouse);
+    const vol = document.getElementById("sideVolRange");
+    if (vol && document.activeElement !== vol) vol.value = String(storedVolume());
+    const volv = document.getElementById("sideVolVal");
+    if (volv) volv.textContent = storedVolume() + "%";
+    const vib = document.getElementById("sideVibToggle");
+    if (vib) vib.checked = vibrationEnabled;
+    const tilt = document.getElementById("sideTiltToggle");
+    if (tilt) tilt.checked = !!tiltEnabled;
+  }
+  function setupSidePanels() {
+    const lbPanel = document.getElementById("sideLb");
+    const setPanel = document.getElementById("sideSet");
+    const lbToggle = document.getElementById("sideLbToggle");
+    const setToggle = document.getElementById("sideSetToggle");
+    let lbCollapsed = false, setCollapsed = false;
+    try { lbCollapsed = localStorage.getItem("morjakaSideLbCollapsed") === "1"; } catch {}
+    try { setCollapsed = localStorage.getItem("morjakaSideSetCollapsed") === "1"; } catch {}
+    function applyCollapse(panel, toggle, collapsed, side) {
+      if (!panel || !toggle) return;
+      panel.classList.toggle("collapsed", collapsed);
+      toggle.textContent = side === "left" ? (collapsed ? "›" : "‹") : (collapsed ? "‹" : "›");
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", (collapsed ? "Развернуть " : "Свернуть ") + (side === "left" ? "рейтинг" : "настройки"));
+    }
+    applyCollapse(lbPanel, lbToggle, lbCollapsed, "left");
+    applyCollapse(setPanel, setToggle, setCollapsed, "right");
+    if (lbToggle) lbToggle.addEventListener("click", () => {
+      lbCollapsed = !lbCollapsed;
+      try { localStorage.setItem("morjakaSideLbCollapsed", lbCollapsed ? "1" : "0"); } catch {}
+      applyCollapse(lbPanel, lbToggle, lbCollapsed, "left");
+      sfx.click();
+    });
+    if (setToggle) setToggle.addEventListener("click", () => {
+      setCollapsed = !setCollapsed;
+      try { localStorage.setItem("morjakaSideSetCollapsed", setCollapsed ? "1" : "0"); } catch {}
+      applyCollapse(setPanel, setToggle, setCollapsed, "right");
+      sfx.click();
+    });
+    const refresh = document.getElementById("sideLbRefresh");
+    if (refresh) refresh.addEventListener("click", () => { lbRefreshGlobal(true); sfx.click(); });
+    const nick = document.getElementById("sideNick");
+    const nickSave = document.getElementById("sideNickSave");
+    function commitNick() {
+      if (nick) saveNick(nick.value);
+      syncSideSettings();
+      sfx.click();
+    }
+    if (nickSave) nickSave.addEventListener("click", commitNick);
+    if (nick) nick.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); commitNick(); } });
+    const sensPairs = [["sideKeySens", "key"], ["sideMouseSens", "mouse"]];
+    for (const [id, which] of sensPairs) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      el.min = String(SENS_MIN); el.max = String(SENS_MAX); el.step = String(SENS_STEP);
+      el.addEventListener("input", () => {
+        const v = Number(el.value);
+        if (!Number.isFinite(v)) return;
+        controls[which] = Math.max(SENS_MIN, Math.min(SENS_MAX, v));
+        saveControls();
+        refreshSensUI();
+      });
+    }
+    const vol = document.getElementById("sideVolRange");
+    if (vol) vol.addEventListener("input", () => applyVolume(vol.value));
+    const vib = document.getElementById("sideVibToggle");
+    if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
+    const tilt = document.getElementById("sideTiltToggle");
+    if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; syncSideSettings(); });
+    const reset = document.getElementById("sideReset");
+    if (reset) reset.addEventListener("click", () => openResetDialog());
+    syncSideSettings();
+    lbRenderSide();
+    lbRefreshGlobal(true);
   }
   function setupLeaderboard() {
     const trophy = document.getElementById("lbButton"); if (trophy) trophy.addEventListener("click", () => lbOpen("global"));
@@ -16258,6 +16443,7 @@ html, body, body * {
   setupSettings();
   setupSoundSettings();
   setupLeaderboard();
+  setupSidePanels();
   setupTutorial();
   loadVibration();
   loadVolume();
