@@ -273,6 +273,8 @@ html, body, body * {
         <div class="sheetRow"><span>Никнейм</span><input id="setNick" type="text" maxlength="20" autocomplete="off" spellcheck="false" placeholder="Моряка" style="width:150px;padding:8px 10px;border-radius:10px;border:1px solid rgba(15,61,92,.22);background:rgba(255,255,255,.9);color:#0f3d5c;font:bold 13px 'Trebuchet MS',Arial;text-align:center"></div>
         <div class="sheetRow"><span>Чувствительность клавиш</span><span style="display:flex;align-items:center;gap:8px"><button id="sensKeyMinus" type="button" aria-label="Меньше">−</button><b id="sensKeyVal">100%</b><button id="sensKeyPlus" type="button" aria-label="Больше">+</button></span></div>
         <div class="sheetRow"><span>Чувствительность мыши</span><span style="display:flex;align-items:center;gap:8px"><button id="sensMouseMinus" type="button" aria-label="Меньше">−</button><b id="sensMouseVal">100%</b><button id="sensMousePlus" type="button" aria-label="Больше">+</button></span></div>
+        <div class="sheetRow"><span>Громкость</span><input id="settingsVolume" type="range" min="0" max="100" value="100" aria-label="Громкость"></div>
+        <div class="sheetRow"><span>Вибрация</span><input id="settingsVibration" type="checkbox" aria-label="Вибрация"></div>
         <div class="sheetActions">
             <button id="setNickSave" type="button">СОХРАНИТЬ НИК</button>
             <button id="settingsClose" type="button" class="primary">ГОТОВО</button>
@@ -14247,8 +14249,8 @@ html, body, body * {
     legendary: 0.06,
     divine: 0.01
   };
-  var GACHA_COST = 40;
-  var GACHA_DUPLICATE_REFUND = 0.5;
+  var GACHA_COST = 50;
+  var GACHA_DUPLICATE_REFUND = 0.4; // 20 монет при цене 50
   var GACHA_TIER_PRICES = {
     common: 100,
     // цена < 100 → обычная
@@ -16512,6 +16514,10 @@ html, body, body * {
     if (side && document.activeElement !== side) side.value = String(v);
     const label = document.getElementById("sideVolVal");
     if (label) label.textContent = Math.round(v) + "%";
+    const settings = document.getElementById("settingsVolume");
+    if (settings && document.activeElement !== settings) settings.value = String(v);
+    const main = document.getElementById("volRange");
+    if (main && document.activeElement !== main) main.value = String(v);
   }
   function loadVolume() {
     const range = document.getElementById("volRange");
@@ -16521,6 +16527,8 @@ html, body, body * {
     if (side) side.value = String(storedVolume());
     const label = document.getElementById("sideVolVal");
     if (label) label.textContent = storedVolume() + "%";
+    const settings = document.getElementById("settingsVolume");
+    if (settings) settings.value = String(storedVolume());
   }
   var vibrationEnabled = true;
   function loadVibration() {
@@ -16529,12 +16537,18 @@ html, body, body * {
     if (cb) cb.checked = vibrationEnabled;
     const side = document.getElementById("sideVibToggle");
     if (side) side.checked = vibrationEnabled;
+    const settings = document.getElementById("settingsVibration");
+    if (settings) settings.checked = vibrationEnabled;
   }
   function setVibration(on) {
     vibrationEnabled = !!on;
     try { localStorage.setItem("morjakaVib", on ? "1" : "0"); } catch {}
     const side = document.getElementById("sideVibToggle");
     if (side) side.checked = vibrationEnabled;
+    const settings = document.getElementById("settingsVibration");
+    if (settings) settings.checked = vibrationEnabled;
+    const main = document.getElementById("vibToggle");
+    if (main) main.checked = vibrationEnabled;
   }
   function sensText(v) { return Math.round(v * 100) + "%"; }
   function refreshSensUI() {
@@ -16554,6 +16568,8 @@ html, body, body * {
   function openSettings() {
     const ov = document.getElementById("settingsOverlay"); if (!ov) return;
     const ni = document.getElementById("setNick"); if (ni) ni.value = playerNick || "";
+    const vol = document.getElementById("settingsVolume"); if (vol) vol.value = String(storedVolume());
+    const vib = document.getElementById("settingsVibration"); if (vib) vib.checked = vibrationEnabled;
     refreshSensUI();
     ov.classList.add("open"); ov.setAttribute("aria-hidden", "false");
     sfx.click();
@@ -16583,6 +16599,10 @@ html, body, body * {
     }
     const rs = document.getElementById("settingsReset");
     if (rs) rs.addEventListener("click", () => { closeSettings(); openResetDialog(); });
+    const vol = document.getElementById("settingsVolume");
+    if (vol) vol.addEventListener("input", () => applyVolume(vol.value));
+    const vib = document.getElementById("settingsVibration");
+    if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
   }
   function openSoundSettings() {
     const ov = document.getElementById("soundOverlay"); if (!ov) return;
