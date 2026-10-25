@@ -9904,9 +9904,11 @@ html, body, body * {
     ctx.fillStyle = "rgba(21,85,118,.42)";
     trackedText(i + 1 + " / " + menuTabCount(), x + w - 16, y + 14, 1.2, "right");
     const title = isShop ? FRAMES[i].name.toUpperCase() : avatarName(i).toUpperCase();
+    // У открытых аватаров блок из двух строк — опускаем его ниже, чтобы не оставалось пустоты снизу.
+    const titleY = !isShop && !locked ? y + h - 44 : L.titleY;
     setFont(title.length > 22 ? 12 : 15, "bold");
     ctx.fillStyle = "#0f3d5c";
-    trackedText(title, cx, L.titleY, 0.9);
+    trackedText(title, cx, titleY, 0.9);
     setFont(9, "bold");
     if (isShop) {
       const frame = FRAMES[i];
@@ -9948,9 +9950,23 @@ html, body, body * {
       ctx.fillStyle = "rgba(21,85,118,.55)";
       trackedText("\u0415\u0429\u0401 " + fmt(Math.max(0, need - highScore)) + " \u0414\u041E \u041E\u0422\u041A\u0420\u042B\u0422\u0418\u042F", cx, L.meterTextY, 0.85);
     } else {
+      // \u041E\u0442\u043A\u0440\u044B\u0442\u044B\u0439 \u0430\u0432\u0430\u0442\u0430\u0440: \u0441\u0442\u0430\u0442\u0443\u0441 \u0440\u0438\u0441\u0443\u0435\u043C \u043F\u043B\u0430\u0448\u043A\u043E\u0439 \u0432\u043D\u0438\u0437\u0443 \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438, \u0430 \u043D\u0435 \u0441\u0442\u0440\u043E\u043A\u043E\u0439 \u043F\u043E\u0434 \u0438\u043C\u0435\u043D\u0435\u043C.
       const worn = menuItemWorn(i);
-      ctx.fillStyle = worn ? "#0f8a76" : "rgba(21,85,118,.55)";
-      trackedText(worn ? "\u0412\u042B\u0411\u0420\u0410\u041D" : "\u041E\u0422\u041A\u0420\u042B\u0422", cx, L.subY, 1.2);
+      const label = worn ? "\u0412\u042B\u0411\u0420\u0410\u041D" : "\u041E\u0422\u041A\u0420\u042B\u0422";
+      const pw = worn ? 70 : 64;
+      const ph = 17;
+      const px = cx - pw / 2;
+      const py = y + h - 26;
+      ctx.fillStyle = worn ? "rgba(18,160,140,.95)" : "rgba(255,255,255,.72)";
+      roundedRect(px, py, pw, ph, 8.5);
+      ctx.fill();
+      ctx.strokeStyle = worn ? "rgba(255,255,255,.7)" : "rgba(21,85,118,.18)";
+      ctx.lineWidth = 1;
+      roundedRect(px, py, pw, ph, 8.5);
+      ctx.stroke();
+      setFont(7, "bold");
+      ctx.fillStyle = worn ? "#ffffff" : "rgba(21,85,118,.62)";
+      trackedText(label, cx, py + ph / 2 + 0.5, 1.2);
     }
     ctx.restore();
   }
