@@ -2,72 +2,53 @@
 
 ## Можно ли на GitHub Pages?
 
-**Нет, напрямую нельзя.** GitHub Pages — это статический хостинг: он отдаёт файлы, но не хранит данные и не принимает запросы на запись. Глобальная таблица результатов требует **внешнего хранилища**.
+**Нет, напрямую нельзя.** GitHub Pages — статический хостинг: он отдаёт файлы, но не хранит данные и не принимает запросы на запись. Для общего рейтинга нужен внешний сервис.
 
-Клиент в игре уже готов: `LB_CONFIG` в `index.html` (провайдеры `supabase` и `worker`) + кнопка «Рейтинг» → вкладка ГЛОБАЛЬНО. Пока ключи не заполнены — показывается подсказка и локальный топ-5.
+Клиент в игре уже готов: кнопка-кубок в главном меню → вкладка **ГЛОБАЛЬНО**. Пока `LB_CONFIG.url` пуст, показывается подсказка, а локальный топ-5 работает как обычно.
 
-Как только вы укажете URL бэкенда — отправка и загрузка рейтинга заработают сами.
+## Firebase Realtime Database (основной вариант)
 
-## Вариант 1: Supabase (подключён)
+Firebase доступен из России, бесплатного тарифа Spark хватает с запасом: 1 ГБ хранилища и 10 ГБ трафика в месяц. Банковская карта не нужна.
 
-Рейтинг уже работает на проекте `caguxojvubfpbrlxggek`. В `index.html` прописаны Project URL и **publishable** key (он публичный по дизайну Supabase). Секретный ключ (`sb_secret_…`) в репозитории не хранится и в клиент не попадает — он нужен только для администрирования.
-
-Клиент поддерживает Supabase через `LB_CONFIG.provider = "supabase"`.
-
-1. Создай проект на [supabase.com](https://supabase.com) (Free tier).
-2. Открой **SQL Editor → New query**, вставь содержимое `supabase-schema.sql` и нажми **Run**.
-3. Перейди в **Project Settings → API** и скопируй:
-   - **Project URL** (например `https://abcd1234.supabase.co`);
-   - **anon public** ключ.
-4. В `index.html` заполни:
+1. Открой [console.firebase.google.com](https://console.firebase.google.com) и создай проект (Google Analytics можно отключить).
+2. **Build → Realtime Database → Create Database**. Регион — ближайший, например `europe-west1`. Режим — **Locked mode**.
+3. Перейди на вкладку **Rules**, вставь содержимое `firebase-rules.json` и нажми **Publish**.
+4. Скопируй URL базы — он показан над деревом данных, например:
+   `https://my-project-default-rtdb.europe-west1.firebasedatabase.app`
+   или старый формат `https://my-project-default-rtdb.firebaseio.com`.
+5. Вставь этот URL в `index.html`:
    ```js
    var LB_CONFIG = {
-     provider: "supabase",
-     url: "https://abcd1234.supabase.co",
-     anonKey: "eyJhbGciOi...",
+     provider: "firebase",
+     url: "https://my-project-default-rtdb.europe-west1.firebasedatabase.app",
      endpoint: "",
      game: "moryaka-jump"
    };
    ```
-5. Открой игру → «Рейтинг» → **ГЛОБАЛЬНО**. Сыграй забег — результат отправится автоматически.
+6. Открой игру, сыграй забег → «Рейтинг» → **ГЛОБАЛЬНО**. Результат отправится автоматически, топ-5 загрузится сразу.
 
-CORS в Supabase включён по умолчанию для REST API. RLS-политики из скрипта разрешают анонимам только `select` и `insert` (без update/delete).
+Данные лежат по пути `/scores/moryaka-jump/<случайный ключ>` в виде `{ name, score, ts }`.
 
-## Варианты бэкенда
+### Правила безопасности
 
-| Вариант | Бесплатно | Сложность | Комментарий |
-|---|---|---|---|
-| **Cloudflare Workers + KV** | да (щедрый лимит) | низкая | готовый файл `leaderboard-worker.js` в репозитории |
-| Supabase (Postgres + REST) | да (free tier) | низкая | публичный anon-key + RLS-политика |
-| Firebase Firestore | да (Spark) | средняя | правила безопасности обязательны |
-| Upstash Redis + API | да (free) | средняя | REST, простой storage |
+`firebase-rules.json` разрешает анонимам только чтение и добавление записей с именем 1–20 символов и счётом 1…100 000 000. Удаление и изменение чужих записей запрещены.
 
-## Быстрый старт (Cloudflare Worker)
+Любой публичный клиентский рейтинг можно подделать: игра — один JS-файл, а запросы идут из браузера. Полной защиты без серверной проверки забега нет. Для честного соревнования нужен сервер, который принимает и проверяет результат.
 
-1. Установи `wrangler`: `npm i -g wrangler` и `wrangler login`.
-2. Создай проект и KV: `wrangler kv namespace create LB`.
-3. В `wrangler.toml` привяжи namespace:
-   ```toml
-   name = "moryaka-leaderboard"
-   main = "leaderboard-worker.js"
-   compatibility_date = "2024-01-01"
-   [[kv_namespaces]]
-   binding = "LB"
-   id = "<ID из шага 2>"
-   ```
-4. `wrangler deploy` — получишь URL вида `https://moryaka-leaderboard.<аккаунт>.workers.dev`.
-5. В `index.html` укажи:
-   ```js
-   var LB_CONFIG = { endpoint: "https://...workers.dev", game: "moryaka-jump" };
-   ```
-6. Открой игру → «Рейтинг» → ГЛОБАЛЬНО. Сыграй забег — результат уйдёт автоматически.
+### Чистка старых записей
 
-## Безопасность (важно)
+Firebase хранит все забеги. Если записей станет слишком много, удали лишние в консоли: **Realtime Database → Data → scores → moryaka-jump**. Для топ-5 достаточно держать несколько сотен записей.
 
-- Любой публичный клиентский рейтинг **можно подделать** (игра — один JS-файл). Полной защиты без серверной валидации забега нет.
-- Минимальные меры: проверка score на сервере (диапазон), лимит длины имени, лимит записей, rate-limit по IP (Cloudflare WAF / Turnstile), подпись/секрет для продвинутого варианта.
-- Не храните в репозитории приватные ключи. Ключ Supabase anon — публичный, но с включённой RLS-политикой «только insert на scores».
+## Альтернатива: свой сервер
+
+В репозитории есть `leaderboard-worker.js` — Cloudflare Worker с KV. Подходит, если у тебя есть собственный домен, подключённый к Cloudflare: домен `*.workers.dev` в России блокируется.
+
+Можно запустить и обычный Node.js-сервер на VPS (Timeweb, Beget, любой другой) — клиент обращается к нему так же, как к воркеру:
+
+```js
+var LB_CONFIG = { provider: "worker", url: "", endpoint: "https://твой-сервер/api", game: "moryaka-jump" };
+```
 
 ## Локальный рейтинг
 
-Хранится в `localStorage["morjakaTopScores"]` (топ-20, показываются топ-5). Работает офлайн и без бэкенда.
+Хранится в `localStorage["morjakaTopScores"]` (топ-20, показываются топ-5). Работает офлайн, без интернета и без сервисов.

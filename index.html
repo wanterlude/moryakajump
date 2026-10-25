@@ -15984,13 +15984,12 @@ html, body, body * {
       if (localStorage.getItem("morjakaSchema") === null) localStorage.setItem("morjakaSchema", String(SCHEMA_VERSION));
     } catch {}
   }
-  // Глобальный рейтинг. Поддерживаются два режима:
-  // 1) Supabase (рекомендуется): provider:"supabase", url, anonKey.
-  // 2) Свой воркер: provider:"worker", endpoint (см. leaderboard-worker.js).
+  // Глобальный рейтинг. Основной режим — Firebase Realtime Database:
+  // provider:"firebase", url:"https://<project>-default-rtdb.<region>.firebasedatabase.app".
+  // Альтернатива — свой воркер: provider:"worker", endpoint (см. leaderboard-worker.js).
   var LB_CONFIG = {
-    provider: "supabase",
-    url: "https://caguxojvubfpbrlxggek.supabase.co",
-    anonKey: "sb_publishable_YLcmNgx8H5sMn1kELr3iVg_8TJbV8A1", // публичный publishable key
+    provider: "firebase",
+    url: "",       // URL базы Realtime Database (см. LEADERBOARD.md)
     endpoint: "",  // для provider:"worker"
     game: "moryaka-jump"
   };
@@ -16011,40 +16010,36 @@ html, body, body * {
     list.sort((a, b) => b.s - a.s);
     lbWriteLocal(list);
   }
-  function lbSupabaseReady() {
-    return LB_CONFIG.provider === "supabase" && !!LB_CONFIG.url && !!LB_CONFIG.anonKey;
+  function lbFirebaseReady() {
+    return LB_CONFIG.provider === "firebase" && !!LB_CONFIG.url;
   }
-  function lbSupabaseHeaders() {
-    return {
-      "apikey": LB_CONFIG.anonKey,
-      "Authorization": "Bearer " + LB_CONFIG.anonKey,
-      "Content-Type": "application/json"
-    };
+  function lbFirebaseBase() {
+    return String(LB_CONFIG.url).replace(/\/+$/, "") + "/scores/" + encodeURIComponent(LB_CONFIG.game);
   }
-  function lbSupabaseTable() {
-    return String(LB_CONFIG.url).replace(/\/+$/, "") + "/rest/v1/scores";
-  }
-  async function lbSupabaseFetch() {
-    if (!lbSupabaseReady()) return { scores: [], note: "Supabase не настроен: заполните LB_CONFIG.url и LB_CONFIG.anonKey (см. LEADERBOARD.md)." };
+  async function lbFirebaseFetch() {
+    if (!lbFirebaseReady()) return { scores: [], note: "Firebase не настроен: укажите URL базы в LB_CONFIG.url (см. LEADERBOARD.md)." };
+    const base = lbFirebaseBase() + ".json";
     try {
-      const url = lbSupabaseTable()
-        + "?select=name,score&game=eq." + encodeURIComponent(LB_CONFIG.game)
-        + "&order=score.desc&limit=" + LB_LIMIT;
-      const res = await fetch(url, { headers: lbSupabaseHeaders(), cache: "no-store" });
+      let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_LIMIT, { cache: "no-store" });
+      if (!res.ok) res = await fetch(base, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
-      return { scores: Array.isArray(data) ? data : [], note: "" };
+      const list = data && typeof data === "object"
+        ? Object.keys(data).map((k) => data[k]).filter((v) => v && typeof v === "object")
+        : [];
+      list.sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0));
+      return { scores: list.slice(0, LB_LIMIT), note: "" };
     } catch (e) {
-      return { scores: [], note: "Ошибка загрузки Supabase (" + (e && e.message ? e.message : "сеть") + ")." };
+      return { scores: [], note: "Ошибка загрузки Firebase (" + (e && e.message ? e.message : "сеть") + ")." };
     }
   }
-  async function lbSupabaseSubmit(name, score) {
-    if (!lbSupabaseReady()) return;
+  async function lbFirebaseSubmit(name, score) {
+    if (!lbFirebaseReady()) return;
     try {
-      await fetch(lbSupabaseTable(), {
+      await fetch(lbFirebaseBase() + ".json", {
         method: "POST",
-        headers: Object.assign({ "Prefer": "return=minimal" }, lbSupabaseHeaders()),
-        body: JSON.stringify([{ game: LB_CONFIG.game, name, score }])
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, score, ts: Date.now() })
       });
     } catch {}
   }
@@ -16052,7 +16047,7 @@ html, body, body * {
     if (!(score > 0)) return;
     lbRecordLocal(score, playerNick);
     const name = (playerNick || "Моряка").slice(0, 20);
-    if (lbSupabaseReady()) { lbSupabaseSubmit(name, Math.floor(score)); return; }
+    if (lbFirebaseReady()) { lbFirebaseSubmit(name, Math.floor(score)); return; }
     if (LB_CONFIG.provider !== "worker" || !LB_CONFIG.endpoint) return;
     try {
       fetch(LB_CONFIG.endpoint, {
@@ -16063,7 +16058,7 @@ html, body, body * {
     } catch {}
   }
   async function lbFetchGlobal() {
-    if (lbSupabaseReady()) return lbSupabaseFetch();
+    if (lbFirebaseReady()) return lbFirebaseFetch();
     if (LB_CONFIG.provider === "worker" && LB_CONFIG.endpoint) {
       try {
         const res = await fetch(LB_CONFIG.endpoint + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_LIMIT, { cache: "no-store" });
@@ -16074,7 +16069,7 @@ html, body, body * {
         return { scores: [], note: "Не удалось загрузить глобальный рейтинг (" + (e && e.message ? e.message : "ошибка") + ")." };
       }
     }
-    return { scores: [], note: "Глобальный рейтинг не подключён. Настройте Supabase в LB_CONFIG (см. LEADERBOARD.md) или свой воркер." };
+    return { scores: [], note: "Глобальный рейтинг не подключён. Укажите Firebase Realtime Database URL в LB_CONFIG (см. LEADERBOARD.md)." };
   }
   var lbState = { tab: "global", global: null, globalNote: "", loading: false };
   function lbRender() {
