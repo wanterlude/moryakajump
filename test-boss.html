@@ -59,6 +59,19 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #nickCancel:hover{background:rgba(255,255,255,.18)}
 #nickConfirm{background:linear-gradient(180deg,#22a884,#0f8a76);color:#fff}
 #nickConfirm:hover{filter:brightness(1.08)}
+#saveOverlay{position:fixed;inset:0;z-index:220;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#saveOverlay.open{display:flex}
+#saveCard{width:min(380px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
+#saveCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
+#saveCard p{margin:0 0 12px;font-size:12px;line-height:1.5;color:rgba(210,228,246,.78)}
+#saveText{width:100%;height:88px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(6,16,32,.55);color:#eaf4ff;font:11px Consolas,monospace;line-height:1.35;resize:none;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation;word-break:break-all}
+#saveText:focus{border-color:rgba(120,220,255,.6);box-shadow:0 0 0 3px rgba(80,190,240,.18)}
+#saveActions{display:flex;gap:10px;margin-top:12px}
+#saveActions button,#saveClose{flex:1;padding:12px 8px;border-radius:13px;border:1px solid transparent;font:bold 11px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
+#saveActions button:active,#saveClose:active{transform:scale(.97)}
+#saveCopy{background:linear-gradient(180deg,#22a884,#0f8a76);color:#fff}
+#saveLoad{background:linear-gradient(180deg,#3d8ec0,#1d6b9c);color:#fff}
+#saveClose{margin-top:10px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
 #pauseButton,#tiltButton{display:none!important}
 @media (max-width:600px) and (pointer:coarse){
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
@@ -117,6 +130,18 @@ html, body, body * {
             <button id="resetCancel" type="button">ОТМЕНА</button>
             <button id="resetConfirm" type="button">СБРОСИТЬ</button>
         </div>
+    </div>
+</div>
+<div id="saveOverlay" role="dialog" aria-modal="true" aria-labelledby="saveTitle" aria-hidden="true">
+    <div id="saveCard">
+        <h2 id="saveTitle">Сохранение</h2>
+        <p>Скопируйте код для бэкапа или вставьте сохранённый код и нажмите «Загрузить».</p>
+        <textarea id="saveText" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div id="saveActions">
+            <button id="saveCopy" type="button">СКОПИРОВАТЬ</button>
+            <button id="saveLoad" type="button">ЗАГРУЗИТЬ</button>
+        </div>
+        <button id="saveClose" type="button">ЗАКРЫТЬ</button>
     </div>
 </div>
 <div id="nickOverlay" role="dialog" aria-modal="true" aria-labelledby="nickTitle" aria-hidden="true">
@@ -930,6 +955,21 @@ html, body, body * {
     ["ring", "sweep", "spiral", "shards", "aim"],
     ["sweep", "cross", "spiral", "hail", "geyser", "ring"]
   ];
+  var DUEL_PATTERNS_STORM = [
+    ["aim", "ring", "sweep", "shards"],
+    ["ring", "spiral", "cross", "hail", "aim"],
+    ["sweep", "cross", "spiral", "geyser", "hail", "ring", "seeker"]
+  ];
+  var DUEL_PATTERNS_AVALANCHE = [
+    ["lob", "geyser", "aim"],
+    ["geyser", "hail", "ring", "lob"],
+    ["hail", "cross", "geyser", "spiral", "lob", "seeker"]
+  ];
+  var DUEL_PATTERNS_LEVIATHAN = [
+    ["shards", "aim", "ring", "lob"],
+    ["spiral", "sweep", "cross", "hail", "aim"],
+    ["geyser", "spiral", "cross", "hail", "ring", "sweep", "seeker"]
+  ];
   var DUEL_PATTERNS_YETI = [
     ["lob", "geyser", "aim"],
     ["geyser", "shards", "ring", "lob"],
@@ -946,8 +986,8 @@ html, body, body * {
     cross: "#c7b3ff", hail: "#c3ecff", geyser: "#a4f0ff", seeker: "#d8c9ff"
   };
   var DUEL_COOLDOWN_FRAMES = [100, 76, 58];
-  var DUEL_SPEED_BY_BOSS = [2.6, 3.1, 3.6, 4.1];
-  var DUEL_COOL_BY_BOSS = [0.24, 0.21, 0.18, 0.15];
+  var DUEL_SPEED_BY_BOSS = [2.6, 3.1, 3.4, 3.8, 4.2];
+  var DUEL_COOL_BY_BOSS = [0.24, 0.21, 0.19, 0.17, 0.15];
   function duelBossIndexClamp(index, len) {
     return Math.min(index, len - 1);
   }
@@ -1390,11 +1430,11 @@ html, body, body * {
     }
   }
   var DUEL_BOSS_DEFS = [
-    { name: "ЛЕДЯНОЙ КРАКЕН", kind: "kraken", arena: "shore", subtitle: "ХРАНИТЕЛЬ ПОЛЫНЬИ" },
-    { name: "СНЕЖНЫЙ ЙЕТИ", kind: "yeti", arena: "canyon", subtitle: "ХОЗЯИН ЛЕДЯНОГО КАНЬОНА" },
-    { name: "ШТОРМОВОЙ СПРУТ", kind: "kraken", arena: "storm", subtitle: "ПОВЕЛИТЕЛЬ ШТОРМА" },
-    { name: "ХРАНИТЕЛЬ ЛАВИН", kind: "yeti", arena: "canyon", subtitle: "ГОЛОС ЛАВИНЫ" },
-    { name: "ЛЕДЯНОЙ ЛЕВИАФАН", kind: "kraken", arena: "storm", subtitle: "ЦАРЬ ГЛУБИН" }
+    { name: "ЛЕДЯНОЙ КРАКЕН", kind: "kraken", arena: "shore", subtitle: "ХРАНИТЕЛЬ ПОЛЫНЬИ", accent: "#4fc3f7" },
+    { name: "СНЕЖНЫЙ ЙЕТИ", kind: "yeti", arena: "canyon", subtitle: "ХОЗЯИН ЛЕДЯНОГО КАНЬОНА", accent: "#7fd8f0" },
+    { name: "ШТОРМОВОЙ СПРУТ", kind: "storm", arena: "storm", subtitle: "ПОВЕЛИТЕЛЬ ШТОРМА", accent: "#8f7dff" },
+    { name: "ХРАНИТЕЛЬ ЛАВИН", kind: "avalanche", arena: "canyon", subtitle: "ГОЛОС ЛАВИНЫ", accent: "#ffc247" },
+    { name: "ЛЕДЯНОЙ ЛЕВИАФАН", kind: "leviathan", arena: "storm", subtitle: "ЦАРЬ ГЛУБИН", accent: "#5ce8ff" }
   ];
   var DUEL_BOSS_NAMES = DUEL_BOSS_DEFS.map((d) => d.name);
   function duelBossDef(index) {
@@ -1404,7 +1444,12 @@ html, body, body * {
     return duelState.bossKind || "kraken";
   }
   function duelPatterns() {
-    return duelBossKind() === "yeti" ? DUEL_PATTERNS_YETI : DUEL_PATTERNS_KRAKEN;
+    const kind = duelBossKind();
+    if (kind === "yeti") return DUEL_PATTERNS_YETI;
+    if (kind === "storm") return DUEL_PATTERNS_STORM;
+    if (kind === "avalanche") return DUEL_PATTERNS_AVALANCHE;
+    if (kind === "leviathan") return DUEL_PATTERNS_LEVIATHAN;
+    return DUEL_PATTERNS_KRAKEN;
   }
   var DUEL_PHASE_TINTS = [
     "rgba(79,195,247,0.00)",
@@ -2399,6 +2444,7 @@ html, body, body * {
     duelDrawPlayer(c);
     duelDrawParticles(c);
     duelDrawHud(c);
+    duelDrawBanner(c);
   }
   var DUEL_ATTACK_LABELS = {
     aim: "ПРИЦЕЛ", ring: "КРУГ", sweep: "ВОЛНА", shards: "ОСКОЛКИ",
@@ -3330,10 +3376,207 @@ html, body, body * {
     }
     c.restore();
   }
+  function duelAvalancheArmor(c, t, tension, defeated) {
+    const pulse = 0.5 + 0.5 * Math.sin(t / 22) + tension * 0.5;
+    const level = duelState.level;
+    c.save();
+    // Снежная мантия за плечами.
+    c.save();
+    const cape = c.createLinearGradient(0, -34, 0, 26);
+    cape.addColorStop(0, "rgba(250,254,255,.92)");
+    cape.addColorStop(0.55, "rgba(214,241,250,.75)");
+    cape.addColorStop(1, "rgba(150,200,220,.25)");
+    c.fillStyle = cape;
+    c.beginPath();
+    c.moveTo(-48, -8);
+    c.quadraticCurveTo(0, -40, 48, -8);
+    c.lineTo(38, 22);
+    c.quadraticCurveTo(0, 8, -38, 22);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "rgba(255,255,255,.7)";
+    c.lineWidth = 1;
+    c.stroke();
+    c.restore();
+    if (level >= 2 && !defeated) {
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.08 + level * 0.035;
+      duelDrawGlow(c, 0, 8, 96, "#ffc247");
+      c.restore();
+    }
+    // Каменные наплечники со снежными шапками.
+    for (const dir of [-1, 1]) {
+      c.save();
+      c.translate(dir * 40, -18);
+      c.rotate(dir * 0.16);
+      const rock = c.createLinearGradient(0, -12, 0, 18);
+      rock.addColorStop(0, "#7b8d99");
+      rock.addColorStop(0.55, "#556873");
+      rock.addColorStop(1, "#33434e");
+      c.fillStyle = rock;
+      c.beginPath();
+      c.moveTo(-16, -8);
+      c.lineTo(-6, -16);
+      c.lineTo(12, -12);
+      c.lineTo(17, 2);
+      c.lineTo(8, 16);
+      c.lineTo(-10, 13);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = "rgba(18,38,52,0.55)";
+      c.lineWidth = 1.4;
+      c.stroke();
+      c.fillStyle = "rgba(245,253,255,.9)";
+      c.beginPath();
+      c.moveTo(-15, -8);
+      c.quadraticCurveTo(-2, -17, 14, -10);
+      c.quadraticCurveTo(2, -7, -15, -8);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = "rgba(255,194,71,.85)";
+      c.lineWidth = 1.3;
+      c.beginPath();
+      c.moveTo(-6, -2);
+      c.lineTo(2, 5);
+      c.lineTo(-3, 11);
+      c.stroke();
+      c.restore();
+    }
+    // Нагрудная пластина с руной.
+    c.save();
+    const plate = c.createLinearGradient(0, -6, 0, 36);
+    plate.addColorStop(0, "#7b8d99");
+    plate.addColorStop(0.5, "#536672");
+    plate.addColorStop(1, "#33434e");
+    c.fillStyle = plate;
+    c.beginPath();
+    c.moveTo(-22, -6);
+    c.lineTo(-14, 26);
+    c.lineTo(0, 36);
+    c.lineTo(14, 26);
+    c.lineTo(22, -6);
+    c.quadraticCurveTo(0, 2, -22, -6);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "rgba(18,38,52,0.55)";
+    c.lineWidth = 1.5;
+    c.stroke();
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.22 + pulse * 0.24;
+    duelDrawGlow(c, 0, 16, 26, "#ffc247");
+    c.restore();
+    c.strokeStyle = `rgba(255,194,71,${0.65 + pulse * 0.3})`;
+    c.lineWidth = 1.7 + level * 0.3;
+    c.beginPath();
+    c.moveTo(0, 5);
+    c.lineTo(0, 27);
+    c.moveTo(-11, 15);
+    c.lineTo(11, 15);
+    c.moveTo(-6, 10);
+    c.lineTo(6, 20);
+    c.stroke();
+    if (level >= 1) {
+      c.strokeStyle = "rgba(10,28,42,.55)";
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.moveTo(-18, 4);
+      c.lineTo(-10, 12);
+      c.lineTo(-15, 20);
+      c.lineTo(-7, 28);
+      c.stroke();
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.4;
+      c.strokeStyle = "#ffc247";
+      c.lineWidth = 1;
+      c.stroke();
+      c.restore();
+    }
+    if (level >= 2) {
+      c.strokeStyle = "rgba(10,28,42,.55)";
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.moveTo(18, 2);
+      c.lineTo(12, 10);
+      c.lineTo(18, 18);
+      c.lineTo(10, 26);
+      c.stroke();
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.4;
+      c.strokeStyle = "#ffc247";
+      c.lineWidth = 1;
+      c.stroke();
+      c.restore();
+    }
+    c.restore();
+    // Каменная корона поверх головы.
+    for (let i = 0; i < 5; i++) {
+      const x = -26 + i * 13;
+      const h = 18 + (i % 3) * 7;
+      c.save();
+      c.translate(x, -72);
+      c.rotate((i - 2) * 0.12);
+      const g = c.createLinearGradient(0, -h, 0, 8);
+      g.addColorStop(0, "#f2fbff");
+      g.addColorStop(0.45, "#a7d8e8");
+      g.addColorStop(1, "#4f6270");
+      c.fillStyle = g;
+      c.beginPath();
+      c.moveTo(-6, 8);
+      c.lineTo(-2, -h);
+      c.lineTo(2, -h * 0.55);
+      c.lineTo(4, -h);
+      c.lineTo(7, 8);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = "rgba(24,64,86,.36)";
+      c.lineWidth = 1;
+      c.stroke();
+      c.restore();
+    }
+    // Тяжёлые каменные брови.
+    c.strokeStyle = "rgba(34,54,68,.6)";
+    c.lineWidth = 2.2;
+    c.lineCap = "round";
+    c.beginPath();
+    c.moveTo(-23, -60);
+    c.lineTo(-8, -56);
+    c.moveTo(23, -60);
+    c.lineTo(8, -56);
+    c.stroke();
+    // Парящие каменные осколки.
+    for (let i = 0; i < 5; i++) {
+      const a = t / 120 + i * 1.4;
+      const r = 58 + Math.sin(t / 40 + i) * 7;
+      const sx = Math.cos(a) * r;
+      const sy = 4 + Math.sin(a * 1.3) * 42;
+      c.save();
+      c.translate(sx, sy);
+      c.rotate(a * 1.7);
+      c.fillStyle = "rgba(63,79,92,.72)";
+      c.beginPath();
+      c.moveTo(0, -5);
+      c.lineTo(4, -1);
+      c.lineTo(2, 5);
+      c.lineTo(-4, 3);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = "rgba(255,194,71,.4)";
+      c.lineWidth = 0.8;
+      c.stroke();
+      c.restore();
+    }
+    c.restore();
+  }
   function duelYetiBody(c) {
     const t = duelState.frame;
     const tension = duelTelegraphTension();
     const accent = DUEL_PHASE_COLORS[duelState.level] || DUEL_PHASE_COLORS[0];
+    const avalanche = duelBossKind() === "avalanche";
+    const eyeAccent = avalanche ? "#ffc247" : accent;
     const defeated = duelState.over && duelState.won;
     const breathe = 1 + Math.sin(t / 46) * 0.02;
     const look = duelClamp((duelState.px + DUEL_PLAYER_HALF - duelState.bx) / 150, -1, 1);
@@ -3529,14 +3772,14 @@ html, body, body * {
       c.save();
       c.globalCompositeOperation = "lighter";
       c.globalAlpha = 0.6 + tension * 0.2;
-      duelDrawGlow(c, ex, ey, 17, accent);
+      duelDrawGlow(c, ex, ey, 17, eyeAccent);
       c.restore();
       c.fillStyle = blink ? "#7fb8cc" : "#eaffff";
       c.beginPath();
       c.ellipse(ex, ey, 8.4, blink ? 2 : 6.4, 0, 0, Math.PI * 2);
       c.fill();
       if (!blink) {
-        c.fillStyle = accent;
+        c.fillStyle = eyeAccent;
         c.beginPath();
         c.arc(ex + look * 2.6, ey + 0.6, 3.6, 0, Math.PI * 2);
         c.fill();
@@ -3626,6 +3869,8 @@ html, body, body * {
       c.fill();
     }
 
+    if (avalanche) duelAvalancheArmor(c, t, tension, defeated);
+
     // Вспышка при попадании
     if (duelState.flash > 0) {
       c.save();
@@ -3648,8 +3893,789 @@ html, body, body * {
     }
     c.restore();
   }
+  function duelStormCrown(c, t, tension, accent) {
+    const topY = -44;
+    const spikes = [
+      { x: -30, h: 32, w: 13, lean: -6 },
+      { x: -16, h: 46, w: 16, lean: -3 },
+      { x: 0, h: 58, w: 18, lean: 0 },
+      { x: 16, h: 42, w: 15, lean: 3 },
+      { x: 29, h: 30, w: 12, lean: 7 }
+    ];
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.16 + tension * 0.18;
+    duelDrawGlow(c, 0, topY - 18, 48 + tension * 12, "#8fb8ff");
+    c.restore();
+    for (const s of spikes) {
+      const tipX = s.x + s.lean;
+      const tipY = topY - s.h;
+      const g = c.createLinearGradient(s.x, tipY, s.x, topY + 8);
+      g.addColorStop(0, "#f4fbff");
+      g.addColorStop(0.35, "#9fd8ff");
+      g.addColorStop(0.7, "#6f8fff");
+      g.addColorStop(1, "#3a4f9c");
+      c.beginPath();
+      c.moveTo(s.x - s.w / 2, topY + 8);
+      c.lineTo(s.x + s.lean * 0.35, topY - s.h * 0.55);
+      c.lineTo(tipX, tipY);
+      c.lineTo(s.x + s.lean * 0.15, topY - s.h * 0.45);
+      c.lineTo(s.x + s.w / 2, topY + 8);
+      c.closePath();
+      c.fillStyle = g;
+      c.fill();
+      c.strokeStyle = "rgba(170,235,255,.65)";
+      c.lineWidth = 1;
+      c.stroke();
+    }
+    const pulse = 0.6 + 0.4 * Math.sin(t / 18) + tension * 0.3;
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.32 + pulse * 0.24;
+    duelDrawGlow(c, 0, topY - 12, 20 + pulse * 4, "#b6a8ff");
+    c.restore();
+    const gem = c.createRadialGradient(-2, topY - 14, 1, 0, topY - 12, 8);
+    gem.addColorStop(0, "#ffffff");
+    gem.addColorStop(0.45, "#c9b8ff");
+    gem.addColorStop(1, duelHexToRgba(accent, 0.9));
+    c.fillStyle = gem;
+    c.beginPath();
+    c.arc(0, topY - 12, 6.5, 0, Math.PI * 2);
+    c.fill();
+    c.strokeStyle = "rgba(255,255,255,.85)";
+    c.lineWidth = 1;
+    c.stroke();
+    c.save();
+    c.strokeStyle = "rgba(190,230,255,.6)";
+    c.lineWidth = 1.1;
+    for (let i = 0; i < 2; i++) {
+      const a = t / 90 + i * 2.6;
+      c.beginPath();
+      c.moveTo(Math.cos(a) * 12, topY - 12 + Math.sin(a) * 6);
+      c.lineTo(Math.cos(a) * 12 + Math.cos(a + 1.2) * 8, topY - 12 + Math.sin(a) * 6 + Math.sin(a + 1.2) * 8);
+      c.stroke();
+    }
+    c.restore();
+  }
+
+  function duelStormBody(c) {
+    const t = duelState.frame;
+    const tension = duelTelegraphTension();
+    const accent = DUEL_PHASE_COLORS[duelState.level] || DUEL_PHASE_COLORS[0];
+    const defeated = duelState.over && duelState.won;
+    const breathe = 1 + Math.sin(t / 50) * 0.02;
+    const look = duelClamp((duelState.px + DUEL_PLAYER_HALF - duelState.bx) / 150, -1, 1) * 4;
+    const blink = !defeated && t % 220 < 8;
+    c.save();
+    c.translate(duelState.bx, duelState.by + (defeated ? 12 : 0));
+    if (defeated) c.rotate(0.06);
+    c.scale(breathe, breathe);
+
+    const shade = c.createRadialGradient(0, 34, 12, 0, 44, 124);
+    shade.addColorStop(0, "rgba(18,44,86,0.18)");
+    shade.addColorStop(0.65, "rgba(18,44,86,0.07)");
+    shade.addColorStop(1, "rgba(18,44,86,0)");
+    c.fillStyle = shade;
+    c.beginPath();
+    c.ellipse(0, 48, 120, 98, 0, 0, Math.PI * 2);
+    c.fill();
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.16 + tension * 0.14;
+    duelDrawGlow(c, 0, 6, 104, "#7f8fff");
+    c.globalAlpha = 0.1;
+    duelDrawGlow(c, 0, 72, 68, "#5ce8ff");
+    c.restore();
+
+    // Дождь и косые струи.
+    c.save();
+    c.strokeStyle = "rgba(170,225,255,.16)";
+    c.lineWidth = 1;
+    for (let i = 0; i < 18; i++) {
+      const x = -92 + ((i * 37 + t * 1.4) % 184);
+      const y = -26 + ((i * 53 + t * 2.6) % 166);
+      c.beginPath();
+      c.moveTo(x, y);
+      c.lineTo(x - 6, y + 18);
+      c.stroke();
+    }
+    c.restore();
+
+    // Задний слой щупалец.
+    for (let i = 0; i < 4; i++) {
+      const spread = (i - 1.5) * 0.9;
+      const sway = Math.sin(t / 40 + i * 1.6) * 8;
+      duelTentacle(c, spread * 18, 20, spread, 82 + (i % 3) * 9, 13, sway, "#2f6f92", "#123a58", false);
+    }
+
+    duelStormCrown(c, t, tension, accent);
+
+    // Тёмная грозовая мантия: держит силуэт на светлом фоне.
+    c.save();
+    for (let i = 0; i < 5; i++) {
+      const a = i / 5 * Math.PI * 2 + t / 320;
+      const cx = Math.cos(a) * 42;
+      const cy = -18 + Math.sin(a) * 18;
+      const rr = 38 + (i % 3) * 9;
+      const g = c.createRadialGradient(cx, cy, 2, cx, cy, rr);
+      g.addColorStop(0, "rgba(18,34,66,.36)");
+      g.addColorStop(0.62, "rgba(18,34,66,.18)");
+      g.addColorStop(1, "rgba(18,34,66,0)");
+      c.fillStyle = g;
+      c.beginPath();
+      c.ellipse(cx, cy, rr, rr * 0.72, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.restore();
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.strokeStyle = "rgba(170,225,255,.45)";
+    c.lineWidth = 1.1;
+    for (let i = 0; i < 4; i++) {
+      const a = i / 4 * Math.PI * 2 + t / 320;
+      const x1 = Math.cos(a) * 34;
+      const y1 = -18 + Math.sin(a) * 16;
+      const x2 = Math.cos(a + 0.6) * 48;
+      const y2 = -18 + Math.sin(a + 0.6) * 22;
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo((x1 + x2) / 2 + Math.cos(a + 1.4) * 7, (y1 + y2) / 2 + Math.sin(a + 1.4) * 7);
+      c.lineTo(x2, y2);
+      c.stroke();
+    }
+    c.globalCompositeOperation = "lighter";
+    for (let i = 0; i < 5; i++) {
+      const a = i / 5 * Math.PI * 2 + t / 320;
+      const cx = Math.cos(a) * 40;
+      const cy = -18 + Math.sin(a) * 18;
+      const rr = 34 + (i % 3) * 8;
+      const g = c.createRadialGradient(cx, cy, 2, cx, cy, rr);
+      g.addColorStop(0, "rgba(92,120,190,.24)");
+      g.addColorStop(0.6, "rgba(40,70,120,.13)");
+      g.addColorStop(1, "rgba(20,40,80,0)");
+      c.fillStyle = g;
+      c.beginPath();
+      c.ellipse(cx, cy, rr, rr * 0.72, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.restore();
+
+    // Купол.
+    c.save();
+    const bodyGrad = c.createRadialGradient(-16, -24, 8, 2, 6, 78);
+    bodyGrad.addColorStop(0, "#cdeeff");
+    bodyGrad.addColorStop(0.24, "#8fd2ea");
+    bodyGrad.addColorStop(0.5, "#4f9fbd");
+    bodyGrad.addColorStop(0.78, "#2b6f92");
+    bodyGrad.addColorStop(1, "#123a58");
+    c.fillStyle = bodyGrad;
+    duelBossBodyPath(c);
+    c.fill();
+    c.strokeStyle = "rgba(10,44,68,0.35)";
+    c.lineWidth = 1.3;
+    duelBossBodyPath(c);
+    c.stroke();
+    c.save();
+    duelBossBodyPath(c);
+    c.clip();
+    const bottomShade = c.createLinearGradient(0, -8, 0, 42);
+    bottomShade.addColorStop(0, "rgba(10,50,80,0)");
+    bottomShade.addColorStop(1, "rgba(8,38,60,0.4)");
+    c.fillStyle = bottomShade;
+    c.fillRect(-50, -8, 100, 52);
+    const sheen = c.createRadialGradient(-22, -28, 3, -22, -28, 30);
+    sheen.addColorStop(0, "rgba(255,255,255,0.55)");
+    sheen.addColorStop(1, "rgba(255,255,255,0)");
+    c.fillStyle = sheen;
+    c.beginPath();
+    c.ellipse(-22, -28, 26, 18, -0.4, 0, Math.PI * 2);
+    c.fill();
+    // Спираль на лбу.
+    c.strokeStyle = "rgba(198,242,255,.42)";
+    c.lineWidth = 1.5;
+    for (let k = 0; k < 2; k++) {
+      c.beginPath();
+      c.arc(0, -17, 7 + k * 7, 0.4, 3.3);
+      c.stroke();
+    }
+    // Электрические прожилки по фазам.
+    const veins = [
+      [[-40, -10], [-28, -2], [-34, 8], [-22, 16]],
+      [[34, -20], [24, -8], [30, 3], [20, 14]],
+      [[0, -44], [-6, -34], [2, -26], [-2, -18]]
+    ];
+    const count = [0, 1, 2][duelState.level] || 0;
+    c.lineCap = "round";
+    for (let i = 0; i < count; i++) {
+      const path = veins[i];
+      c.strokeStyle = "rgba(10,40,70,.42)";
+      c.lineWidth = 2;
+      c.beginPath();
+      c.moveTo(path[0][0], path[0][1]);
+      for (let k = 1; k < path.length; k++) c.lineTo(path[k][0], path[k][1]);
+      c.stroke();
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.5 + tension * 0.3;
+      c.strokeStyle = "#8fe8ff";
+      c.lineWidth = 1;
+      c.stroke();
+      c.restore();
+    }
+    c.restore();
+    const rim = c.createLinearGradient(-44, -44, 22, 34);
+    rim.addColorStop(0, "rgba(220,250,255,.9)");
+    rim.addColorStop(0.42, "rgba(150,220,255,.3)");
+    rim.addColorStop(1, "rgba(120,160,255,0)");
+    c.strokeStyle = rim;
+    c.lineWidth = 2.2;
+    duelBossBodyPath(c);
+    c.stroke();
+    c.restore();
+
+    // Лицо.
+    if (defeated) {
+      c.strokeStyle = "#0d3450";
+      c.lineWidth = 2.6;
+      c.lineCap = "round";
+      for (const ex of [-18, 18]) {
+        c.beginPath();
+        c.moveTo(ex - 7, -12);
+        c.lineTo(ex + 7, 0);
+        c.moveTo(ex + 7, -12);
+        c.lineTo(ex - 7, 0);
+        c.stroke();
+      }
+    } else {
+      duelBossEye(c, -18, -8, look, blink, 1, accent);
+      duelBossEye(c, 18, -8, look, blink, 1, accent);
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.24 + tension * 0.24;
+      c.strokeStyle = "#b6eaff";
+      c.lineWidth = 1;
+      for (const ex of [-18, 18]) {
+        c.beginPath();
+        c.moveTo(ex + 11, -20);
+        c.lineTo(ex + 16, -15);
+        c.lineTo(ex + 12, -9);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    // Пасть.
+    const my = 20.5;
+    if (defeated) {
+      c.fillStyle = "#0b344c";
+      c.beginPath();
+      c.ellipse(0, my + 2, 7, 8, 0, 0, Math.PI * 2);
+      c.fill();
+    } else {
+      const open = 2.2 + tension * 10;
+      if (tension <= 0.02) {
+        c.strokeStyle = "rgba(10,48,76,0.85)";
+        c.lineWidth = 2.6;
+        c.lineCap = "round";
+        c.beginPath();
+        c.moveTo(-7.5, my);
+        c.quadraticCurveTo(0, my + 5.5, 7.5, my);
+        c.stroke();
+      } else {
+        const maw = c.createLinearGradient(0, my - open, 0, my + open);
+        maw.addColorStop(0, "#102a4a");
+        maw.addColorStop(0.55, "#081a30");
+        maw.addColorStop(1, "#174b70");
+        c.fillStyle = maw;
+        c.beginPath();
+        c.ellipse(0, my, 13, open, 0, 0, Math.PI * 2);
+        c.fill();
+        c.save();
+        c.globalCompositeOperation = "lighter";
+        c.globalAlpha = 0.28 + tension * 0.5;
+        duelDrawGlow(c, 0, my + 2, 22 + tension * 10, "#8fe8ff");
+        c.restore();
+        c.fillStyle = "#eafaff";
+        for (const fx of [-8, 0, 8]) {
+          c.beginPath();
+          c.moveTo(fx - 3, my - open + 0.5);
+          c.lineTo(fx, my - open + 6.5);
+          c.lineTo(fx + 3, my - open + 0.5);
+          c.closePath();
+          c.fill();
+        }
+        c.strokeStyle = "rgba(190,240,255,0.45)";
+        c.lineWidth = 1.1;
+        c.beginPath();
+        c.ellipse(0, my, 13, open, 0, 0, Math.PI * 2);
+        c.stroke();
+      }
+    }
+
+    // Передний слой щупалец.
+    for (let i = 0; i < 4; i++) {
+      const spread = (i - 1.5) / 1.6;
+      const sway = Math.sin(t / 34 + i * 1.4) * 9;
+      duelTentacle(
+        c,
+        spread * 24,
+        38,
+        spread * 0.95,
+        94 + (i % 2) * 12,
+        16 - Math.abs(spread) * 4,
+        sway,
+        "#4f9fbd",
+        "#1b4f70",
+        i === 1 || i === 2
+      );
+    }
+
+    // Электрические дуги между щупальцами.
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.22 + 0.22 * Math.abs(Math.sin(t / 26));
+    c.strokeStyle = "#b6eaff";
+    c.lineWidth = 1.2;
+    for (let i = 0; i < 3; i++) {
+      const x1 = -24 + i * 16;
+      const y1 = 112 + (i % 2) * 10;
+      const x2 = x1 + 16;
+      const y2 = y1 + 8;
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo((x1 + x2) / 2 + 3, (y1 + y2) / 2 - 4);
+      c.lineTo(x2, y2);
+      c.stroke();
+    }
+    c.restore();
+
+    // Туман и орбитальные осколки.
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.1 + 0.04 * Math.sin(t / 30);
+    duelDrawGlow(c, 0, 132, 84, "#9fdcff");
+    c.restore();
+    for (let i = 0; i < 6; i++) {
+      const a = t / 170 + i * 1.05;
+      const r = 80 + Math.sin(t / 46 + i) * 6;
+      c.save();
+      c.translate(Math.cos(a) * r, Math.sin(a) * r * 0.6 + 8);
+      c.rotate(a * 1.7);
+      c.fillStyle = "rgba(198,240,255,.45)";
+      c.beginPath();
+      c.moveTo(0, -4);
+      c.lineTo(1.4, 0);
+      c.lineTo(0, 4);
+      c.lineTo(-1.4, 0);
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    if (duelState.flash > 0) {
+      const flash = duelState.flash / 18;
+      c.save();
+      c.globalAlpha = Math.min(0.5, flash * 0.42);
+      c.fillStyle = "#ffffff";
+      duelBossBodyPath(c);
+      c.fill();
+      c.restore();
+      if (duelState.flash > 8) {
+        c.save();
+        c.globalAlpha = Math.min(0.55, (duelState.flash - 8) / 12);
+        c.strokeStyle = accent;
+        c.lineWidth = 2.6;
+        c.beginPath();
+        c.arc(0, 0, 58 + (18 - duelState.flash) * 4.5, 0, Math.PI * 2);
+        c.stroke();
+        c.restore();
+      }
+    }
+    c.restore();
+  }
+
+  function duelLeviathanCoil(c, t, defeated) {
+    const sway = Math.sin(t / 60) * 5;
+    const path = () => {
+      c.beginPath();
+      c.moveTo(-8, 20);
+      c.bezierCurveTo(-48, 38, -80, 70 + sway, -58, 106);
+      c.bezierCurveTo(-36, 142 + sway, 28, 128, 48, 154);
+      c.bezierCurveTo(62, 172, 86, 168, 98, 150 + sway);
+    };
+    c.save();
+    c.lineCap = "round";
+    c.lineJoin = "round";
+    path();
+    c.strokeStyle = "rgba(8,30,50,.55)";
+    c.lineWidth = 38;
+    c.stroke();
+    path();
+    const g = c.createLinearGradient(0, 0, 0, 180);
+    g.addColorStop(0, "#7fd8f0");
+    g.addColorStop(0.45, "#2f7fa4");
+    g.addColorStop(1, "#123a5c");
+    c.strokeStyle = g;
+    c.lineWidth = 32;
+    c.stroke();
+    path();
+    c.strokeStyle = "rgba(255,255,255,.22)";
+    c.lineWidth = 5;
+    c.stroke();
+    const plates = [
+      [-22, 32, 24, 12, -0.5], [-48, 56, 22, 11, -0.8], [-62, 82, 20, 10, 0.2],
+      [-48, 108, 18, 9, 0.7], [-14, 124, 18, 8, 0.4], [26, 134, 17, 8, 0.2],
+      [62, 148, 15, 7, 0.4]
+    ];
+    for (let i = 0; i < plates.length; i++) {
+      const [x, y, rx, ry, rot] = plates[i];
+      c.save();
+      c.translate(x, y);
+      c.rotate(rot);
+      const pg = c.createLinearGradient(0, -ry, 0, ry);
+      pg.addColorStop(0, "#dff9ff");
+      pg.addColorStop(0.5, "#7fd8f0");
+      pg.addColorStop(1, "#2f7fa4");
+      c.fillStyle = pg;
+      c.beginPath();
+      c.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      c.fill();
+      c.strokeStyle = "rgba(10,46,70,.4)";
+      c.lineWidth = 1;
+      c.stroke();
+      c.fillStyle = "rgba(255,255,255,.4)";
+      c.beginPath();
+      c.ellipse(-rx * 0.25, -ry * 0.25, rx * 0.28, ry * 0.2, -0.3, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+      // Дорсальные плавники.
+      c.save();
+      c.translate(x, y - ry);
+      c.rotate(rot);
+      c.fillStyle = "rgba(180,240,255,.62)";
+      c.beginPath();
+      c.moveTo(-4, 0);
+      c.lineTo(-11, -17);
+      c.lineTo(1, -8);
+      c.lineTo(6, 0);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = "rgba(255,255,255,.45)";
+      c.lineWidth = 0.8;
+      c.stroke();
+      c.restore();
+    }
+    // Ледяные трещины по фазам.
+    const crackCount = [0, 2, 3][duelState.level] || 0;
+    const veinPts = [
+      [-48, 52, -38, 60, -44, 68, -34, 74],
+      [-14, 122, -4, 128, -10, 136, 0, 142],
+      [30, 134, 40, 140, 34, 148, 44, 152]
+    ];
+    for (let i = 0; i < crackCount; i++) {
+      const p = veinPts[i];
+      c.strokeStyle = "rgba(8,36,58,.55)";
+      c.lineWidth = 1.8;
+      c.beginPath();
+      c.moveTo(p[0], p[1]);
+      for (let k = 2; k < p.length; k += 2) c.lineTo(p[k], p[k + 1]);
+      c.stroke();
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.55;
+      c.strokeStyle = "#8fe8ff";
+      c.lineWidth = 1;
+      c.stroke();
+      c.restore();
+    }
+    // Хвостовой плавник.
+    c.save();
+    c.translate(96, 150);
+    c.rotate(0.3);
+    const fin = c.createLinearGradient(0, -20, 0, 18);
+    fin.addColorStop(0, "rgba(220,250,255,.85)");
+    fin.addColorStop(1, "rgba(47,127,164,.6)");
+    c.fillStyle = fin;
+    c.beginPath();
+    c.moveTo(0, 0);
+    c.lineTo(22, -16);
+    c.lineTo(16, 2);
+    c.lineTo(24, 16);
+    c.lineTo(2, 8);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "rgba(10,46,70,.4)";
+    c.lineWidth = 1;
+    c.stroke();
+    c.restore();
+    c.restore();
+  }
+
+  function duelLeviathanBody(c) {
+    const t = duelState.frame;
+    const tension = duelTelegraphTension();
+    const accent = DUEL_PHASE_COLORS[duelState.level] || DUEL_PHASE_COLORS[0];
+    const defeated = duelState.over && duelState.won;
+    const breathe = 1 + Math.sin(t / 54) * 0.018;
+    const look = duelClamp((duelState.px + DUEL_PLAYER_HALF - duelState.bx) / 150, -1, 1) * 4;
+    const blink = !defeated && t % 240 < 8;
+    c.save();
+    c.translate(duelState.bx, duelState.by + (defeated ? 14 : 0));
+    if (defeated) c.rotate(-0.06);
+    c.scale(breathe, breathe);
+
+    const shade = c.createRadialGradient(0, 30, 14, 0, 46, 132);
+    shade.addColorStop(0, "rgba(8,30,54,0.2)");
+    shade.addColorStop(0.7, "rgba(8,30,54,0.08)");
+    shade.addColorStop(1, "rgba(8,30,54,0)");
+    c.fillStyle = shade;
+    c.beginPath();
+    c.ellipse(0, 48, 128, 104, 0, 0, Math.PI * 2);
+    c.fill();
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    c.globalAlpha = 0.16 + tension * 0.12;
+    duelDrawGlow(c, 0, 0, 112, "#5ce8ff");
+    c.globalAlpha = 0.08;
+    duelDrawGlow(c, 24, 70, 78, "#9d9bff");
+    c.restore();
+
+    duelLeviathanCoil(c, t, defeated);
+
+    // Плавники за головой.
+    for (const dir of [-1, 1]) {
+      const flap = Math.sin(t / 34 + (dir > 0 ? 1.2 : 0)) * 6;
+      c.save();
+      c.beginPath();
+      c.moveTo(dir * 28, -6);
+      c.quadraticCurveTo(dir * (64 + flap), -38, dir * 82, 4);
+      c.quadraticCurveTo(dir * 58, 8, dir * 34, 18);
+      c.closePath();
+      const fin = c.createLinearGradient(0, -20, 0, 20);
+      fin.addColorStop(0, "rgba(220,250,255,.78)");
+      fin.addColorStop(1, "rgba(47,127,164,.35)");
+      c.fillStyle = fin;
+      c.fill();
+      c.strokeStyle = "rgba(150,230,250,.55)";
+      c.lineWidth = 1;
+      c.stroke();
+      c.strokeStyle = "rgba(255,255,255,.4)";
+      for (let i = 0; i < 3; i++) {
+        c.beginPath();
+        c.moveTo(dir * 34, 2 + i * 4);
+        c.lineTo(dir * (58 + i * 6 + flap), -12 + i * 6);
+        c.stroke();
+      }
+      c.restore();
+    }
+
+    duelBossCrown(c, t, tension, accent);
+
+    // Голова.
+    c.save();
+    const headGrad = c.createLinearGradient(0, -52, 0, 14);
+    headGrad.addColorStop(0, "#eafcff");
+    headGrad.addColorStop(0.42, "#b9e8f7");
+    headGrad.addColorStop(0.78, "#5fb6d4");
+    headGrad.addColorStop(1, "#1e5a7c");
+    c.fillStyle = headGrad;
+    c.beginPath();
+    c.moveTo(-34, -14);
+    c.bezierCurveTo(-36, -38, -20, -50, 0, -50);
+    c.bezierCurveTo(20, -50, 36, -38, 34, -14);
+    c.bezierCurveTo(32, 4, 20, 12, 0, 12);
+    c.bezierCurveTo(-20, 12, -32, 4, -34, -14);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "rgba(12,54,80,.4)";
+    c.lineWidth = 1.5;
+    c.stroke();
+    // Ледяные пластины на голове.
+    c.fillStyle = "rgba(255,255,255,.22)";
+    c.beginPath();
+    c.moveTo(-26, -24);
+    c.lineTo(-8, -44);
+    c.lineTo(4, -28);
+    c.lineTo(-8, -10);
+    c.closePath();
+    c.fill();
+    c.beginPath();
+    c.moveTo(10, -30);
+    c.lineTo(28, -36);
+    c.lineTo(24, -12);
+    c.lineTo(12, -6);
+    c.closePath();
+    c.fill();
+    // Рога.
+    for (const dir of [-1, 1]) {
+      c.save();
+      c.translate(dir * 24, -36);
+      c.rotate(dir * 0.42);
+      const horn = c.createLinearGradient(0, 0, dir * 10, -52);
+      horn.addColorStop(0, "#dff9ff");
+      horn.addColorStop(0.5, "#8fd8ee");
+      horn.addColorStop(1, "#eafaff");
+      c.fillStyle = horn;
+      c.beginPath();
+      c.moveTo(-7, 8);
+      c.bezierCurveTo(dir * 10, -16, dir * 22, -38, dir * 18, -54);
+      c.bezierCurveTo(dir * 4, -34, -2, -12, 6, 6);
+      c.closePath();
+      c.fill();
+      c.strokeStyle = "rgba(255,255,255,.75)";
+      c.lineWidth = 1;
+      c.stroke();
+      c.restore();
+    }
+    // Глаза.
+    if (defeated) {
+      c.strokeStyle = "#0d3450";
+      c.lineWidth = 2.6;
+      c.lineCap = "round";
+      for (const ex of [-14, 14]) {
+        c.beginPath();
+        c.moveTo(ex - 6, -24);
+        c.lineTo(ex + 6, -14);
+        c.moveTo(ex + 6, -24);
+        c.lineTo(ex - 6, -14);
+        c.stroke();
+      }
+    } else {
+      duelBossEye(c, -14, -18, look, blink, 1, accent);
+      duelBossEye(c, 14, -18, look, blink, 1, accent);
+      c.strokeStyle = "rgba(8,40,64,.7)";
+      c.lineWidth = 2.4;
+      c.lineCap = "round";
+      c.beginPath();
+      c.moveTo(-23, -31);
+      c.lineTo(-8, -25);
+      c.moveTo(23, -31);
+      c.lineTo(8, -25);
+      c.stroke();
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.3 + tension * 0.2;
+      for (const dir of [-1, 1]) {
+        duelDrawGlow(c, dir * 27, -31, 8, "#8fe8ff");
+        c.fillStyle = "#dffcff";
+        c.beginPath();
+        c.arc(dir * 27, -31, 2.2, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.restore();
+    }
+    // Морда и пасть.
+    c.fillStyle = "rgba(18,62,86,.18)";
+    c.beginPath();
+    c.ellipse(0, 2, 24, 9, 0, 0, Math.PI * 2);
+    c.fill();
+    const open = defeated ? 1 : 2 + tension * 9;
+    if (open > 2.2) {
+      c.fillStyle = "#0a2b40";
+      c.beginPath();
+      c.ellipse(0, 6, 16, open, 0, 0, Math.PI * 2);
+      c.fill();
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.25 + tension * 0.45;
+      duelDrawGlow(c, 0, 8, 20 + tension * 10, "#8fe8ff");
+      c.restore();
+      c.fillStyle = "#eafaff";
+      for (const fx of [-9, -3, 3, 9]) {
+        c.beginPath();
+        c.moveTo(fx - 2, 6 - open + 0.5);
+        c.lineTo(fx, 6 - open + 6);
+        c.lineTo(fx + 2, 6 - open + 0.5);
+        c.closePath();
+        c.fill();
+      }
+    } else {
+      c.strokeStyle = "rgba(10,48,72,.8)";
+      c.lineWidth = 2.2;
+      c.lineCap = "round";
+      c.beginPath();
+      c.moveTo(-10, 6);
+      c.quadraticCurveTo(0, 8, 10, 6);
+      c.stroke();
+      c.fillStyle = "#eafaff";
+      for (const fx of [-9, -3, 3, 9]) {
+        c.beginPath();
+        c.moveTo(fx - 2, 6);
+        c.lineTo(fx, 11);
+        c.lineTo(fx + 2, 6);
+        c.closePath();
+        c.fill();
+      }
+    }
+    // Ледяная «борода» под челюстью.
+    for (const bx of [-14, -5, 5, 14]) {
+      c.fillStyle = "rgba(233,251,255,.9)";
+      c.beginPath();
+      c.moveTo(bx - 3, 12);
+      c.lineTo(bx, 22 + Math.abs(bx) * 0.3);
+      c.lineTo(bx + 3, 12);
+      c.closePath();
+      c.fill();
+    }
+    // Дыхание.
+    if (!defeated) {
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      for (let i = 0; i < 4; i++) {
+        const q = (t / 90 + i / 4) % 1;
+        c.globalAlpha = (1 - q) * 0.16;
+        duelDrawGlow(c, 12 + q * 22, 8 + q * 16, 6 + q * 8, "#dff7ff");
+      }
+      c.restore();
+    }
+    c.restore();
+
+    // Пузыри и ледяные осколки.
+    for (let i = 0; i < 6; i++) {
+      const a = t / 150 + i * 1.1;
+      const r = 76 + Math.sin(t / 44 + i) * 8;
+      c.save();
+      c.translate(Math.cos(a) * r, Math.sin(a) * r * 0.58 + 12);
+      c.rotate(a * 1.5);
+      c.fillStyle = "rgba(220,250,255,.34)";
+      c.beginPath();
+      c.moveTo(0, -4.4);
+      c.lineTo(1.5, 0);
+      c.lineTo(0, 4.4);
+      c.lineTo(-1.5, 0);
+      c.closePath();
+      c.fill();
+      c.restore();
+    }
+
+    if (duelState.flash > 0) {
+      const flash = duelState.flash / 18;
+      c.save();
+      c.globalAlpha = Math.min(0.55, flash * 0.45);
+      c.fillStyle = "#ffffff";
+      c.beginPath();
+      c.ellipse(0, -18, 42, 36, 0, 0, Math.PI * 2);
+      c.fill();
+      c.restore();
+      if (duelState.flash > 8) {
+        c.save();
+        c.globalAlpha = Math.min(0.55, (duelState.flash - 8) / 12);
+        c.strokeStyle = accent;
+        c.lineWidth = 2.6;
+        c.beginPath();
+        c.arc(0, -14, 56 + (18 - duelState.flash) * 4.5, 0, Math.PI * 2);
+        c.stroke();
+        c.restore();
+      }
+    }
+    c.restore();
+  }
+
   function duelDrawBossBody(c) {
-    if (duelBossKind() === "yeti") duelYetiBody(c);
+    const kind = duelBossKind();
+    if (kind === "yeti" || kind === "avalanche") duelYetiBody(c);
+    else if (kind === "storm") duelStormBody(c);
+    else if (kind === "leviathan") duelLeviathanBody(c);
     else duelBossBody(c);
   }
   function duelShardShape(c, len, wid, fill, edge) {
@@ -4039,27 +5065,44 @@ html, body, body * {
     const x = 14;
     const y = 12;
     const w = DUEL_W - 28;
-    const h = 58;
+    const h = 64;
+    const def = DUEL_BOSS_DEFS[Math.min(duelState.index, DUEL_BOSS_DEFS.length - 1)];
     c.save();
+    // Мягкая тень и светлое стекло в стиле остального HUD.
+    c.save();
+    c.shadowColor = "rgba(10,40,62,.18)";
+    c.shadowBlur = 18;
+    c.shadowOffsetY = 6;
+    duelRoundRect(c, x, y, w, h, 12);
+    c.fillStyle = "rgba(255,255,255,.92)";
+    c.fill();
+    c.restore();
     duelRoundRect(c, x, y, w, h, 12);
     const panel = c.createLinearGradient(0, y, 0, y + h);
-    panel.addColorStop(0, "rgba(8,36,56,0.78)");
-    panel.addColorStop(1, "rgba(8,30,48,0.62)");
+    panel.addColorStop(0, "rgba(255,255,255,.97)");
+    panel.addColorStop(1, "rgba(236,248,255,.88)");
     c.fillStyle = panel;
     c.fill();
-    c.strokeStyle = "rgba(206,242,255,0.28)";
-    c.lineWidth = 1;
-    c.stroke();
+    c.save();
     duelRoundRect(c, x + 1, y + 1, w - 2, h * 0.52, 11);
+    c.clip();
     const shine = c.createLinearGradient(0, y, 0, y + h * 0.5);
-    shine.addColorStop(0, "rgba(255,255,255,0.16)");
+    shine.addColorStop(0, "rgba(255,255,255,.82)");
     shine.addColorStop(1, "rgba(255,255,255,0)");
     c.fillStyle = shine;
-    c.fill();
+    c.fillRect(x, y, w, h * 0.5);
+    c.restore();
+    duelRoundRect(c, x + 0.75, y + 0.75, w - 1.5, h - 1.5, 11.5);
+    c.strokeStyle = "rgba(255,255,255,.98)";
+    c.lineWidth = 1.4;
+    c.stroke();
     const name = DUEL_BOSS_NAMES[Math.min(duelState.index, DUEL_BOSS_NAMES.length - 1)];
-    duelText(c, name, x + 14, y + 17, 9.5, "#eaf7ff", "left", 1.4);
-    duelText(c, "БОСС " + (duelState.index + 1), x + w - 42, y + 17, 8, "rgba(226,246,255,0.72)", "right", 1.1);
-    const pipY = y + 30;
+    duelText(c, name, x + 14, y + 14, 9.5, "#0f3d5c", "left", 1.4);
+    if (def && def.subtitle) {
+      duelText(c, def.subtitle, x + 14, y + 25, 5.5, "rgba(18,58,92,.55)", "left", 1.2, "normal");
+    }
+    duelText(c, "БОСС " + (duelState.index + 1), x + w - 42, y + 14, 7.5, "rgba(18,58,92,.52)", "right", 1.1);
+    const pipY = y + 40;
     for (let i = 0; i < 3; i++) {
       const px = x + 15 + i * 13;
       c.beginPath();
@@ -4068,16 +5111,16 @@ html, body, body * {
       c.lineTo(px, pipY + 3.4);
       c.lineTo(px - 3.4, pipY);
       c.closePath();
-      c.fillStyle = i <= duelState.level ? DUEL_PHASE_COLORS[i] : "rgba(255,255,255,0.18)";
+      c.fillStyle = i <= duelState.level ? DUEL_PHASE_COLORS[i] : "rgba(18,58,92,.15)";
       c.fill();
     }
     const barX = x + 60;
-    const barY = y + 26;
+    const barY = y + 35;
     const barW = w - 104;
     const barH = 9;
     const frac = duelClamp(duelState.bhp / duelState.bmax, 0, 1);
     duelRoundRect(c, barX, barY, barW, barH, 4.5);
-    c.fillStyle = "rgba(6,26,42,0.55)";
+    c.fillStyle = "rgba(21,85,118,.12)";
     c.fill();
     if (frac > 0) {
       c.save();
@@ -4089,13 +5132,13 @@ html, body, body * {
       fill.addColorStop(1, duelHexToRgba(accent, 0.62));
       c.fillStyle = fill;
       c.fillRect(barX, barY, barW * frac, barH);
-      c.fillStyle = "rgba(255,255,255,0.32)";
+      c.fillStyle = "rgba(255,255,255,.42)";
       c.fillRect(barX, barY, barW * frac, barH * 0.42);
       c.restore();
     }
     c.save();
     const segments = 20;
-    c.strokeStyle = "rgba(6,26,42,0.35)";
+    c.strokeStyle = "rgba(18,58,92,.18)";
     c.lineWidth = 1;
     for (let i = 1; i < segments; i++) {
       const sx = barX + barW * (i / segments);
@@ -4106,7 +5149,7 @@ html, body, body * {
     }
     c.restore();
     duelRoundRect(c, barX, barY, barW, barH, 4.5);
-    c.strokeStyle = "rgba(255,255,255,0.22)";
+    c.strokeStyle = "rgba(18,58,92,.18)";
     c.lineWidth = 1;
     c.stroke();
     const bottom = DUEL_H - 26;
@@ -4128,7 +5171,7 @@ html, body, body * {
       c.restore();
     }
     if (duelState.lives > 5) {
-      duelText(c, "+" + (duelState.lives - 5), 26 + 5 * 19 + 2, bottom - 1, 9, "#ffd0d7", "left");
+      duelText(c, "+" + (duelState.lives - 5), 26 + 5 * 19 + 2, bottom - 1, 9, "#b3202a", "left");
     }
     if (duelState.shield > 0) {
       const sx = DUEL_W - 30;
@@ -4149,22 +5192,28 @@ html, body, body * {
       c.stroke();
       duelText(c, String(duelState.shield), 0, 0.5, 8.5, "#053247", "center");
       c.restore();
-      duelText(c, "ЩИТ", sx - 16, bottom - 1, 7.5, "rgba(180,240,255,0.8)", "right", 0.8);
+      duelText(c, "ЩИТ", sx - 16, bottom - 1, 7.5, "rgba(18,58,92,.62)", "right", 0.8);
     }
     if (duelState.frame < 320) {
-      c.globalAlpha = Math.min(1, (320 - duelState.frame) / 80) * 0.7;
-      duelText(c, "← → ДВИЖЕНИЕ · СТРЕЛЬБА АВТОМАТИЧЕСКАЯ", DUEL_W / 2, DUEL_H - 46, 7.6, "rgba(230,248,255,0.9)", "center", 0.9, "normal");
+      c.globalAlpha = Math.min(1, (320 - duelState.frame) / 80) * 0.75;
+      const hint = isCoarsePointer()
+        ? "ТАП СЛЕВА/СПРАВА · СТРЕЛЬБА АВТОМАТИЧЕСКАЯ"
+        : "← → ИЛИ МЫШЬ · СТРЕЛЬБА АВТОМАТИЧЕСКАЯ";
+      duelRoundRect(c, DUEL_W / 2 - 116, DUEL_H - 54, 232, 16, 8);
+      c.fillStyle = "rgba(255,255,255,.68)";
+      c.fill();
+      duelText(c, hint, DUEL_W / 2, DUEL_H - 46, 7.4, "rgba(18,58,92,.68)", "center", 0.9, "normal");
       c.globalAlpha = 1;
     }
     // Пауза доступна и в дуэли: HUD забега здесь скрыт, поэтому кнопка своя.
     const pz = DUEL_PAUSE_ZONE;
     duelRoundRect(c, pz.x, pz.y, pz.w, pz.h, 7);
-    c.fillStyle = "rgba(206,242,255,0.12)";
+    c.fillStyle = "rgba(21,85,118,.08)";
     c.fill();
-    c.strokeStyle = "rgba(206,242,255,0.32)";
+    c.strokeStyle = "rgba(18,58,92,.18)";
     c.lineWidth = 1;
     c.stroke();
-    c.fillStyle = "rgba(234,247,255,0.92)";
+    c.fillStyle = "rgba(18,58,92,.78)";
     c.fillRect(pz.x + pz.w / 2 - 3.2, pz.y + 8, 2.2, 8);
     c.fillRect(pz.x + pz.w / 2 + 1, pz.y + 8, 2.2, 8);
     c.restore();
@@ -4173,33 +5222,39 @@ html, body, body * {
     if (!duelState.over) return;
     const k = 1 - Math.max(0, duelState.overLeft) / DUEL_END_FRAMES;
     const alpha = Math.min(1, k * 3);
-    const accent = duelState.won ? "#ffd76a" : "#ff8095";
+    const accent = duelState.won ? "#c28000" : "#b3202a";
     const w = 292;
     const h = 106;
     const x = (DUEL_W - w) / 2;
     const y = DUEL_H / 2 - h / 2;
     c.save();
     c.globalAlpha = alpha;
+    c.save();
+    c.shadowColor = "rgba(10,40,62,.22)";
+    c.shadowBlur = 24;
+    c.shadowOffsetY = 9;
+    duelRoundRect(c, x, y, w, h, 16);
+    c.fillStyle = "rgba(255,255,255,.96)";
+    c.fill();
+    c.restore();
     duelRoundRect(c, x, y, w, h, 16);
     const panel = c.createLinearGradient(0, y, 0, y + h);
-    panel.addColorStop(0, "rgba(6,26,42,0.92)");
-    panel.addColorStop(1, "rgba(6,22,36,0.8)");
+    panel.addColorStop(0, "rgba(255,255,255,.98)");
+    panel.addColorStop(1, "rgba(236,248,255,.9)");
     c.fillStyle = panel;
     c.fill();
-    c.strokeStyle = duelHexToRgba(accent, 0.6);
+    duelRoundRect(c, x + 0.75, y + 0.75, w - 1.5, h - 1.5, 15.5);
+    c.strokeStyle = duelHexToRgba(accent, 0.38);
     c.lineWidth = 1.4;
     c.stroke();
-    c.globalAlpha = alpha * 0.85;
+    c.globalAlpha = alpha * 0.9;
     c.fillStyle = accent;
     c.fillRect(x + 30, y + 1.5, w - 60, 2);
     c.globalAlpha = alpha;
-    c.shadowColor = duelHexToRgba(accent, 0.55);
-    c.shadowBlur = 16;
     duelText(c, duelState.won ? "ПОБЕДА" : "ПОРАЖЕНИЕ", DUEL_W / 2, y + 42, 26, accent, "center", 4);
-    c.shadowBlur = 0;
     let subtitle = duelState.won ? "БОСС ПОВЕРЖЕН" : "ЗАБЕГ ОКОНЧЕН";
     if (duelState.won && typeof bossState !== "undefined" && bossState.reward) subtitle = "+" + bossState.reward + " МОНЕТ";
-    duelText(c, subtitle, DUEL_W / 2, y + 74, 10, "rgba(234,247,255,0.92)", "center", 1.6, "normal");
+    duelText(c, subtitle, DUEL_W / 2, y + 74, 10, "rgba(18,58,92,.62)", "center", 1.6, "normal");
     c.restore();
   }
 
@@ -5562,6 +6617,85 @@ html, body, body * {
   var ownedFrames = readStoredArray("morjakaOwnedFrames", [0]);
   if (!FRAMES.some((frame) => frame.id === selectedFrame)) selectedFrame = 0;
   if (!ownedFrames.includes(0)) ownedFrames = [0, ...ownedFrames];
+  var DAILY_DEFS = [
+    { id: "coins", short: "МОНЕТЫ", label: "СОБЕРИ 30 МОНЕТ", target: 30, reward: 50 },
+    { id: "height", short: "ВЫСОТА", label: "ПОДНИМИСЬ НА 20000", target: 20000, reward: 50 }
+  ];
+  function localDateKey(date) {
+    const d = date || new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function yesterdayDateKey() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return localDateKey(d);
+  }
+  function dailyHash(text) {
+    let h = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      h ^= text.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  function dailyPick(dateKey, avoidId) {
+    let index = dailyHash(dateKey) % DAILY_DEFS.length;
+    if (DAILY_DEFS.length > 1 && DAILY_DEFS[index].id === avoidId) index = (index + 1) % DAILY_DEFS.length;
+    return DAILY_DEFS[index];
+  }
+  var dailyState = {
+    date: readStoredText("morjakaDailyDate", ""),
+    id: readStoredText("morjakaDailyId", ""),
+    progress: readStoredNumber("morjakaDailyProgress"),
+    done: readStoredNumber("morjakaDailyDone") === 1,
+    streak: readStoredNumber("morjakaDailyStreak"),
+    lastDone: readStoredText("morjakaDailyLastDone", "")
+  };
+  function dailyDef() {
+    for (const def of DAILY_DEFS) if (def.id === dailyState.id) return def;
+    return null;
+  }
+  function initDaily(force) {
+    const today = localDateKey();
+    if (!force && dailyState.date === today && dailyDef()) return;
+    const def = dailyPick(today, dailyState.id);
+    dailyState.date = today;
+    dailyState.id = def.id;
+    dailyState.progress = 0;
+    dailyState.done = false;
+    if (dailyState.lastDone !== today && dailyState.lastDone !== yesterdayDateKey()) dailyState.streak = 0;
+    saveProgress();
+  }
+  function dailyComplete() {
+    const def = dailyDef();
+    if (!def || dailyState.done) return;
+    const today = localDateKey();
+    dailyState.done = true;
+    dailyState.progress = def.target;
+    dailyState.streak = dailyState.lastDone === yesterdayDateKey() ? dailyState.streak + 1 : 1;
+    dailyState.lastDone = today;
+    bankCoins += def.reward;
+    saveProgress();
+    hudState.coinPulse = 1;
+    hudPop(player.x + 15, player.y - 26, "ЕЖЕДНЕВНОЕ ВЫПОЛНЕНО", "#0f8a76");
+    hudPop(player.x + 15, player.y - 40, "+" + def.reward + " МОНЕТ", "#c28000");
+    sfx.coin();
+  }
+  function dailyAdd(id, amount) {
+    const def = dailyDef();
+    if (!def || dailyState.done || def.id !== id || amount <= 0) return;
+    dailyState.progress = Math.min(def.target, dailyState.progress + amount);
+    if (dailyState.progress >= def.target) dailyComplete();
+    else saveProgress();
+  }
+  function dailyMax(id, value) {
+    const def = dailyDef();
+    if (!def || dailyState.done || def.id !== id) return;
+    const before = dailyState.progress;
+    dailyState.progress = Math.max(before, Math.min(def.target, value));
+    if (dailyState.progress >= def.target) dailyComplete();
+    else if (Math.floor(dailyState.progress / 250) !== Math.floor(before / 250)) saveProgress();
+  }
   var savedProgress = /* @__PURE__ */ new Map();
   function saveProgress() {
     const next = {
@@ -5572,7 +6706,13 @@ html, body, body * {
       morjakaOwnedFrames: JSON.stringify(ownedFrames),
       morjakaSelectedFrame: String(selectedFrame),
       morjakaPlatformOwned: JSON.stringify(platformOwned),
-      morjakaPlatformSelected: JSON.stringify(platformSelected)
+      morjakaPlatformSelected: JSON.stringify(platformSelected),
+      morjakaDailyDate: dailyState.date,
+      morjakaDailyId: dailyState.id,
+      morjakaDailyProgress: String(dailyState.progress),
+      morjakaDailyDone: dailyState.done ? "1" : "0",
+      morjakaDailyStreak: String(dailyState.streak),
+      morjakaDailyLastDone: dailyState.lastDone
     };
     try {
       for (const key in next) {
@@ -6297,6 +7437,20 @@ html, body, body * {
   };
   var seenPlatformTypes = /* @__PURE__ */ new Set();
   var runCoins = 0;
+  var comboState = { count: 0, timer: 0, best: 0 };
+  var COMBO_WINDOW_MS = 4000;
+  var COMBO_MAX_BONUS = 2;
+  function comboMultiplier() {
+    return 1 + Math.min(COMBO_MAX_BONUS, Math.floor(comboState.count / 10) * 0.5);
+  }
+  function registerComboLanding() {
+    comboState.count++;
+    comboState.best = Math.max(comboState.best, comboState.count);
+    comboState.timer = COMBO_WINDOW_MS;
+    if (comboState.count % 10 === 0) {
+      hudPop(player.x + 15, player.y - 26, "СЕРИЯ ×" + comboState.count, HUD_COLORS.green);
+    }
+  }
   var keys = {};
   function resetGame() {
     player = { x: 185, y: 500, vx: 0, dy: 0, score: 0 };
@@ -6320,6 +7474,9 @@ html, body, body * {
     stillRefY = 0;
     dryRowsLeft = 0;
     runCoins = 0;
+    comboState.count = 0;
+    comboState.timer = 0;
+    comboState.best = 0;
     resetPerks();
     resetWind();
     resetQuests();
@@ -6335,6 +7492,9 @@ html, body, body * {
     }
   }
   function startGame() {
+    trainingState.active = false;
+    bossTrainOpen = false;
+    initDaily();
     resetGame();
     resetHud();
     gameOverState.openedAt = 0;
@@ -7357,6 +8517,8 @@ html, body, body * {
     swipeMode: "drag",
     swipeTrail: []
   };
+  var bossTrainOpen = false;
+  var trainingState = { active: false, index: 0 };
   function menuTabCount() {
     return menuState.tab === "shop" ? FRAMES.length : avatarImages.length;
   }
@@ -7564,9 +8726,112 @@ html, body, body * {
   }
   function menuActionButtons() {
     return [
-      { x: MENU.padX, y: MENU.barY, w: 228, h: MENU.barH, label: menuPrimary().label },
-      { x: 260, y: MENU.barY, w: 120, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" }
+      { id: "primary", x: MENU.padX, y: MENU.barY, w: 120, h: MENU.barH, label: menuPrimary().label },
+      { id: "play", x: 146, y: MENU.barY, w: 72, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" },
+      { id: "train", x: 224, y: MENU.barY, w: 70, h: MENU.barH, label: "\u0411\u041E\u0421\u0421\u042B" },
+      { id: "save", x: 300, y: MENU.barY, w: 80, h: MENU.barH, label: "\u0411\u042D\u041A\u0410\u041F" }
     ];
+  }
+  function bossTrainRows() {
+    const rows = [];
+    for (let i = 0; i < DUEL_BOSS_DEFS.length; i++) {
+      rows.push({ x: 46, y: 148 + i * 60, w: 308, h: 52 });
+    }
+    return rows;
+  }
+  function bossTrainBackRect() {
+    return { x: 110, y: 452, w: 180, h: 38 };
+  }
+  function drawBossTrain() {
+    const x = 30, y = 82, w = 340, h = 428;
+    ctx.save();
+    ctx.fillStyle = "rgba(8,28,46,.34)";
+    ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+    ctx.save();
+    ctx.shadowColor = "rgba(10,40,62,.22)";
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 10;
+    roundedRect(x, y, w, h, 22);
+    ctx.fillStyle = "rgba(255,255,255,.97)";
+    ctx.fill();
+    ctx.restore();
+    roundedRect(x + 0.75, y + 0.75, w - 1.5, h - 1.5, 21.5);
+    ctx.strokeStyle = "rgba(255,255,255,.95)";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    setFont(18, "bold");
+    ctx.fillStyle = "#0f3d5c";
+    trackedText("ТРЕНИРОВКА", WORLD_W / 2, y + 30, 2.2);
+    setFont(6.8, "bold");
+    ctx.fillStyle = "rgba(21,85,118,.55)";
+    trackedText("ВЫБЕРИ БОССА · БЕЗ НАГРАД И РЕКОРДОВ", WORLD_W / 2, y + 48, 0.9);
+    const rows = bossTrainRows();
+    for (let i = 0; i < DUEL_BOSS_DEFS.length; i++) {
+      const r = rows[i];
+      const def = DUEL_BOSS_DEFS[i];
+      const hovered = pauseState.hover === "boss-train-" + i;
+      uiPill(r.x, r.y, r.w, r.h, { fill: hovered ? "rgba(219,250,244,.96)" : "rgba(255,255,255,.72)", radius: 14 });
+      const cx = r.x + 28;
+      const cy = r.y + r.h / 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 16, 0, Math.PI * 2);
+      ctx.fillStyle = hexToRgba(def.accent || "#4fc3f7", 0.14);
+      ctx.fill();
+      ctx.strokeStyle = hexToRgba(def.accent || "#4fc3f7", 0.38);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 8);
+      ctx.lineTo(cx + 8, cy);
+      ctx.lineTo(cx, cy + 8);
+      ctx.lineTo(cx - 8, cy);
+      ctx.closePath();
+      ctx.fillStyle = def.accent || "#4fc3f7";
+      ctx.fill();
+      ctx.textAlign = "left";
+      setFont(11.5, "bold");
+      ctx.fillStyle = "#0f3d5c";
+      trackedText(def.name, r.x + 52, r.y + 20, 0.6, "left");
+      setFont(6.2, "bold");
+      ctx.fillStyle = "rgba(21,85,118,.55)";
+      trackedText(def.subtitle, r.x + 52, r.y + 36, 0.5, "left");
+      ctx.textAlign = "right";
+      setFont(7, "bold");
+      ctx.fillStyle = "rgba(21,85,118,.4)";
+      trackedText("БОСС " + (i + 1), r.x + r.w - 12, cy, 0.8, "right");
+    }
+    const back = bossTrainBackRect();
+    const backHover = pauseState.hover === "boss-train-back";
+    uiPill(back.x, back.y, back.w, back.h, { fill: backHover ? UI.surfaceSolid : UI.surface, radius: 12 });
+    setFont(9, "bold");
+    ctx.textAlign = "center";
+    ctx.fillStyle = UI.ink;
+    trackedText("НАЗАД", WORLD_W / 2, back.y + back.h / 2, 1.6);
+    ctx.restore();
+  }
+  function startTrainingBoss(index) {
+    bossTrainOpen = false;
+    trainingState.active = true;
+    trainingState.index = index;
+    duelCancel();
+    currentState = STATE.PLAYING;
+    bossState.phase = "fight";
+    bossState.index = index;
+    perkState.offering = false;
+    lastFrameTime = 0;
+    clearTouchInput();
+    duelStart(index, 5, 185);
+    sfx.click();
+  }
+  function exitTraining() {
+    trainingState.active = false;
+    bossTrainOpen = false;
+    bossState.phase = "idle";
+    duelCancel();
+    currentState = STATE.MENU;
+    lastFrameTime = 0;
   }
   var MENU_TABS = [
     { id: "avatars", label: "\u0410\u0412\u0410\u0422\u0410\u0420\u042B" },
@@ -7875,17 +9140,25 @@ html, body, body * {
     drawMenuButton(
       MENU.padX,
       MENU.barY,
-      228,
+      120,
       MENU.barH,
       primary.label,
       primary.enabled ? "gold" : "green",
       {
-        size: 13,
+        size: 11,
         dim: !primary.enabled
       }
     );
-    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
-      size: 11,
+    drawMenuButton(146, MENU.barY, 72, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
+      size: 9.5,
+      tracking: 1
+    });
+    drawMenuButton(224, MENU.barY, 70, MENU.barH, "\u0411\u041E\u0421\u0421\u042B", "green", {
+      size: 9.5,
+      tracking: 1
+    });
+    drawMenuButton(300, MENU.barY, 80, MENU.barH, "\u0411\u042D\u041A\u0410\u041F", "gold", {
+      size: 9.5,
       tracking: 1
     });
     ctx.save();
@@ -8000,6 +9273,7 @@ html, body, body * {
       ctx.restore();
     }
     drawMenuToast();
+    if (bossTrainOpen) drawBossTrain();
   }
   function drawGroundShadow(cx, y, rx, ry, alpha = 0.18) {
     const g = ctx.createRadialGradient(cx, y, 0, cx, y, rx);
@@ -9212,6 +10486,8 @@ html, body, body * {
       sfx.fall();
       vibrate(40);
       lives--;
+      comboState.count = 0;
+      comboState.timer = 0;
       player.y = 500;
       stickyStuck = null;
       player.dy = -42;
@@ -9254,11 +10530,12 @@ html, body, body * {
           perkState.coinMultiplier = 0;
           perkState.coinUntil = 0;
         }
-        const gained = 1 + perkState.coinMultiplier;
+        const gained = Math.max(1, Math.round((1 + perkState.coinMultiplier) * comboMultiplier()));
         const perLife = coinsPerLife();
         const livesBefore = Math.floor(runCoins / perLife);
         runCoins += gained;
         bankCoins += gained;
+        dailyAdd("coins", gained);
         const livesAfter = Math.floor(runCoins / perLife);
         const livesGained = Math.max(0, livesAfter - livesBefore);
         if (livesGained) lives += livesGained;
@@ -9383,7 +10660,8 @@ html, body, body * {
     rocks: [],
     pending: [],
     stunMs: 0,
-    level: 0
+    level: 0,
+    rewardPerk: false
   };
   function resetBoss() {
     duelCancel();
@@ -9407,6 +10685,7 @@ html, body, body * {
     bossState.pending = [];
     bossState.stunMs = 0;
     bossState.level = 0;
+    bossState.rewardPerk = false;
   }
   function bossHurtPlayer(reason) {
     if (invulnerableActive()) return;
@@ -9461,12 +10740,25 @@ html, body, body * {
     bossState.windup = 0;
     bossState.charging = 0;
     bossState.nextScore += BOSS_STEP_SCORE;
+    bossState.rewardPerk = true;
+    perkState.lastOfferScore = Math.max(perkState.lastOfferScore, Math.floor(player.score / PERK_SCORE_STEP) * PERK_SCORE_STEP);
     bankCoins += bossState.reward;
     saveProgress();
     startScreenShake(3, 18);
     hudPop(WORLD_W / 2, 230, "\u041F\u041E\u0411\u0415\u0414\u0410! +" + bossState.reward, HUD_COLORS.green);
   }
   function finishDuel(end) {
+    if (trainingState.active) {
+      const won = end.won;
+      trainingState.active = false;
+      bossState.phase = "idle";
+      duelCancel();
+      currentState = STATE.MENU;
+      bossTrainOpen = true;
+      lastFrameTime = 0;
+      setMenuMessage("ТРЕНИРОВКА", won ? "БОСС ПОВЕРЖЕН" : "ПОРАЖЕНИЕ");
+      return;
+    }
     lives = end.livesLeft;
     player.x = duelPlayerX();
     player.vx = 0;
@@ -9492,7 +10784,14 @@ html, body, body * {
     }
     if (b.phase === "won") {
       b.timer -= SIM_STEP_MS;
-      if (b.timer <= 0) b.phase = "idle";
+      if (b.timer <= 0) {
+        if (b.rewardPerk && perkState.offering) return;
+        b.phase = "idle";
+        if (b.rewardPerk) {
+          b.rewardPerk = false;
+          offerBossReward();
+        }
+      }
       return;
     }
     if (b.phase === "warn") {
@@ -9696,6 +10995,10 @@ html, body, body * {
       tickEvents(SIM_STEP_MS);
       return;
     }
+    if (comboState.timer > 0) {
+      comboState.timer -= SIM_STEP_MS;
+      if (comboState.timer <= 0) comboState.count = 0;
+    }
     const keyboardOrTouchLeft = keys.ArrowLeft || keys.KeyA || touchInput.left;
     const keyboardOrTouchRight = keys.ArrowRight || keys.KeyD || touchInput.right;
     const tiltLeft = tiltEnabled && tiltDirection < 0;
@@ -9825,6 +11128,7 @@ html, body, body * {
         refillJumps();
         squash = 0.14;
         sfx.land();
+        registerComboLanding();
         lastLandedPlatform = platform;
         if (platform.type === "broken") {
           platform.breaking = true;
@@ -9882,6 +11186,7 @@ html, body, body * {
         refillJumps();
         squash = 0.14;
         sfx.land();
+        registerComboLanding();
         break;
       }
     }
@@ -9900,6 +11205,7 @@ html, body, body * {
         squash = -0.3;
         questState.springUsed = true;
         sfx.spring();
+        registerComboLanding();
         hudPop(spring.x + 10, spring.y - 14, "\u041F\u0420\u042B\u0416\u041E\u041A", "#f5a623");
       }
     }
@@ -9917,6 +11223,7 @@ html, body, body * {
     if (player.y < 250) {
       const diff = 250 - player.y;
       player.score += diff;
+      dailyMax("height", Math.floor(player.score));
       player.y = 250;
       platforms.forEach((platform) => platform.y += diff);
       verticalPlatforms.forEach((platform) => {
@@ -10406,6 +11713,64 @@ html, body, body * {
     }
     ctx.restore();
   }
+  function drawDailyQuest() {
+    const def = dailyDef();
+    if (!def) return;
+    const d = dailyState;
+    const done = d.done;
+    const x = 15, y = 116, w = 312, h = 18;
+    const shown = Math.min(d.progress, def.target);
+    const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
+    ctx.save();
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    roundedRect(x, y, w, h, 9);
+    ctx.fillStyle = done ? "rgba(232,251,242,.94)" : "rgba(255,255,255,.90)";
+    ctx.fill();
+    ctx.strokeStyle = done ? "rgba(15,138,118,.34)" : "rgba(15,61,92,.20)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    const ix = x + 13;
+    const iy = y + h / 2 - 0.5;
+    ctx.beginPath();
+    ctx.arc(ix, iy, 6.2, 0, Math.PI * 2);
+    ctx.fillStyle = done ? "rgba(15,138,118,.15)" : `rgba(255,194,71,${0.14 + pulse * 0.10})`;
+    ctx.fill();
+    ctx.strokeStyle = done ? "#0a6b4a" : "#b07a00";
+    ctx.lineWidth = 1.1;
+    ctx.lineCap = "round";
+    for (let i = 0; i < 3; i++) {
+      const a = i * Math.PI / 3;
+      ctx.beginPath();
+      ctx.moveTo(ix - Math.cos(a) * 3.4, iy - Math.sin(a) * 3.4);
+      ctx.lineTo(ix + Math.cos(a) * 3.4, iy + Math.sin(a) * 3.4);
+      ctx.stroke();
+    }
+    ctx.lineCap = "butt";
+    setFont(6.5, "bold");
+    ctx.fillStyle = done ? "#0a6b4a" : "rgba(15,61,92,.86)";
+    const head = done ? "ЕЖЕДНЕВНО · ВЫПОЛНЕНО" : `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
+    const headW = trackedWidth(head, 0.8);
+    const right = done ? `+${def.reward} МОНЕТ` : d.streak > 0 ? `СЕРИЯ ${d.streak}` : "";
+    const rightW = right ? trackedWidth(right, 0.8) : 0;
+    trackedText(head, x + 24, iy, 0.8, "left");
+    if (right && x + 24 + headW + 10 < x + w - 10 - rightW) {
+      ctx.fillStyle = done ? "#b07a00" : "rgba(21,85,118,.55)";
+      trackedText(right, x + w - 10, iy, 0.8, "right");
+    }
+    if (!done) {
+      const frac = Math.max(0, Math.min(1, shown / def.target));
+      roundedRect(x + 24, y + h - 3.4, w - 48, 2.2, 1.1);
+      ctx.fillStyle = "rgba(15,61,92,.10)";
+      ctx.fill();
+      if (frac > 0) {
+        roundedRect(x + 24, y + h - 3.4, Math.max(2, (w - 48) * frac), 2.2, 1.1);
+        ctx.fillStyle = done ? "#0f8a76" : "#e0a91f";
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
   function drawHud() {
     const t = performance.now() / 1e3;
     const bigScore = Math.floor(hudState.score);
@@ -10532,6 +11897,24 @@ html, body, body * {
       trackedText(jumpHint, jumpCursor, chipY + chipH / 2 + 0.5, 0.8, "left");
     }
     ctx.restore();
+    if (comboState.count >= 3) {
+      const comboW = 70;
+      const comboX = chipX + jumpW + 6;
+      if (comboX + comboW < PAUSE_ZONE.x - 6) {
+        const hot = comboState.count >= 20;
+        drawHudChip(comboX, chipY, comboW, chipH, hot ? "rgba(255,194,71,.55)" : null);
+        ctx.save();
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
+        setFont(8.5, "bold");
+        ctx.fillStyle = hot ? "#8a5a00" : "#0f8a76";
+        trackedText("×" + comboState.count, comboX + 9, chipY + chipH / 2 + 0.5, 0.3, "left");
+        setFont(5.4, "bold");
+        ctx.fillStyle = "rgba(21,85,118,.5)";
+        trackedText("СЕРИЯ", comboX + comboW - 8, chipY + chipH / 2 + 0.5, 0.6, "right");
+        ctx.restore();
+      }
+    }
     let questPlateAlpha = 1;
     if (questState.active && questState.done && questState.doneAt) {
       const elapsed = performance.now() - questState.doneAt;
@@ -10596,6 +11979,7 @@ html, body, body * {
       }
       ctx.restore();
     }
+    drawDailyQuest();
     drawHudButtons();
     if (performance.now() < tiltFeedbackUntil) {
       ctx.save();
@@ -10718,7 +12102,7 @@ html, body, body * {
     trackedText("\u041F\u0410\u0423\u0417\u0410", 98, 130, 1.8, "left");
     setFont(6.8, "bold");
     ctx.fillStyle = UI.inkSoft;
-    trackedText("\u0417\u0410\u0411\u0415\u0413 \u041F\u0420\u0418\u041E\u0421\u0422\u0410\u041D\u041E\u0412\u041B\u0415\u041D", 98, 148, 1.6, "left");
+    trackedText(trainingState.active ? "ТРЕНИРОВКА БОССА" : "ЗАБЕГ ПРИОСТАНОВЛЕН", 98, 148, 1.6, "left");
     ctx.restore();
   }
   function drawPauseScore(alpha) {
@@ -11168,6 +12552,7 @@ html, body, body * {
     };
   }
   window.addEventListener("keydown", (event) => {
+    if (saveOpen) return;
     if (nickOpen) {
       if (event.code === "Escape") {
         event.preventDefault();
@@ -11299,13 +12684,19 @@ html, body, body * {
     if (currentState === STATE.PAUSE) {
       if (event.code === "Escape") resumeGame();
       else if (event.code === "KeyR" || event.code === "Enter") {
-        commitRunScore();
-        startGame();
+        if (trainingState.active) startTrainingBoss(trainingState.index);
+        else {
+          commitRunScore();
+          startGame();
+        }
       } else if (event.code === "KeyM") {
-        commitRunScore();
-        pauseState.hover = null;
-        currentState = STATE.MENU;
-        lastFrameTime = 0;
+        if (trainingState.active) exitTraining();
+        else {
+          commitRunScore();
+          pauseState.hover = null;
+          currentState = STATE.MENU;
+          lastFrameTime = 0;
+        }
       }
     }
   });
@@ -11339,13 +12730,19 @@ html, body, body * {
       if (button) {
         if (button.id === "resume" || button.id === "close") resumeGame();
         else if (button.id === "restart") {
-          commitRunScore();
-          startGame();
+          if (trainingState.active) startTrainingBoss(trainingState.index);
+          else {
+            commitRunScore();
+            startGame();
+          }
         } else if (button.id === "menu") {
-          commitRunScore();
-          pauseState.hover = null;
-          currentState = STATE.MENU;
-          lastFrameTime = 0;
+          if (trainingState.active) exitTraining();
+          else {
+            commitRunScore();
+            pauseState.hover = null;
+            currentState = STATE.MENU;
+            lastFrameTime = 0;
+          }
         }
       }
       event.preventDefault();
@@ -11369,6 +12766,24 @@ html, body, body * {
       return;
     }
     if (currentState === STATE.MENU) {
+      if (bossTrainOpen) {
+        const back = bossTrainBackRect();
+        if (point.x >= back.x && point.x <= back.x + back.w && point.y >= back.y && point.y <= back.y + back.h) {
+          bossTrainOpen = false;
+          sfx.click();
+        } else {
+          const rows = bossTrainRows();
+          for (let i = 0; i < rows.length; i++) {
+            const r = rows[i];
+            if (point.x >= r.x && point.x <= r.x + r.w && point.y >= r.y && point.y <= r.y + r.h) {
+              startTrainingBoss(i);
+              break;
+            }
+          }
+        }
+        event.preventDefault();
+        return;
+      }
       const onActionBar = point.y >= MENU.barY - 6;
       if (!onActionBar) {
         menuState.swiping = true;
@@ -11428,10 +12843,18 @@ html, body, body * {
         return;
       }
       if (point.y >= MENU.barY && point.y <= MENU.barY + MENU.barH) {
-        if (point.x >= 260 && point.x <= 380) {
-          startGame();
-        } else if (point.x >= MENU.padX && point.x <= MENU.padX + 228) {
-          if (menuPrimary().enabled) runPrimary();
+        const hit = menuActionButtons().find((b) =>
+          point.x >= b.x && point.x <= b.x + b.w && point.y >= b.y && point.y <= b.y + b.h
+        );
+        if (hit) {
+          if (hit.id === "play") startGame();
+          else if (hit.id === "train") {
+            bossTrainOpen = true;
+            sfx.click();
+          } else if (hit.id === "save") {
+            openSaveDialog();
+            sfx.click();
+          } else if (menuPrimary().enabled) runPrimary();
           else {
             const i = menuCursor();
             if (menuState.tab === "avatars" && !menuItemUnlocked(i)) runPrimary();
@@ -11509,6 +12932,27 @@ html, body, body * {
   }, { passive: false });
   canvas.addEventListener("pointermove", (event) => {
     const point = canvasPoint(event);
+    if (currentState === STATE.MENU && bossTrainOpen) {
+      let next = null;
+      const back = bossTrainBackRect();
+      if (point.x >= back.x && point.x <= back.x + back.w && point.y >= back.y && point.y <= back.y + back.h) {
+        next = "boss-train-back";
+      } else {
+        const rows = bossTrainRows();
+        for (let i = 0; i < rows.length; i++) {
+          const r = rows[i];
+          if (point.x >= r.x && point.x <= r.x + r.w && point.y >= r.y && point.y <= r.y + r.h) {
+            next = "boss-train-" + i;
+            break;
+          }
+        }
+      }
+      if (next !== pauseState.hover) {
+        pauseState.hover = next;
+        canvas.style.cursor = next ? "pointer" : "default";
+      }
+      return;
+    }
     if (currentState === STATE.MENU && menuState.tab === "shop" && gachaState.pickerDrag && gachaState.pickerPointerId === event.pointerId) {
       const dx = point.x - gachaState.pickerStartX;
       gachaState.pickerMoved = Math.max(gachaState.pickerMoved, Math.abs(dx));
@@ -13084,7 +14528,26 @@ html, body, body * {
   }
   function offerPerk() {
     perkState.offering = true;
+    perkState.offerTitle = "ВЫБЕРИ УСИЛЕНИЕ";
     perkState.offerCards = rollPerkOffer();
+    perkState.offerReadyAt = performance.now() + 350;
+    perkState.pickedAt = 0;
+    perkState.pickedIndex = -1;
+    perkState.rerolls = 0;
+  }
+  function offerBossReward() {
+    const used = new Set(perkState.active.map((a) => a.id));
+    const rare = PERK_DEFS.filter((p) => p.rarity !== "common" && !used.has(p.id));
+    const all = PERK_DEFS.filter((p) => !used.has(p.id));
+    const bag = (rare.length >= 3 ? rare : all).slice();
+    const cards = [];
+    while (cards.length < 3 && bag.length) {
+      const i = Math.floor(Math.random() * bag.length);
+      cards.push(bag.splice(i, 1)[0]);
+    }
+    perkState.offering = true;
+    perkState.offerTitle = "НАГРАДА ЗА БОССА";
+    perkState.offerCards = cards;
     perkState.offerReadyAt = performance.now() + 350;
     perkState.pickedAt = 0;
     perkState.pickedIndex = -1;
@@ -13335,7 +14798,7 @@ html, body, body * {
     ctx.globalAlpha = alpha;
     setFont(9, "bold");
     ctx.fillStyle = "rgba(255,255,255,.78)";
-    trackedText("\u0412\u042B\u0411\u0415\u0420\u0418 \u0423\u0421\u0418\u041B\u0415\u041D\u0418\u0415", 200, 118, 2.4);
+    trackedText(perkState.offerTitle || "ВЫБЕРИ УСИЛЕНИЕ", 200, 118, 2.4);
     setFont(6.2, "bold");
     ctx.fillStyle = "rgba(255,255,255,.45)";
     trackedText("\u041E\u0411\u042B\u0427\u041D\u042B\u0419 \xB7 \u0420\u0415\u0414\u041A\u0418\u0419 \xB7 \u042D\u041F\u0418\u0427\u0415\u0421\u041A\u0418\u0419 \xB7 \u041B\u0415\u0413\u0415\u041D\u0414\u0410\u0420\u041D\u042B\u0419", 200, 133, 0.9);
@@ -13357,8 +14820,113 @@ html, body, body * {
     "morjakaOwnedFrames",
     "morjakaPlatformOwned",
     "morjakaPlatformSelected",
-    "doodleHighScore"
+    "doodleHighScore",
+    "morjakaDailyDate",
+    "morjakaDailyId",
+    "morjakaDailyProgress",
+    "morjakaDailyDone",
+    "morjakaDailyStreak",
+    "morjakaDailyLastDone"
   ];
+  var SAVE_KEYS = PROGRESS_KEYS.concat(["morjakaNick", "morjakaSound", "morjakaKeySens", "morjakaMouseSens"]);
+  var saveOverlay = document.getElementById("saveOverlay");
+  var saveText = document.getElementById("saveText");
+  var saveCopy = document.getElementById("saveCopy");
+  var saveLoad = document.getElementById("saveLoad");
+  var saveClose = document.getElementById("saveClose");
+  var saveOpen = false;
+  function saveEncode(text) {
+    const bytes = new TextEncoder().encode(text);
+    let bin = "";
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function saveDecode(code) {
+    const bin = atob(code.trim());
+    const bytes = Uint8Array.from(bin, (ch) => ch.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+  function exportProgressCode() {
+    const data = {};
+    for (const key of SAVE_KEYS) {
+      const value = localStorage.getItem(key);
+      if (value !== null) data[key] = value;
+    }
+    return saveEncode(JSON.stringify({ v: 1, data }));
+  }
+  function decodeProgressCode(code) {
+    try {
+      const parsed = JSON.parse(saveDecode(code));
+      if (!parsed || parsed.v !== 1 || !parsed.data || typeof parsed.data !== "object") return null;
+      return parsed.data;
+    } catch (error) {
+      return null;
+    }
+  }
+  function openSaveDialog() {
+    if (!saveOverlay || !saveText) return;
+    saveOpen = true;
+    saveText.value = exportProgressCode();
+    saveOverlay.classList.add("open");
+    saveOverlay.setAttribute("aria-hidden", "false");
+    if (saveLoad) saveLoad.textContent = "ЗАГРУЗИТЬ";
+    if (saveText.focus) {
+      saveText.focus();
+      saveText.select();
+    }
+  }
+  function closeSaveDialog() {
+    if (!saveOverlay) return;
+    saveOpen = false;
+    saveOverlay.classList.remove("open");
+    saveOverlay.setAttribute("aria-hidden", "true");
+  }
+  function importProgressCode() {
+    if (!saveText) return;
+    const data = decodeProgressCode(saveText.value);
+    if (!data) {
+      if (saveLoad) {
+        saveLoad.textContent = "НЕВЕРНЫЙ КОД";
+        setTimeout(() => { if (saveLoad) saveLoad.textContent = "ЗАГРУЗИТЬ"; }, 1500);
+      }
+      return;
+    }
+    let applied = 0;
+    for (const key in data) {
+      if (!SAVE_KEYS.includes(key) || typeof data[key] !== "string") continue;
+      localStorage.setItem(key, data[key]);
+      applied++;
+    }
+    if (!applied) {
+      if (saveLoad) {
+        saveLoad.textContent = "НЕВЕРНЫЙ КОД";
+        setTimeout(() => { if (saveLoad) saveLoad.textContent = "ЗАГРУЗИТЬ"; }, 1500);
+      }
+      return;
+    }
+    if (saveLoad) saveLoad.textContent = "ЗАГРУЖЕНО";
+    setTimeout(() => location.reload(), 350);
+  }
+  if (saveCopy) {
+    saveCopy.addEventListener("click", async () => {
+      if (!saveText) return;
+      saveText.select();
+      try {
+        await navigator.clipboard.writeText(saveText.value);
+      } catch (error) {
+        try { document.execCommand("copy"); } catch (fallback) {}
+      }
+      saveCopy.textContent = "СКОПИРОВАНО";
+      setTimeout(() => { saveCopy.textContent = "СКОПИРОВАТЬ"; }, 1200);
+    });
+  }
+  if (saveLoad) saveLoad.addEventListener("click", importProgressCode);
+  if (saveClose) saveClose.addEventListener("click", closeSaveDialog);
+  if (saveOverlay) {
+    saveOverlay.addEventListener("pointerdown", (event) => {
+      if (event.target === saveOverlay) closeSaveDialog();
+    });
+  }
   var resetOpen = false;
   var nickOverlay = document.getElementById("nickOverlay");
   var nickInput = document.getElementById("nickInput");
@@ -13435,6 +15003,8 @@ html, body, body * {
     menuCursors.shop = 0;
     menuState.scroll = 0;
     menuState.tab = "avatars";
+    dailyState = { date: "", id: "", progress: 0, done: false, streak: 0, lastDone: "" };
+    initDaily(true);
     perkState.lastOfferScore = 0;
     resetPerks();
     gameOverState.newRecord = false;
@@ -13840,6 +15410,7 @@ html, body, body * {
       isFullscreen ? "\u0412\u044B\u0439\u0442\u0438 \u0438\u0437 \u043F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u043E\u0433\u043E \u0440\u0435\u0436\u0438\u043C\u0430" : "\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u043F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u044B\u0439 \u0440\u0435\u0436\u0438\u043C"
     );
   });
+  initDaily();
   scheduleDraw();
 })();
 </script>
