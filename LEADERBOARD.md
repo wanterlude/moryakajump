@@ -41,9 +41,7 @@ Firebase хранит все забеги. Если записей станет 
 
 ## Альтернатива: свой сервер
 
-В репозитории есть `leaderboard-worker.js` — Cloudflare Worker с KV. Подходит, если у тебя есть собственный домен, подключённый к Cloudflare: домен `*.workers.dev` в России блокируется.
-
-Можно запустить и обычный Node.js-сервер на VPS (Timeweb, Beget, любой другой) — клиент обращается к нему так же, как к воркеру:
+Можно запустить обычный Node.js-сервер на VPS (Timeweb, Beget, любой другой) с теми же эндпоинтами, что ждёт клиент:
 
 ```js
 var LB_CONFIG = { provider: "worker", url: "", endpoint: "https://твой-сервер/api", game: "moryaka-jump" };

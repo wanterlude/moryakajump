@@ -9,7 +9,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 ![Canvas 2D](https://img.shields.io/badge/Canvas%202D-4FC3F7?style=for-the-badge&logo=html5&logoColor=000)
-![Version](https://img.shields.io/badge/version-v1.0.13-38bdf8?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v1.0.14-38bdf8?style=for-the-badge)
 
 </div>
 
@@ -68,7 +68,7 @@
 - `test-boss.html` — тестовая сборка для проверки боссов.
 - `test-frames.html` — галерея всех рамок и их эффектов.
 - `Changelog` — история изменений, новые версии сверху.
-- `1.jpg`–`27.jpg`, `fon.jpg`, `character.png`, `babazaki.gif` — локальные материалы игры.
+- `1.jpg`–`27.jpg`, `fon.jpg` — локальные материалы игры.
 
 ## 💾 Прогресс
 
