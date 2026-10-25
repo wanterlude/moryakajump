@@ -7487,7 +7487,7 @@ html, body, body * {
     }
     selectedAvatar = i;
     saveProgress();
-    setMenuMessage("\u0410\u0432\u0430\u0442\u0430\u0440 \u0432\u044B\u0431\u0440\u0430\u043D", "\u041C\u043E\u0440\u044F\u043A \xB7 " + (i + 1));
+    setMenuMessage("\u0410\u0432\u0430\u0442\u0430\u0440 \u0432\u044B\u0431\u0440\u0430\u043D", "\u041C\u043E\u0440\u044F\u043A\u0430 \xB7 " + (i + 1));
     sfx.click();
   }
   function drawMenuButton(x, y, w, h, label, tone = "green", options = {}) {
@@ -7681,7 +7681,7 @@ html, body, body * {
     trackedText(i + 1 + " / " + menuTabCount(), x + w - 16, y + 14, 1.2, "right");
     setFont(14, "bold");
     ctx.fillStyle = "#0f3d5c";
-    const title = isShop ? FRAMES[i].name.toUpperCase() : "\u041C\u041E\u0420\u042F\u041A \xB7 " + (i + 1);
+    const title = isShop ? FRAMES[i].name.toUpperCase() : "\u041C\u041E\u0420\u042F\u041A\u0410 \xB7 " + (i + 1);
     trackedText(title, cx, L.titleY, 0.9);
     setFont(8, "bold");
     if (isShop) {
