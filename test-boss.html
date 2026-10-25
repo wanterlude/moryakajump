@@ -10238,6 +10238,13 @@ html, body, body * {
       }
       ctx.restore();
     }
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    setFont(6.5, "bold");
+    ctx.fillStyle = "rgba(21,85,118,.34)";
+    trackedText("СОЗДАТЕЛЬ \xB7 WANTERLUDE", WORLD_W / 2, 585, 1.4);
+    ctx.restore();
     drawMenuGear();
     drawMenuTrophy();
     drawMenuProfile();
