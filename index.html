@@ -7237,7 +7237,7 @@ html, body, body * {
   function avatarName(index) {
     return AVATAR_NAMES[index] || "Моряка";
   }
-  var AVATAR_SCORES = Array.from({ length: 26 }, (_, index) => index * 2500);
+  var AVATAR_SCORES = Array.from({ length: 26 }, (_, index) => index * 3000);
   function avatarUnlockLabel(index) {
     const need = AVATAR_SCORES[index] || 0;
     if (need >= 1e4) {
