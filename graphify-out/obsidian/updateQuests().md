@@ -1,0 +1,21 @@
+---
+source_file: "moryaka.js"
+type: "code"
+community: "Забег: перки и награды"
+location: "L7347"
+tags:
+  - graphify/code
+  - graphify/EXTRACTED
+  - community/Забег_перки_и_награды
+---
+
+# updateQuests()
+
+## Connections
+- [[hudPop()]] - `calls` [EXTRACTED]
+- [[moryaka.js]] - `contains` [EXTRACTED]
+- [[questFailedNow()]] - `calls` [EXTRACTED]
+- [[saveProgress()]] - `calls` [EXTRACTED]
+- [[update()]] - `calls` [EXTRACTED]
+
+#graphify/code #graphify/EXTRACTED #community/Забег_перки_и_награды
