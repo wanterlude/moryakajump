@@ -9844,6 +9844,7 @@ html, body, body * {
     const look = (FRAMES.find((f) => f.id === frameId) || {}).look || null;
     const glow = (a) => look ? hexToRgba(look.glow, a) : "rgba(30,110,150," + a + ")";
     const L = showcaseLayout();
+    L.locked = !menuItemUnlocked(i);
     ctx.save();
     ctx.shadowColor = "rgba(18,70,110,.16)";
     ctx.shadowBlur = 20;
