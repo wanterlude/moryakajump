@@ -88,6 +88,37 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     #gameStage{height:100dvh;gap:4px}
     #game{width:auto;height:calc(100dvh - 54px);max-width:68vw;border-radius:10px}
 }
+/* 0.6: рейтинг, настройки, туториал (светлое стекло) */
+#lbButton,#settingsButton{width:52px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:0}
+#lbButton:hover,#settingsButton:hover{background:rgba(255,255,255,.22)}
+#lbButton:active,#settingsButton:active{transform:scale(.96)}
+#lbButton svg,#settingsButton svg{display:block}
+.sheetOverlay{position:fixed;inset:0;z-index:230;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.sheetOverlay.open{display:flex}
+.sheetCard{width:min(360px,94vw);max-height:88vh;overflow:auto;padding:20px 20px 16px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(0,0,0,.45);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
+.sheetCard h2{margin:0 0 6px;font-size:17px;color:#0f3d5c;letter-spacing:.4px}
+.sheetCard p{margin:0 0 12px;font-size:12px;line-height:1.5;color:rgba(15,61,92,.62)}
+.sheetActions{display:flex;gap:8px;margin-top:10px}
+.sheetActions button{flex:1;padding:11px 8px;border-radius:13px;border:1px solid rgba(15,61,92,.18);font:bold 11.5px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;background:rgba(255,255,255,.9);color:#0f3d5c;touch-action:manipulation}
+.sheetActions button.primary{background:linear-gradient(180deg,#23b6e2,#0a5fa0);border-color:transparent;color:#fff}
+.sheetActions button:active{transform:scale(.97)}
+.sheetRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid rgba(15,61,92,.08);font-size:12.5px;text-align:left}
+.sheetRow:last-of-type{border-bottom:0}
+.sheetRow input[type=range]{width:150px;accent-color:#12a08c}
+.sheetRow input[type=checkbox]{width:20px;height:20px;accent-color:#12a08c}
+.lbTabs{display:flex;gap:6px;margin:0 0 10px}
+.lbTabs button{flex:1;padding:8px;border-radius:10px;border:1px solid rgba(15,61,92,.18);background:rgba(255,255,255,.75);color:#0f3d5c;font:bold 11px Arial;cursor:pointer}
+.lbTabs button.cur{background:linear-gradient(180deg,#22a884,#0f8a76);border-color:transparent;color:#fff}
+.lbList{list-style:none;margin:0;padding:0;text-align:left}
+.lbList li{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.72);margin-bottom:6px;font-size:12px}
+.lbList li .nm{font-weight:bold;color:#0f3d5c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbList li .sc{color:#b07a00;font-weight:bold;flex:0 0 auto}
+.lbList li.me{outline:2px solid rgba(15,138,118,.55);background:rgba(219,250,244,.92)}
+.lbNote{font-size:11px;color:rgba(15,61,92,.55);margin-top:6px;min-height:14px}
+#tutCard{width:min(330px,92vw)}
+#tutStep{display:flex;gap:6px;justify-content:center;margin:4px 0 10px}
+#tutStep i{width:7px;height:7px;border-radius:50%;background:rgba(15,61,92,.18)}
+#tutStep i.on{background:#0f8a76}
 
 /* Отключаем выделение и iOS long-press callout по всей странице игры.
    Поле ника остаётся редактируемым для ввода, но текст в нём нельзя выделить. */
@@ -116,6 +147,18 @@ html, body, body * {
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
             <path d="M5 7h14M10 7V5.4c0-.5.4-.9.9-.9h2.2c.5 0 .9.4.9.9V7M7.2 7l.8 11.2c.05.7.63 1.2 1.33 1.2h5.34c.7 0 1.28-.5 1.33-1.2L16.8 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M10.4 10.6v6M13.6 10.6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".75"/>
+        </svg>
+    </button>
+    <button id="lbButton" type="button" aria-label="Рейтинг" title="Рейтинг">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+            <path d="M7 4h10v3a5 5 0 0 1-10 0V4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M12 12v4M8 20h8M10 20l1-4h2l1 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <button id="settingsButton" type="button" aria-label="Настройки" title="Настройки">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
     </button>
 </div>
@@ -153,6 +196,45 @@ html, body, body * {
         <div id="nickActions">
             <button id="nickCancel" type="button">ОТМЕНА</button>
             <button id="nickConfirm" type="button">ПОДЕЛИТЬСЯ</button>
+        </div>
+    </div>
+</div>
+</div>
+<div id="settingsOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="setTitle" aria-hidden="true">
+    <div class="sheetCard">
+        <h2 id="setTitle">Настройки</h2>
+        <div class="sheetRow"><span>Громкость</span><input id="volRange" type="range" min="0" max="100" value="100" aria-label="Громкость"></div>
+        <div class="sheetRow"><span>Вибрация</span><input id="vibToggle" type="checkbox" aria-label="Вибрация"></div>
+        <div class="sheetRow"><span>Наклон (моб.)</span><input id="tiltToggle" type="checkbox" aria-label="Наклон"></div>
+        <div class="sheetActions">
+            <button id="settingsReset" type="button">СБРОС ПРОГРЕССА</button>
+            <button id="settingsClose" type="button" class="primary">ГОТОВО</button>
+        </div>
+    </div>
+</div>
+<div id="leaderboardOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="lbTitle" aria-hidden="true">
+    <div class="sheetCard">
+        <h2 id="lbTitle">Рейтинг</h2>
+        <div class="lbTabs">
+            <button id="lbTabLocal" type="button" class="cur">ЛОКАЛЬНО</button>
+            <button id="lbTabGlobal" type="button">ГЛОБАЛЬНО</button>
+        </div>
+        <ul id="lbList" class="lbList"></ul>
+        <div id="lbNote" class="lbNote"></div>
+        <div class="sheetActions">
+            <button id="lbRefresh" type="button">ОБНОВИТЬ</button>
+            <button id="lbClose" type="button" class="primary">ЗАКРЫТЬ</button>
+        </div>
+    </div>
+</div>
+<div id="tutorialOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="tutTitle" aria-hidden="true">
+    <div class="sheetCard" id="tutCard">
+        <h2 id="tutTitle">Добро пожаловать!</h2>
+        <div id="tutStep"></div>
+        <p id="tutText"></p>
+        <div class="sheetActions">
+            <button id="tutSkip" type="button">ПРОПУСТИТЬ</button>
+            <button id="tutNext" type="button" class="primary">ДАЛЕЕ</button>
         </div>
     </div>
 </div>
@@ -7530,7 +7612,9 @@ html, body, body * {
     try {
       sound.ctx = new Ctor();
       sound.master = sound.ctx.createGain();
-      sound.master.gain.value = 0.05;
+      let vol = 100;
+      try { const raw = localStorage.getItem("morjakaVolume"); if (raw !== null) vol = Number(raw); } catch {}
+      sound.master.gain.value = 0.05 * (Math.max(0, Math.min(100, Number.isFinite(vol) ? vol : 100)) / 100);
       sound.master.connect(sound.ctx.destination);
     } catch {
       sound.ctx = null;
@@ -7589,7 +7673,7 @@ html, body, body * {
     }
   }
   function vibrate(pattern) {
-    if (!sound.enabled) return;
+    if (!sound.enabled || !vibrationEnabled) return;
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       try {
         navigator.vibrate(pattern);
@@ -10973,6 +11057,7 @@ html, body, body * {
     currentState = STATE.GAMEOVER;
     const finalScore = Math.floor(player.score);
     gameOverState.openedAt = performance.now();
+    lbSubmitRun(finalScore);
     pauseState.hover = null;
     gameOverState.newRecord = finalScore > 0 && finalScore > highScore;
     if (finalScore > highScore) {
@@ -11256,6 +11341,7 @@ html, body, body * {
     currentState = STATE.GAMEOVER;
     const finalScore = Math.floor(player.score);
     gameOverState.openedAt = performance.now();
+    lbSubmitRun(finalScore);
     pauseState.hover = null;
     gameOverState.newRecord = finalScore > 0 && finalScore > highScore;
     if (finalScore > highScore) {
@@ -15801,6 +15887,197 @@ html, body, body * {
     drawFpsDebug(timestamp, frameWorkStartedAt);
     scheduleDraw();
   }
+  // ===== 0.6: схема сохранения, рейтинги, настройки, туториал =====
+  var SCHEMA_VERSION = 1;
+  function migrateSchema() {
+    try {
+      if (localStorage.getItem("morjakaSchema") === null) localStorage.setItem("morjakaSchema", String(SCHEMA_VERSION));
+    } catch {}
+  }
+  // Глобальный рейтинг: укажите endpoint своего воркера (см. leaderboard-worker.js).
+  var LB_CONFIG = { endpoint: "", game: "moryaka-jump" };
+  var LB_LIMIT = 5;
+  function lbReadLocal() {
+    try {
+      const raw = JSON.parse(localStorage.getItem("morjakaTopScores") || "[]");
+      return Array.isArray(raw) ? raw : [];
+    } catch { return []; }
+  }
+  function lbWriteLocal(list) {
+    try { localStorage.setItem("morjakaTopScores", JSON.stringify(list.slice(0, 20))); } catch {}
+  }
+  function lbRecordLocal(score, name) {
+    if (!(score > 0)) return;
+    const list = lbReadLocal();
+    list.push({ n: (name || "Моряка").slice(0, 20), s: Math.floor(score), d: new Date().toISOString().slice(0, 10) });
+    list.sort((a, b) => b.s - a.s);
+    lbWriteLocal(list);
+  }
+  var lbSubmitTimer = 0;
+  function lbSubmitRun(score) {
+    if (!(score > 0)) return;
+    lbRecordLocal(score, playerNick);
+    if (!LB_CONFIG.endpoint) return;
+    try {
+      fetch(LB_CONFIG.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ game: LB_CONFIG.game, name: (playerNick || "Моряка").slice(0, 20), score: Math.floor(score) })
+      }).catch(() => {});
+    } catch {}
+  }
+  async function lbFetchGlobal() {
+    if (!LB_CONFIG.endpoint) return { scores: [], note: "Глобальный рейтинг не подключён. Укажите LB_CONFIG.endpoint (см. leaderboard-worker.js)." };
+    try {
+      const res = await fetch(LB_CONFIG.endpoint + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_LIMIT, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      return { scores: Array.isArray(data) ? data : (data.scores || []), note: "" };
+    } catch (e) {
+      return { scores: [], note: "Не удалось загрузить глобальный рейтинг (" + (e && e.message ? e.message : "ошибка") + ")." };
+    }
+  }
+  var lbState = { tab: "local", global: null, globalNote: "", loading: false };
+  function lbRender() {
+    const list = document.getElementById("lbList");
+    const note = document.getElementById("lbNote");
+    if (!list) return;
+    const rows = lbState.tab === "local" ? lbReadLocal().slice(0, LB_LIMIT) : (lbState.global || []);
+    list.innerHTML = "";
+    if (!rows.length) {
+      const li = document.createElement("li");
+      li.textContent = lbState.loading ? "Загрузка…" : "Пока пусто";
+      list.appendChild(li);
+    } else {
+      rows.forEach((r, i) => {
+        const li = document.createElement("li");
+        const nm = document.createElement("span"); nm.className = "nm";
+        nm.textContent = (i + 1) + ". " + ((r.n || r.name) || "Игрок");
+        const sc = document.createElement("span"); sc.className = "sc";
+        sc.textContent = fmt(Number(r.s != null ? r.s : r.score) || 0);
+        if (lbState.tab === "local" && (r.n || r.name) === playerNick) li.className = "me";
+        li.appendChild(nm); li.appendChild(sc); list.appendChild(li);
+      });
+    }
+    if (note) note.textContent = lbState.tab === "global" ? (lbState.loading ? "Загрузка…" : (lbState.globalNote || "")) : "Локальный топ-5 на этом устройстве.";
+  }
+  function lbSyncTabs() {
+    document.getElementById("lbTabLocal").classList.toggle("cur", lbState.tab === "local");
+    document.getElementById("lbTabGlobal").classList.toggle("cur", lbState.tab === "global");
+  }
+  function lbOpen(tab) {
+    lbState.tab = tab || "local";
+    const ov = document.getElementById("leaderboardOverlay");
+    if (!ov) return;
+    ov.classList.add("open"); ov.setAttribute("aria-hidden", "false");
+    lbSyncTabs(); lbRender();
+    if (lbState.tab === "global") lbRefreshGlobal();
+    sfx.click();
+  }
+  function lbClose() {
+    const ov = document.getElementById("leaderboardOverlay");
+    if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
+  }
+  async function lbRefreshGlobal() {
+    if (lbState.tab !== "global") return;
+    lbState.loading = true; lbState.globalNote = ""; lbRender();
+    const r = await lbFetchGlobal();
+    lbState.loading = false; lbState.global = r.scores; lbState.globalNote = r.note;
+    lbRender();
+  }
+  function storedVolume() {
+    let v = 100;
+    try { const raw = localStorage.getItem("morjakaVolume"); if (raw !== null) v = Number(raw); } catch {}
+    return Math.max(0, Math.min(100, Number.isFinite(v) ? v : 100));
+  }
+  function applyVolume(vol) {
+    const v = Math.max(0, Math.min(100, Number(vol) || 0));
+    try { localStorage.setItem("morjakaVolume", String(v)); } catch {}
+    if (sound.master) sound.master.gain.value = 0.05 * (v / 100);
+    sound.enabled = v > 0;
+    syncSoundButton();
+  }
+  function loadVolume() {
+    const range = document.getElementById("volRange");
+    if (range) range.value = String(storedVolume());
+    if (sound.master) sound.master.gain.value = 0.05 * (storedVolume() / 100);
+  }
+  var vibrationEnabled = true;
+  function loadVibration() {
+    try { vibrationEnabled = localStorage.getItem("morjakaVib") !== "0"; } catch {}
+    const cb = document.getElementById("vibToggle");
+    if (cb) cb.checked = vibrationEnabled;
+  }
+  function setVibration(on) {
+    vibrationEnabled = !!on;
+    try { localStorage.setItem("morjakaVib", on ? "1" : "0"); } catch {}
+  }
+  function setupSettings() {
+    const ov = document.getElementById("settingsOverlay");
+    const open = () => { if (!ov) return; ov.classList.add("open"); ov.setAttribute("aria-hidden", "false"); sfx.click(); };
+    const close = () => { if (!ov) return; ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); sfx.click(); };
+    const gear = document.getElementById("settingsButton"); if (gear) gear.addEventListener("click", open);
+    const cl = document.getElementById("settingsClose"); if (cl) cl.addEventListener("click", close);
+    if (ov) ov.addEventListener("pointerdown", (e) => { if (e.target === ov) close(); });
+    const range = document.getElementById("volRange"); if (range) range.addEventListener("input", () => applyVolume(range.value));
+    const vib = document.getElementById("vibToggle"); if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
+    const tilt = document.getElementById("tiltToggle");
+    if (tilt) {
+      tilt.checked = !!tiltEnabled;
+      tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; });
+    }
+    const rs = document.getElementById("settingsReset");
+    if (rs) rs.addEventListener("click", () => { close(); openResetDialog(); });
+  }
+  function setupLeaderboard() {
+    const trophy = document.getElementById("lbButton"); if (trophy) trophy.addEventListener("click", () => lbOpen("local"));
+    const local = document.getElementById("lbTabLocal"); if (local) local.addEventListener("click", () => { lbState.tab = "local"; lbState.globalNote = ""; lbSyncTabs(); lbRender(); });
+    const globalTab = document.getElementById("lbTabGlobal"); if (globalTab) globalTab.addEventListener("click", () => { lbState.tab = "global"; lbSyncTabs(); lbRender(); lbRefreshGlobal(); });
+    const refresh = document.getElementById("lbRefresh"); if (refresh) refresh.addEventListener("click", () => { if (lbState.tab === "global") lbRefreshGlobal(); else lbRender(); });
+    const close = document.getElementById("lbClose"); if (close) close.addEventListener("click", lbClose);
+    const ov = document.getElementById("leaderboardOverlay"); if (ov) ov.addEventListener("pointerdown", (e) => { if (e.target === ov) lbClose(); });
+  }
+  var TUTORIAL_STEPS = [
+    "Прыгай с платформы на платформу и забирайся как можно выше. Тап/клик, стрелки или мышь.",
+    "Собирай монеты: каждые N монет — новая жизнь. По пути появляются перки и события.",
+    "На 30 000 счёта приходит босс. Переживи его атаки и получи награду.",
+    "Ежедневное задание и серия дней — вверху экрана. Удачи, Моряка!"
+  ];
+  var tutIndex = 0;
+  function renderTutorial() {
+    const step = document.getElementById("tutStep");
+    const txt = document.getElementById("tutText");
+    const next = document.getElementById("tutNext");
+    if (step) { step.innerHTML = ""; TUTORIAL_STEPS.forEach((_, i) => { const d = document.createElement("i"); if (i === tutIndex) d.className = "on"; step.appendChild(d); }); }
+    if (txt) txt.textContent = TUTORIAL_STEPS[tutIndex] || "";
+    if (next) next.textContent = tutIndex >= TUTORIAL_STEPS.length - 1 ? "ПОНЯТНО" : "ДАЛЕЕ";
+  }
+  function closeTutorial() {
+    const ov = document.getElementById("tutorialOverlay");
+    if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
+    try { localStorage.setItem("morjakaTutorialDone", "1"); } catch {}
+  }
+  function maybeShowTutorial() {
+    let done = false;
+    try { done = localStorage.getItem("morjakaTutorialDone") === "1"; } catch {}
+    if (done) return;
+    const ov = document.getElementById("tutorialOverlay"); if (!ov) return;
+    tutIndex = 0; renderTutorial();
+    ov.classList.add("open"); ov.setAttribute("aria-hidden", "false");
+  }
+  function setupTutorial() {
+    const next = document.getElementById("tutNext");
+    const skip = document.getElementById("tutSkip");
+    if (next) next.addEventListener("click", () => { if (tutIndex >= TUTORIAL_STEPS.length - 1) closeTutorial(); else { tutIndex++; renderTutorial(); sfx.click(); } });
+    if (skip) skip.addEventListener("click", closeTutorial);
+  }
+  migrateSchema();
+  setupSettings();
+  setupLeaderboard();
+  setupTutorial();
+  loadVibration();
+  loadVolume();
+  setTimeout(maybeShowTutorial, 500);
   soundButton.addEventListener("click", () => toggleSound());
   syncSoundButton();
   fullscreenButton.addEventListener("click", async () => {
