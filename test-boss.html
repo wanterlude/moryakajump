@@ -9670,10 +9670,10 @@ html, body, body * {
   }
   function menuActionButtons() {
     return [
-      { id: "primary", x: MENU.padX, y: MENU.barY, w: 120, h: MENU.barH, label: menuPrimary().label },
-      { id: "play", x: 146, y: MENU.barY, w: 72, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" },
-      { id: "train", x: 224, y: MENU.barY, w: 70, h: MENU.barH, label: "\u0411\u041E\u0421\u0421\u042B" },
-      { id: "save", x: 300, y: MENU.barY, w: 80, h: MENU.barH, label: "\u0411\u042D\u041A\u0410\u041F" }
+      { id: "primary", x: MENU.padX, y: MENU.barY, w: 110, h: MENU.barH, label: menuPrimary().label },
+      { id: "play", x: 136, y: MENU.barY, w: 146, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" },
+      { id: "train", x: 288, y: MENU.barY + 8, w: 46, h: MENU.barH - 16, label: "\u0411\u041E\u0421\u0421\u042B" },
+      { id: "save", x: 340, y: MENU.barY + 8, w: 40, h: MENU.barH - 16, label: "\u0411\u042D\u041A\u0410\u041F" }
     ];
   }
   function bossTrainRows() {
@@ -10086,26 +10086,27 @@ html, body, body * {
     drawMenuButton(
       MENU.padX,
       MENU.barY,
-      120,
+      110,
       MENU.barH,
       primary.label,
       primary.enabled ? "gold" : "green",
       {
-        size: 11,
+        size: 10.5,
         dim: !primary.enabled
       }
     );
-    drawMenuButton(146, MENU.barY, 72, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
-      size: 9.5,
-      tracking: 1
+    drawMenuButton(136, MENU.barY, 146, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
+      size: 12,
+      tracking: 1.2,
+      icon: "play"
     });
-    drawMenuButton(224, MENU.barY, 70, MENU.barH, "\u0411\u041E\u0421\u0421\u042B", "green", {
-      size: 9.5,
-      tracking: 1
+    drawMenuButton(288, MENU.barY + 8, 46, MENU.barH - 16, "\u0411\u041E\u0421\u0421\u042B", "green", {
+      size: 7.6,
+      tracking: 0.6
     });
-    drawMenuButton(300, MENU.barY, 80, MENU.barH, "\u0411\u042D\u041A\u0410\u041F", "gold", {
-      size: 9.5,
-      tracking: 1
+    drawMenuButton(340, MENU.barY + 8, 40, MENU.barH - 16, "\u0411\u042D\u041A\u0410\u041F", "gold", {
+      size: 7.4,
+      tracking: 0.5
     });
     ctx.save();
     ctx.textBaseline = "middle";
