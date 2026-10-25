@@ -9334,7 +9334,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.20";
+  var GAME_VERSION = "1.0.21";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -16419,6 +16419,8 @@ html, body, body * {
     game: "moryaka-jump"
   };
   var LB_MAX = 50;
+  // Локальный топ — 5 лучших забегов игрока.
+  var LB_LOCAL_MAX = 5;
   function lbIsTestName(name) {
     const n = String(name || "").trim().toLowerCase();
     return n.indexOf("test") === 0 || n === "тест" || n === "qa" || n === "bot";
@@ -16443,11 +16445,14 @@ html, body, body * {
     try {
       const raw = JSON.parse(localStorage.getItem("morjakaTopScores") || "[]");
       if (!Array.isArray(raw)) return [];
-      return lbBestPerPlayer(raw.filter((r) => !lbIsTestName(r && r.n)));
+      return raw
+        .filter((r) => r && !lbIsTestName(r.n))
+        .sort((a, b) => (Number(b.s) || 0) - (Number(a.s) || 0))
+        .slice(0, LB_LOCAL_MAX);
     } catch { return []; }
   }
   function lbWriteLocal(list) {
-    try { localStorage.setItem("morjakaTopScores", JSON.stringify(list.slice(0, LB_MAX))); } catch {}
+    try { localStorage.setItem("morjakaTopScores", JSON.stringify(list.slice(0, LB_LOCAL_MAX))); } catch {}
   }
   function lbRecordLocal(score, name) {
     if (!(score > 0)) return;
@@ -16556,9 +16561,9 @@ html, body, body * {
     const note = document.getElementById("lbNote");
     if (!list) return;
     const local = lbState.tab === "local";
-    const rows = (local ? lbReadLocal() : (lbState.global || [])).slice(0, LB_MAX);
+    const rows = (local ? lbReadLocal() : (lbState.global || [])).slice(0, local ? LB_LOCAL_MAX : LB_MAX);
     lbFillRows(list, rows, local, local ? false : lbState.loading);
-    if (note) note.textContent = lbState.tab === "global" ? (lbState.loading ? "Загрузка…" : (lbState.globalNote || "")) : "Локальный топ-10, прокрутка до 50.";
+    if (note) note.textContent = lbState.tab === "global" ? (lbState.loading ? "Загрузка…" : (lbState.globalNote || "")) : "Локальный топ-5 ваших забегов.";
     lbRenderSide();
   }
   function lbSyncTabs() {

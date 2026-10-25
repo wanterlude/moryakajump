@@ -9,7 +9,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 ![Canvas 2D](https://img.shields.io/badge/Canvas%202D-4FC3F7?style=for-the-badge&logo=html5&logoColor=000)
-![Version](https://img.shields.io/badge/version-v1.0.20-38bdf8?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v1.0.21-38bdf8?style=for-the-badge)
 
 </div>
 
@@ -24,7 +24,7 @@
 - 🎁 **Награда за босса** — выбор одного из трёх редких усилений.
 - 🥊 **Тренировка боссов** — любой босс из меню, без наград и записи в рекорд.
 - 📅 **Ежедневные задания** — 6 типов: монеты, высота, босс, платформы, забеги и события; серия дней подряд.
-- 🏆 **Глобальный рейтинг** — топ-10 сразу и прокрутка до 50 через Firebase Realtime Database, у каждого игрока показывается только лучший результат.
+- 🏆 **Глобальный рейтинг** — топ-10 сразу и прокрутка до 50 через Firebase Realtime Database, у каждого игрока показывается только лучший результат. Локальный топ — 5 лучших забегов.
 - 🧭 **Боковые панели на ПК** — рейтинг слева и настройки справа на широком экране; сворачиваются, на телефоне скрыты.
 - 👤 **Профиль и статистика** — лучший счёт, монеты, платформы, забеги, время, любимый персонаж и журнал боссов.
 - 🏅 **15 достижений** — награды монетами за рекорды, коллекции и победы; выдаются один раз.
