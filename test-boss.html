@@ -12204,7 +12204,7 @@ html, body, body * {
     // Карточка скрывается сразу после выполнения и до следующего дня.
     if (!def || dailyState.done) return;
     const d = dailyState;
-    const x = 15, y = 88, h = 20;
+    const x = 15, y = 92, h = 20;
     const shown = Math.min(d.progress, def.target);
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
     setFont(6.5, "bold");
@@ -12399,6 +12399,10 @@ html, body, body * {
     }
     const hasQuest = !!questState.active && questPlateAlpha > 0;
     const hasWind = wind.active;
+    // Ежедневка висит выше плашек ветра и задания на забег; когда она скрыта
+    // (выполнена), плашки поднимаются на её место, чтобы не было пустоты.
+    const dailyShown = !dailyState.done && !!dailyDef();
+    const infoY = dailyShown ? 118 : 92;
     if (hasQuest || hasWind) {
       ctx.save();
       ctx.textBaseline = "middle";
@@ -12423,7 +12427,7 @@ html, body, body * {
       const plateW = totalWidth + padX * 2;
       const plateX = 15;
       const textX = plateX + padX;
-      roundedRect(plateX, 116, plateW, 17, 8.5);
+      roundedRect(plateX, infoY, plateW, 17, 8.5);
       ctx.fillStyle = "rgba(255,255,255,.90)";
       ctx.fill();
       ctx.strokeStyle = "rgba(15,61,92,.22)";
@@ -12435,7 +12439,7 @@ html, body, body * {
       ctx.save();
       ctx.globalAlpha = questPlateAlpha;
       ctx.fillStyle = color;
-      if (label) trackedText(label, textX, 124.5, 1.2, "left");
+      if (label) trackedText(label, textX, infoY + 8.5, 1.2, "left");
       ctx.restore();
       if (windLabel) {
         const warning = wind.warn > 0;
@@ -12448,7 +12452,7 @@ html, body, body * {
           ctx.fillStyle = `rgb(${shade},${shade + 40},${shade + 70})`;
         }
         setFont(7, "bold");
-        trackedText(windLabel, textX + labelWidth + (label ? gap : 0), 124.5, 2, "left");
+        trackedText(windLabel, textX + labelWidth + (label ? gap : 0), infoY + 8.5, 2, "left");
       }
       ctx.restore();
     }
@@ -12462,11 +12466,11 @@ html, body, body * {
       const label = "\u041D\u0410\u041A\u041B\u041E\u041D \u0412\u041A\u041B\u042E\u0427\u0401\u041D";
       const w = trackedWidth(label, 1.6) + 20;
       const bx = WORLD_W - w - 15;
-      roundedRect(bx, 116, w, 17, 8.5);
+      roundedRect(bx, infoY, w, 17, 8.5);
       ctx.fillStyle = "rgba(15,138,118,.88)";
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      trackedText(label, bx + w / 2, 125, 1.6);
+      trackedText(label, bx + w / 2, infoY + 9, 1.6);
       ctx.restore();
     }
     drawActivePerks();
