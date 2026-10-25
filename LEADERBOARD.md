@@ -8,9 +8,11 @@
 
 Как только вы укажете URL бэкенда — отправка и загрузка рейтинга заработают сами.
 
-## Вариант 1: Supabase (рекомендуется)
+## Вариант 1: Supabase (подключён)
 
-Клиент уже поддерживает Supabase через `LB_CONFIG.provider = "supabase"`.
+Рейтинг уже работает на проекте `caguxojvubfpbrlxggek`. В `index.html` прописаны Project URL и **publishable** key (он публичный по дизайну Supabase). Секретный ключ (`sb_secret_…`) в репозитории не хранится и в клиент не попадает — он нужен только для администрирования.
+
+Клиент поддерживает Supabase через `LB_CONFIG.provider = "supabase"`.
 
 1. Создай проект на [supabase.com](https://supabase.com) (Free tier).
 2. Открой **SQL Editor → New query**, вставь содержимое `supabase-schema.sql` и нажми **Run**.
