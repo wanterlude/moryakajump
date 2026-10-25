@@ -16410,10 +16410,27 @@ html, body, body * {
     const n = String(name || "").trim().toLowerCase();
     return n.indexOf("test") === 0 || n === "тест" || n === "qa" || n === "bot";
   }
+  // В рейтинге у каждого ника — только лучший результат (без учёта регистра).
+  function lbBestPerPlayer(list) {
+    const best = /* @__PURE__ */ new Map();
+    for (const r of list) {
+      if (!r) continue;
+      const key = String(r.name != null ? r.name : r.n || "").trim().toLowerCase();
+      if (!key) continue;
+      const score = Number(r.score != null ? r.score : r.s) || 0;
+      const prev = best.get(key);
+      const prevScore = prev ? (Number(prev.score != null ? prev.score : prev.s) || 0) : -1;
+      if (score > prevScore) best.set(key, r);
+    }
+    return [...best.values()].sort(
+      (a, b) => (Number(b.score != null ? b.score : b.s) || 0) - (Number(a.score != null ? a.score : a.s) || 0)
+    );
+  }
   function lbReadLocal() {
     try {
       const raw = JSON.parse(localStorage.getItem("morjakaTopScores") || "[]");
-      return Array.isArray(raw) ? raw.filter((r) => !lbIsTestName(r && r.n)) : [];
+      if (!Array.isArray(raw)) return [];
+      return lbBestPerPlayer(raw.filter((r) => !lbIsTestName(r && r.n)));
     } catch { return []; }
   }
   function lbWriteLocal(list) {
@@ -16436,7 +16453,8 @@ html, body, body * {
     if (!lbFirebaseReady()) return { scores: [], note: "Firebase не настроен: укажите URL базы в LB_CONFIG.url." };
     const base = lbFirebaseBase() + ".json";
     try {
-      let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_MAX, { cache: "no-store" });
+      // Берём с запасом: после схлопывания по никам должно остаться до 50 игроков.
+      let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_MAX * 4, { cache: "no-store" });
       if (!res.ok) res = await fetch(base, { cache: "no-store" });
       if (res.status === 401 || res.status === 403) throw new Error("нет доступа — проверьте правила базы в консоли Firebase");
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -16444,8 +16462,7 @@ html, body, body * {
       const list = data && typeof data === "object"
         ? Object.keys(data).map((k) => data[k]).filter((v) => v && typeof v === "object" && !lbIsTestName(v.name))
         : [];
-      list.sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0));
-      return { scores: list.slice(0, LB_MAX), note: "" };
+      return { scores: lbBestPerPlayer(list).slice(0, LB_MAX), note: "" };
     } catch (e) {
       return { scores: [], note: "Ошибка загрузки Firebase (" + (e && e.message ? e.message : "сеть") + ")." };
     }
