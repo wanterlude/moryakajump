@@ -13779,6 +13779,21 @@ html, body, body * {
         menuState.swipeTrail = [{ t: performance.now(), x: point.x }];
         menuState.pointerId = event.pointerId;
       }
+      if (point.x >= MENU_GEAR.x && point.x <= MENU_GEAR.x + MENU_GEAR.w && point.y >= MENU_GEAR.y && point.y <= MENU_GEAR.y + MENU_GEAR.h) {
+        openSettings();
+        event.preventDefault();
+        return;
+      }
+      if (point.x >= MENU_LB.x && point.x <= MENU_LB.x + MENU_LB.w && point.y >= MENU_LB.y && point.y <= MENU_LB.y + MENU_LB.h) {
+        lbOpen("global");
+        event.preventDefault();
+        return;
+      }
+      if (point.x >= MENU_PROFILE.x && point.x <= MENU_PROFILE.x + MENU_PROFILE.w && point.y >= MENU_PROFILE.y && point.y <= MENU_PROFILE.y + MENU_PROFILE.h) {
+        openProfile();
+        event.preventDefault();
+        return;
+      }
       if (menuState.tab === "platforms") {
         const onTabsP = point.y >= MENU.tabsY && point.y <= MENU.tabsY + MENU.tabsH && point.x >= MENU.padX && point.x <= WORLD_W - MENU.padX;
         if (!onTabsP) {
@@ -13815,21 +13830,6 @@ html, body, body * {
           event.preventDefault();
           return;
         }
-      }
-      if (point.x >= MENU_GEAR.x && point.x <= MENU_GEAR.x + MENU_GEAR.w && point.y >= MENU_GEAR.y && point.y <= MENU_GEAR.y + MENU_GEAR.h) {
-        openSettings();
-        event.preventDefault();
-        return;
-      }
-      if (point.x >= MENU_LB.x && point.x <= MENU_LB.x + MENU_LB.w && point.y >= MENU_LB.y && point.y <= MENU_LB.y + MENU_LB.h) {
-        lbOpen("global");
-        event.preventDefault();
-        return;
-      }
-      if (point.x >= MENU_PROFILE.x && point.x <= MENU_PROFILE.x + MENU_PROFILE.w && point.y >= MENU_PROFILE.y && point.y <= MENU_PROFILE.y + MENU_PROFILE.h) {
-        openProfile();
-        event.preventDefault();
-        return;
       }
       if (point.y >= MENU.tabsY && point.y <= MENU.tabsY + MENU.tabsH && point.x >= MENU.padX && point.x <= WORLD_W - MENU.padX) {
         menuState.swipeMode = "click";
