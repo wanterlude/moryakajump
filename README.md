@@ -9,7 +9,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 ![Canvas 2D](https://img.shields.io/badge/Canvas%202D-4FC3F7?style=for-the-badge&logo=html5&logoColor=000)
-![Version](https://img.shields.io/badge/version-v0.7.2-38bdf8?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v0.7.3-38bdf8?style=for-the-badge)
 
 </div>
 
@@ -57,7 +57,7 @@
 |---|---|
 | `index.html` | основная игра — просто открой в браузере |
 | `test-boss.html` | тестовая сборка: панель выбора босса и количества жизней |
-| `test-frames.html` | тестовая галерея всех 211 рамок с анимацией эффектов |
+| `test-frames.html` | тестовая галерея всех 211 рамок: анимация эффектов и номера по редкости |
 
 ## 📁 Структура
 
