@@ -7927,19 +7927,12 @@ html, body, body * {
   };
   var seenPlatformTypes = /* @__PURE__ */ new Set();
   var runCoins = 0;
-  var comboState = { count: 0, timer: 0, best: 0 };
-  var COMBO_WINDOW_MS = 4000;
-  var COMBO_MAX_BONUS = 2;
+  // Серия приземлений убрана полностью: не влияет на коины и больше не загружает HUD.
   function comboMultiplier() {
-    return 1 + Math.min(COMBO_MAX_BONUS, Math.floor(comboState.count / 10) * 0.5);
+    return 1;
   }
   function registerComboLanding() {
-    comboState.count++;
-    comboState.best = Math.max(comboState.best, comboState.count);
-    comboState.timer = COMBO_WINDOW_MS;
-    if (comboState.count % 10 === 0) {
-      hudPop(player.x + 15, player.y - 26, "СЕРИЯ ×" + comboState.count, HUD_COLORS.green);
-    }
+    // Нет-оп: серия больше не считается.
   }
   var keys = {};
   function resetGame() {
@@ -7964,9 +7957,6 @@ html, body, body * {
     stillRefY = 0;
     dryRowsLeft = 0;
     runCoins = 0;
-    comboState.count = 0;
-    comboState.timer = 0;
-    comboState.best = 0;
     resetPerks();
     resetWind();
     resetQuests();
@@ -10976,8 +10966,6 @@ html, body, body * {
       sfx.fall();
       vibrate(40);
       lives--;
-      comboState.count = 0;
-      comboState.timer = 0;
       player.y = 500;
       stickyStuck = null;
       player.dy = -42;
@@ -11020,7 +11008,7 @@ html, body, body * {
           perkState.coinMultiplier = 0;
           perkState.coinUntil = 0;
         }
-        const gained = Math.max(1, Math.round((1 + perkState.coinMultiplier) * comboMultiplier()));
+        const gained = Math.max(1, Math.round(1 + perkState.coinMultiplier));
         const perLife = coinsPerLife();
         const livesBefore = Math.floor(runCoins / perLife);
         runCoins += gained;
@@ -11498,10 +11486,6 @@ html, body, body * {
     if (perkState.offering) {
       tickEvents(SIM_STEP_MS);
       return;
-    }
-    if (comboState.timer > 0) {
-      comboState.timer -= SIM_STEP_MS;
-      if (comboState.timer <= 0) comboState.count = 0;
     }
     const keyboardOrTouchLeft = keys.ArrowLeft || keys.KeyA || touchInput.left;
     const keyboardOrTouchRight = keys.ArrowRight || keys.KeyD || touchInput.right;
@@ -12219,28 +12203,36 @@ html, body, body * {
   }
   function drawDailyQuest() {
     const def = dailyDef();
-    if (!def) return;
+    // Карточка скрывается сразу после выполнения и до следующего дня.
+    if (!def || dailyState.done) return;
     const d = dailyState;
-    const done = d.done;
-    const x = 15, y = 116, w = 312, h = 18;
+    const x = 15, y = 88, h = 20;
     const shown = Math.min(d.progress, def.target);
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
+    setFont(6.5, "bold");
+    const head = `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
+    const right = d.streak > 0 ? `СЕРИЯ ${d.streak}` : "";
+    const headW = trackedWidth(head, 0.8);
+    const rightW = right ? trackedWidth(right, 0.8) : 0;
+    const gap = right ? 14 : 0;
+    // Компактная рамка: ширина по контенту, длинная полоса не растягивает её.
+    const w = Math.min(252, 40 + headW + gap + rightW + 16);
     ctx.save();
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
-    roundedRect(x, y, w, h, 9);
-    ctx.fillStyle = done ? "rgba(232,251,242,.94)" : "rgba(255,255,255,.90)";
+    roundedRect(x, y, w, h, 10);
+    ctx.fillStyle = "rgba(255,255,255,.92)";
     ctx.fill();
-    ctx.strokeStyle = done ? "rgba(15,138,118,.34)" : "rgba(15,61,92,.20)";
+    ctx.strokeStyle = "rgba(15,61,92,.20)";
     ctx.lineWidth = 1;
     ctx.stroke();
     const ix = x + 13;
     const iy = y + h / 2 - 0.5;
     ctx.beginPath();
     ctx.arc(ix, iy, 6.2, 0, Math.PI * 2);
-    ctx.fillStyle = done ? "rgba(15,138,118,.15)" : `rgba(255,194,71,${0.14 + pulse * 0.10})`;
+    ctx.fillStyle = `rgba(255,194,71,${0.14 + pulse * 0.10})`;
     ctx.fill();
-    ctx.strokeStyle = done ? "#0a6b4a" : "#b07a00";
+    ctx.strokeStyle = "#b07a00";
     ctx.lineWidth = 1.1;
     ctx.lineCap = "round";
     for (let i = 0; i < 3; i++) {
@@ -12252,26 +12244,23 @@ html, body, body * {
     }
     ctx.lineCap = "butt";
     setFont(6.5, "bold");
-    ctx.fillStyle = done ? "#0a6b4a" : "rgba(15,61,92,.86)";
-    const head = done ? "ЕЖЕДНЕВНО · ВЫПОЛНЕНО" : `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
-    const headW = trackedWidth(head, 0.8);
-    const right = done ? `+${def.reward} МОНЕТ` : d.streak > 0 ? `СЕРИЯ ${d.streak}` : "";
-    const rightW = right ? trackedWidth(right, 0.8) : 0;
+    ctx.fillStyle = "rgba(15,61,92,.86)";
     trackedText(head, x + 24, iy, 0.8, "left");
-    if (right && x + 24 + headW + 10 < x + w - 10 - rightW) {
-      ctx.fillStyle = done ? "#b07a00" : "rgba(21,85,118,.55)";
+    if (right) {
+      ctx.fillStyle = "rgba(21,85,118,.55)";
       trackedText(right, x + w - 10, iy, 0.8, "right");
     }
-    if (!done) {
-      const frac = Math.max(0, Math.min(1, shown / def.target));
-      roundedRect(x + 24, y + h - 3.4, w - 48, 2.2, 1.1);
-      ctx.fillStyle = "rgba(15,61,92,.10)";
+    // Короткая полоса выполнения — не растягивает рамку.
+    const frac = Math.max(0, Math.min(1, shown / def.target));
+    const barW = Math.min(128, w - 44);
+    const by = y + h - 5;
+    roundedRect(x + 24, by, barW, 2.4, 1.2);
+    ctx.fillStyle = "rgba(15,61,92,.10)";
+    ctx.fill();
+    if (frac > 0) {
+      roundedRect(x + 24, by, Math.max(2, barW * frac), 2.4, 1.2);
+      ctx.fillStyle = "#e0a91f";
       ctx.fill();
-      if (frac > 0) {
-        roundedRect(x + 24, y + h - 3.4, Math.max(2, (w - 48) * frac), 2.2, 1.1);
-        ctx.fillStyle = done ? "#0f8a76" : "#e0a91f";
-        ctx.fill();
-      }
     }
     ctx.restore();
   }
@@ -12401,24 +12390,6 @@ html, body, body * {
       trackedText(jumpHint, jumpCursor, chipY + chipH / 2 + 0.5, 0.8, "left");
     }
     ctx.restore();
-    if (comboState.count >= 3) {
-      const comboW = 70;
-      const comboX = chipX + jumpW + 6;
-      if (comboX + comboW < PAUSE_ZONE.x - 6) {
-        const hot = comboState.count >= 20;
-        drawHudChip(comboX, chipY, comboW, chipH, hot ? "rgba(255,194,71,.55)" : null);
-        ctx.save();
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "left";
-        setFont(8.5, "bold");
-        ctx.fillStyle = hot ? "#8a5a00" : "#0f8a76";
-        trackedText("×" + comboState.count, comboX + 9, chipY + chipH / 2 + 0.5, 0.3, "left");
-        setFont(5.4, "bold");
-        ctx.fillStyle = "rgba(21,85,118,.5)";
-        trackedText("СЕРИЯ", comboX + comboW - 8, chipY + chipH / 2 + 0.5, 0.6, "right");
-        ctx.restore();
-      }
-    }
     let questPlateAlpha = 1;
     if (questState.active && questState.done && questState.doneAt) {
       const elapsed = performance.now() - questState.doneAt;
@@ -12454,7 +12425,7 @@ html, body, body * {
       const plateW = totalWidth + padX * 2;
       const plateX = 15;
       const textX = plateX + padX;
-      roundedRect(plateX, 94, plateW, 17, 8.5);
+      roundedRect(plateX, 116, plateW, 17, 8.5);
       ctx.fillStyle = "rgba(255,255,255,.90)";
       ctx.fill();
       ctx.strokeStyle = "rgba(15,61,92,.22)";
@@ -12466,7 +12437,7 @@ html, body, body * {
       ctx.save();
       ctx.globalAlpha = questPlateAlpha;
       ctx.fillStyle = color;
-      if (label) trackedText(label, textX, 102.5, 1.2, "left");
+      if (label) trackedText(label, textX, 124.5, 1.2, "left");
       ctx.restore();
       if (windLabel) {
         const warning = wind.warn > 0;
@@ -12479,7 +12450,7 @@ html, body, body * {
           ctx.fillStyle = `rgb(${shade},${shade + 40},${shade + 70})`;
         }
         setFont(7, "bold");
-        trackedText(windLabel, textX + labelWidth + (label ? gap : 0), 102.5, 2, "left");
+        trackedText(windLabel, textX + labelWidth + (label ? gap : 0), 124.5, 2, "left");
       }
       ctx.restore();
     }
@@ -12493,11 +12464,11 @@ html, body, body * {
       const label = "\u041D\u0410\u041A\u041B\u041E\u041D \u0412\u041A\u041B\u042E\u0427\u0401\u041D";
       const w = trackedWidth(label, 1.6) + 20;
       const bx = WORLD_W - w - 15;
-      roundedRect(bx, 94, w, 17, 8.5);
+      roundedRect(bx, 116, w, 17, 8.5);
       ctx.fillStyle = "rgba(15,138,118,.88)";
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      trackedText(label, bx + w / 2, 103, 1.6);
+      trackedText(label, bx + w / 2, 125, 1.6);
       ctx.restore();
     }
     drawActivePerks();
