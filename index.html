@@ -9587,8 +9587,8 @@ html, body, body * {
       r: 34,
       /** Центр аватара и цветовой кольцевой рамки. */
       cy: y + 64,
-      titleY: y + h - 34,
-      subY: y + h - 20,
+      titleY: y + h - 40,
+      subY: y + h - 26,
       meterY: y + h - 12,
       meterTextY: y + h - 12,
       locked: false
@@ -9663,11 +9663,11 @@ html, body, body * {
     setFont(7, "bold");
     ctx.fillStyle = "rgba(21,85,118,.42)";
     trackedText(i + 1 + " / " + menuTabCount(), x + w - 16, y + 14, 1.2, "right");
-    setFont(14, "bold");
-    ctx.fillStyle = "#0f3d5c";
     const title = isShop ? FRAMES[i].name.toUpperCase() : avatarName(i).toUpperCase();
+    setFont(title.length > 22 ? 12 : 15, "bold");
+    ctx.fillStyle = "#0f3d5c";
     trackedText(title, cx, L.titleY, 0.9);
-    setFont(8, "bold");
+    setFont(9, "bold");
     if (isShop) {
       const frame = FRAMES[i];
       const rarity = FRAME_RARITY(frame);
