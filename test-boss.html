@@ -16406,10 +16406,14 @@ html, body, body * {
     game: "moryaka-jump"
   };
   var LB_MAX = 50;
+  function lbIsTestName(name) {
+    const n = String(name || "").trim().toLowerCase();
+    return n.indexOf("test") === 0 || n === "тест" || n === "qa" || n === "bot";
+  }
   function lbReadLocal() {
     try {
       const raw = JSON.parse(localStorage.getItem("morjakaTopScores") || "[]");
-      return Array.isArray(raw) ? raw : [];
+      return Array.isArray(raw) ? raw.filter((r) => !lbIsTestName(r && r.n)) : [];
     } catch { return []; }
   }
   function lbWriteLocal(list) {
@@ -16438,7 +16442,7 @@ html, body, body * {
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       const list = data && typeof data === "object"
-        ? Object.keys(data).map((k) => data[k]).filter((v) => v && typeof v === "object")
+        ? Object.keys(data).map((k) => data[k]).filter((v) => v && typeof v === "object" && !lbIsTestName(v.name))
         : [];
       list.sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0));
       return { scores: list.slice(0, LB_MAX), note: "" };
@@ -16458,8 +16462,10 @@ html, body, body * {
   }
   function lbSubmitRun(score) {
     if (!(score > 0)) return;
-    lbRecordLocal(score, playerNick);
     const name = (playerNick || "Моряка").slice(0, 20);
+    // Тестовые забеги (сборки и ники вроде TestAi) в рейтинг не попадают.
+    if (window.__TEST_BUILD || lbIsTestName(name)) return;
+    lbRecordLocal(score, playerNick);
     if (lbFirebaseReady()) {
       const sent = lbFirebaseSubmit(name, Math.floor(score));
       if (sent && sent.then) sent.then(() => lbRefreshGlobal(true)).catch(() => {});
@@ -16929,6 +16935,7 @@ html, body, body * {
   loadVibration();
   loadVolume();
   setTimeout(maybeShowTutorial, 500);
+  window.__TEST_BUILD = true;
   window.__testBoss = (index, livesCount) => {
     startGame();
     lives = Math.max(1, livesCount || 5);
