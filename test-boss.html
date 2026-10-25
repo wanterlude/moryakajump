@@ -16383,9 +16383,15 @@ html, body, body * {
       if (localStorage.getItem("morjakaSchema") === null) localStorage.setItem("morjakaSchema", String(SCHEMA_VERSION));
     } catch {}
   }
-  // Глобальный рейтинг. Основной режим — Firebase Realtime Database:
-  // provider:"firebase", url:"https://<project>-default-rtdb.<region>.firebasedatabase.app".
-  // Альтернатива — свой воркер: provider:"worker", endpoint (см. leaderboard-worker.js).
+  // Глобальный рейтинг — Firebase Realtime Database.
+  // База: https://moryaka-jump-default-rtdb.asia-southeast1.firebasedatabase.app
+  // Записи: /scores/moryaka-jump/<key> = { name, score, ts }, индекс по "score".
+  // Правила задаются в консоли Firebase (Realtime Database → Rules → Publish):
+  //   scores/moryaka-jump: .read true, .indexOn ["score"];
+  //   $entry: .write "!data.exists() && newData.exists()" (только создание);
+  //   .validate: name — строка 1–20 символов, score — число 1…100000000.
+  // Нельзя ставить ".write": true на всю ветку — тогда рейтинг можно стереть целиком.
+  // Альтернатива — свой сервер: provider:"worker", endpoint.
   var LB_CONFIG = {
     provider: "firebase",
     url: "https://moryaka-jump-default-rtdb.asia-southeast1.firebasedatabase.app", // URL базы Realtime Database
@@ -16416,12 +16422,12 @@ html, body, body * {
     return String(LB_CONFIG.url).replace(/\/+$/, "") + "/scores/" + encodeURIComponent(LB_CONFIG.game);
   }
   async function lbFirebaseFetch() {
-    if (!lbFirebaseReady()) return { scores: [], note: "Firebase не настроен: укажите URL базы в LB_CONFIG.url (см. LEADERBOARD.md)." };
+    if (!lbFirebaseReady()) return { scores: [], note: "Firebase не настроен: укажите URL базы в LB_CONFIG.url." };
     const base = lbFirebaseBase() + ".json";
     try {
       let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_MAX, { cache: "no-store" });
       if (!res.ok) res = await fetch(base, { cache: "no-store" });
-      if (res.status === 401 || res.status === 403) throw new Error("нет доступа — опубликуйте правила из firebase-rules.json");
+      if (res.status === 401 || res.status === 403) throw new Error("нет доступа — проверьте правила базы в консоли Firebase");
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       const list = data && typeof data === "object"
@@ -16473,7 +16479,7 @@ html, body, body * {
         return { scores: [], note: "Не удалось загрузить глобальный рейтинг (" + (e && e.message ? e.message : "ошибка") + ")." };
       }
     }
-    return { scores: [], note: "Глобальный рейтинг не подключён. Укажите Firebase Realtime Database URL в LB_CONFIG (см. LEADERBOARD.md)." };
+    return { scores: [], note: "Глобальный рейтинг не подключён. Укажите Firebase Realtime Database URL в LB_CONFIG." };
   }
   var lbState = { tab: "global", global: null, globalNote: "", loading: false };
   function lbFillRows(list, rows, markMe, loading) {
