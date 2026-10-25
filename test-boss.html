@@ -145,6 +145,22 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .sideBtn:active{transform:scale(.97)}
 .sideBtn.primary{background:linear-gradient(180deg,#22a884,#0f8a76);border-color:transparent;color:#fff}
 .sideBtn.danger{background:rgba(255,235,236,.9);border-color:rgba(200,50,60,.35);color:#b02a34}
+.profileCard{width:min(430px,94vw);max-height:88vh;overflow-y:auto}
+.profileStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
+.profileStat{background:rgba(255,255,255,.72);border-radius:10px;padding:7px 9px;text-align:left;min-width:0}
+.profileStat b{display:block;font-size:14px;color:#0f3d5c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profileStat span{display:block;font-size:8.5px;letter-spacing:.55px;color:rgba(15,61,92,.55);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profileSection{font:bold 9.5px Arial,sans-serif;letter-spacing:1px;color:rgba(15,61,92,.6);margin:10px 0 5px;text-align:left}
+.profileBossRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 2px;border-bottom:1px solid rgba(15,61,92,.08);font-size:10.5px;color:#0f3d5c;text-align:left}
+.profileBossRow:last-child{border-bottom:0}
+.profileBossRow span:last-child{font-weight:bold;white-space:nowrap;color:rgba(15,61,92,.72)}
+.profileAch{max-height:220px;overflow-y:auto;padding-right:2px}
+.profileAchRow{display:flex;gap:8px;align-items:flex-start;padding:6px 2px;border-bottom:1px solid rgba(15,61,92,.08);text-align:left}
+.profileAchRow:last-child{border-bottom:0}
+.profileAchRow .paName{font:bold 10.5px Arial,sans-serif;color:#0f3d5c}
+.profileAchRow .paDesc{font-size:9px;color:rgba(15,61,92,.55);margin-top:1px}
+.profileAchRow.done .paName{color:#0f8a76}
+.profileAchReward{margin-left:auto;font:bold 9.5px Arial,sans-serif;color:#b07a00;white-space:nowrap;padding-top:1px}
 #tutCard{width:min(330px,92vw)}
 #tutStep{display:flex;gap:6px;justify-content:center;margin:4px 0 10px}
 #tutStep i{width:7px;height:7px;border-radius:50%;background:rgba(15,61,92,.18)}
@@ -289,6 +305,19 @@ html, body, body * {
         <div class="sheetActions">
             <button id="lbRefresh" type="button">ОБНОВИТЬ</button>
             <button id="lbClose" type="button" class="primary">ЗАКРЫТЬ</button>
+        </div>
+    </div>
+</div>
+<div id="profileOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="profileTitle" aria-hidden="true">
+    <div class="sheetCard profileCard">
+        <h2 id="profileTitle">ПРОФИЛЬ</h2>
+        <div id="profileStats" class="profileStats"></div>
+        <div class="profileSection">ЖУРНАЛ БОССОВ</div>
+        <div id="profileBosses"></div>
+        <div class="profileSection">ДОСТИЖЕНИЯ <span id="profileAchCount"></span></div>
+        <div id="profileAch" class="profileAch"></div>
+        <div class="sheetActions">
+            <button id="profileClose" type="button" class="primary">ЗАКРЫТЬ</button>
         </div>
     </div>
 </div>
@@ -6666,6 +6695,24 @@ html, body, body * {
       hint2: "\u0441\u0447\u0451\u0442 +25 000",
       lives: 2,
       mods: [["magnet", 3, LEGENDARY_SPAN.perfect]]
+    },
+    {
+      id: "life2",
+      rarity: "rare",
+      icon: "heartPlus",
+      title: "+2 \u0416\u0418\u0417\u041D\u0418",
+      hint: "\u0441\u0440\u0430\u0437\u0443 \u0434\u0432\u0435 \u0436\u0438\u0437\u043D\u0438",
+      hint2: "\u0431\u0435\u0437 \u043E\u0436\u0438\u0434\u0430\u043D\u0438\u044F",
+      lives: 2
+    },
+    {
+      id: "magnet2",
+      rarity: "rare",
+      icon: "magnet",
+      title: "\u041C\u0410\u0413\u041D\u0418\u0422 \xD72",
+      hint: "\u043C\u043E\u043D\u0435\u0442\u044B \u043B\u0438\u043F\u043D\u0443\u0442 \u043E\u0447\u0435\u043D\u044C \u0434\u0430\u043B\u0435\u043A\u043E",
+      hint2: "\u0441\u0447\u0451\u0442 +20 000",
+      mods: [["magnet", 2, 2e4]]
     }
   ];
 
@@ -7131,6 +7178,25 @@ html, body, body * {
     }
     ctx.restore();
   }
+  function drawBlizzard() {
+    const t = frameNow();
+    ctx.save();
+    ctx.fillStyle = "rgba(236,248,255,.14)";
+    ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+    ctx.strokeStyle = "rgba(255,255,255,.55)";
+    ctx.lineWidth = 1;
+    ctx.lineCap = "round";
+    for (let i = 0; i < 34; i++) {
+      const y = (i * 53 + t * 260) % (WORLD_H + 40) - 20;
+      const x = (i * 137 + Math.sin(t * 1.7 + i) * 40) % (WORLD_W + 80) - 40;
+      ctx.globalAlpha = 0.35 + 0.35 * Math.sin(t * 3 + i);
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - 22, y + 9);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
   var gameStage = document.getElementById("gameStage");
   var fullscreenButton = document.getElementById("fullscreenButton");
   var soundButton = document.getElementById("soundButton");
@@ -7255,9 +7321,107 @@ html, body, body * {
   var ownedFrames = readStoredArray("morjakaOwnedFrames", [0]);
   if (!FRAMES.some((frame) => frame.id === selectedFrame)) selectedFrame = 0;
   if (!ownedFrames.includes(0)) ownedFrames = [0, ...ownedFrames];
+
+  // ===== 0.8: статистика, достижения и журнал боссов =====
+  function defaultStats() {
+    return {
+      runs: 0,
+      coins: 0,
+      platforms: 0,
+      playMs: 0,
+      bossWins: [0, 0, 0, 0, 0],
+      bossTries: [0, 0, 0, 0, 0],
+      trainWins: [0, 0, 0, 0, 0],
+      trainTries: [0, 0, 0, 0, 0],
+      characterRuns: {}
+    };
+  }
+  function loadStats() {
+    try {
+      const raw = JSON.parse(localStorage.getItem("morjakaStats") || "null");
+      if (!raw || typeof raw !== "object") return defaultStats();
+      const out = defaultStats();
+      const num = (v) => Math.max(0, Math.floor(Number(v) || 0));
+      out.runs = num(raw.runs);
+      out.coins = num(raw.coins);
+      out.platforms = num(raw.platforms);
+      out.playMs = num(raw.playMs);
+      for (const key of ["bossWins", "bossTries", "trainWins", "trainTries"]) {
+        if (Array.isArray(raw[key])) for (let i = 0; i < 5; i++) out[key][i] = num(raw[key][i]);
+      }
+      if (raw.characterRuns && typeof raw.characterRuns === "object") {
+        for (const key in raw.characterRuns) {
+          if (Object.prototype.hasOwnProperty.call(raw.characterRuns, key)) out.characterRuns[key] = num(raw.characterRuns[key]);
+        }
+      }
+      return out;
+    } catch {
+      return defaultStats();
+    }
+  }
+  var stats = loadStats();
+  var achievementsClaimed = readStoredArray("morjakaAchievements", []).filter((id) => typeof id === "string");
+  function saveStats() {
+    try { localStorage.setItem("morjakaStats", JSON.stringify(stats)); } catch {}
+  }
+  function formatPlayTime(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor(total % 3600 / 60);
+    const s = total % 60;
+    if (h > 0) return h + " ч " + m + " мин";
+    if (m > 0) return m + " мин " + s + " с";
+    return s + " с";
+  }
+  var ACHIEVEMENT_DEFS = [
+    { id: "first_run", name: "ПЕРВЫЙ ШАГ", desc: "Заверши первый забег", reward: 20, check: () => stats.runs >= 1, progress: () => [Math.min(stats.runs, 1), 1] },
+    { id: "score_500", name: "РАЗБЕГ", desc: "Набери 500 очков", reward: 25, check: () => highScore >= 500, progress: () => [Math.min(highScore, 500), 500] },
+    { id: "score_5000", name: "ВЫСОТА", desc: "Набери 5 000 очков", reward: 60, check: () => highScore >= 5000, progress: () => [Math.min(highScore, 5000), 5000] },
+    { id: "score_25000", name: "К НЕБУ", desc: "Набери 25 000 очков", reward: 150, check: () => highScore >= 25000, progress: () => [Math.min(highScore, 25000), 25000] },
+    { id: "coins_100", name: "КЛАДОВАЯ", desc: "Собери 100 монет", reward: 40, check: () => stats.coins >= 100, progress: () => [Math.min(stats.coins, 100), 100] },
+    { id: "coins_1000", name: "ЗОЛОТО", desc: "Собери 1 000 монет", reward: 140, check: () => stats.coins >= 1000, progress: () => [Math.min(stats.coins, 1000), 1000] },
+    { id: "platforms_100", name: "ПЕРВЫЕ СТУПЕНИ", desc: "Приземлись на 100 платформ", reward: 45, check: () => stats.platforms >= 100, progress: () => [Math.min(stats.platforms, 100), 100] },
+    { id: "platforms_1000", name: "ЛЕДЯНАЯ ЛЕСТНИЦА", desc: "Приземлись на 1 000 платформ", reward: 160, check: () => stats.platforms >= 1000, progress: () => [Math.min(stats.platforms, 1000), 1000] },
+    { id: "first_boss", name: "ПОБЕДИТЕЛЬ", desc: "Победи первого босса", reward: 100, check: () => stats.bossWins.some((n) => n > 0), progress: () => [stats.bossWins.some((n) => n > 0) ? 1 : 0, 1] },
+    { id: "all_bosses", name: "ЦАРЬ СТУЖИ", desc: "Победи всех пятерых боссов", reward: 300, check: () => stats.bossWins.every((n) => n > 0), progress: () => [stats.bossWins.filter((n) => n > 0).length, 5] },
+    { id: "daily_7", name: "ПРИВЫЧКА", desc: "7 дней ежедневной серии", reward: 120, check: () => dailyState.streak >= 7, progress: () => [Math.min(dailyState.streak, 7), 7] },
+    { id: "frames_10", name: "КОЛЛЕКЦИОНЕР", desc: "Открой 10 рамок", reward: 80, check: () => ownedFrames.filter((id) => id !== 0).length >= 10, progress: () => [Math.min(ownedFrames.filter((id) => id !== 0).length, 10), 10] },
+    { id: "characters_10", name: "ДРУЖНАЯ КОМАНДА", desc: "Открой 10 персонажей", reward: 100, check: () => unlockedAvatars.length >= 10, progress: () => [Math.min(unlockedAvatars.length, 10), 10] },
+    { id: "play_1h", name: "СТАРЫЙ МОРЯКА", desc: "Проведи в игре час", reward: 150, check: () => stats.playMs >= 3600000, progress: () => [Math.min(stats.playMs, 3600000), 3600000] },
+    { id: "runs_25", name: "НЕ СДАВАЙСЯ", desc: "Заверши 25 забегов", reward: 90, check: () => stats.runs >= 25, progress: () => [Math.min(stats.runs, 25), 25] }
+  ];
+  function checkAchievements(announce) {
+    let gained = 0;
+    let count = 0;
+    let lastName = "";
+    for (const achievement of ACHIEVEMENT_DEFS) {
+      if (achievementsClaimed.includes(achievement.id)) continue;
+      let unlocked = false;
+      try { unlocked = achievement.check(); } catch {}
+      if (!unlocked) continue;
+      achievementsClaimed.push(achievement.id);
+      bankCoins += achievement.reward;
+      gained += achievement.reward;
+      count++;
+      lastName = achievement.name;
+    }
+    if (!count) return 0;
+    saveProgress();
+    if (announce !== false) {
+      const text = count === 1 ? lastName : "ДОСТИЖЕНИЙ: " + count;
+      if (currentState === STATE.MENU) setMenuMessage("ДОСТИЖЕНИЕ", text + " · +" + gained + " МОНЕТ");
+      else hudPop(WORLD_W / 2, 210, "ДОСТИЖЕНИЕ +" + gained, "#c28000");
+    }
+    return gained;
+  }
+
   var DAILY_DEFS = [
     { id: "coins", short: "МОНЕТЫ", label: "СОБЕРИ 30 МОНЕТ", target: 30, reward: 50 },
-    { id: "height", short: "ВЫСОТА", label: "ПОДНИМИСЬ НА 20000", target: 20000, reward: 50 }
+    { id: "height", short: "ВЫСОТА", label: "ПОДНИМИСЬ НА 20000", target: 20000, reward: 50 },
+    { id: "boss", short: "БОСС", label: "ПОБЕДИ БОССА", target: 1, reward: 65 },
+    { id: "platforms", short: "ПЛАТФОРМЫ", label: "ПРИЗЕМЛИСЬ НА 120 ПЛАТФОРМ", target: 120, reward: 50 },
+    { id: "runs", short: "ЗАБЕГИ", label: "ЗАВЕРШИ 2 ЗАБЕГА", target: 2, reward: 40 },
+    { id: "events", short: "СОБЫТИЕ", label: "ПОПАДИ В СОБЫТИЕ", target: 1, reward: 55 }
   ];
   function localDateKey(date) {
     const d = date || new Date();
@@ -7313,6 +7477,7 @@ html, body, body * {
     dailyState.streak = dailyState.lastDone === yesterdayDateKey() ? dailyState.streak + 1 : 1;
     dailyState.lastDone = today;
     bankCoins += def.reward;
+    checkAchievements();
     saveProgress();
     hudState.coinPulse = 1;
     hudPop(player.x + 15, player.y - 26, "ЕЖЕДНЕВНОЕ ВЫПОЛНЕНО", "#0f8a76");
@@ -7350,7 +7515,9 @@ html, body, body * {
       morjakaDailyProgress: String(dailyState.progress),
       morjakaDailyDone: dailyState.done ? "1" : "0",
       morjakaDailyStreak: String(dailyState.streak),
-      morjakaDailyLastDone: dailyState.lastDone
+      morjakaDailyLastDone: dailyState.lastDone,
+      morjakaStats: JSON.stringify(stats),
+      morjakaAchievements: JSON.stringify(achievementsClaimed)
     };
     try {
       for (const key in next) {
@@ -7473,8 +7640,9 @@ html, body, body * {
     wind.force += (target - wind.force) * Math.min(1, accel * dt);
   }
   function applyWind(dt) {
-    if (!wind.active || !wind.force) return;
-    player.x += wind.force * windStrength() * dt;
+    const blizzard = eventActive("blizzard") ? Math.sin(performance.now() / 900) * 2.6 : 0;
+    if (!wind.active && !blizzard) return;
+    player.x += ((wind.active ? wind.force * windStrength() : 0) + blizzard) * dt;
   }
   var COINS_PER_LIFE = 25;
   var COIN_MAGNET_RADIUS = 38;
@@ -7596,6 +7764,7 @@ html, body, body * {
       const livesBefore = Math.floor(runCoins / perLife);
       runCoins += perk.coinsNow;
       bankCoins += perk.coinsNow;
+      stats.coins += perk.coinsNow;
       const livesGained = Math.floor(runCoins / perLife) - livesBefore;
       if (livesGained > 0) {
         lives += livesGained;
@@ -7844,11 +8013,13 @@ html, body, body * {
     avalanche: "\u041B\u0410\u0412\u0418\u041D\u0410",
     platformTimer: "\u041D\u0415 \u0421\u0422\u041E\u0419 \u041D\u0410 \u041C\u0415\u0421\u0422\u0415",
     walls: "\u0421\u0422\u0415\u041D\u042B",
-    spikes: "\u0428\u0418\u041F\u042B"
+    spikes: "\u0428\u0418\u041F\u042B",
+    blizzard: "\u041C\u0415\u0422\u0415\u041B\u042C",
+    iceholes: "\u041F\u041E\u041B\u042B\u041D\u042C\u0418"
   };
   var PLATFORM_TIMER_ENABLED = false;
   var EVENT_FIRST_SCORE = 15e3;
-  var EVENT_POOL = ["darkness", "slide", "avalanche", "walls", "spikes"];
+  var EVENT_POOL = ["darkness", "slide", "avalanche", "walls", "spikes", "blizzard", "iceholes"];
   var spikyPlatforms = /* @__PURE__ */ new WeakMap();
   var SPIKY_CHANCE = 0.15;
   var SPIKY_MAX_PER_EVENT = 3;
@@ -7874,14 +8045,18 @@ html, body, body * {
     slide: { title: "\u0421\u041A\u041E\u041B\u042C\u0417\u041A\u0418\u0419 \u041F\u041E\u041B", text: "\u041F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u044B, \u043D\u0430 \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u0442\u044B \u043F\u0440\u0438\u0437\u0435\u043C\u043B\u0438\u043B\u0441\u044F, \u043D\u0430\u0447\u0438\u043D\u0430\u044E\u0442 \u0443\u0435\u0437\u0436\u0430\u0442\u044C \u0432\u0431\u043E\u043A." },
     avalanche: { title: "\u041B\u0410\u0412\u0418\u041D\u0410", text: "\u0421\u0432\u0435\u0440\u0445\u0443 \u043F\u0430\u0434\u0430\u044E\u0442 \u043A\u0430\u043C\u043D\u0438. \u041E\u043D\u0438 \u0442\u043E\u043B\u043A\u0430\u044E\u0442 \u0438\u0433\u0440\u043E\u043A\u0430, \u043D\u043E \u0436\u0438\u0437\u043D\u044C \u043D\u0435 \u043E\u0442\u043D\u0438\u043C\u0430\u044E\u0442." },
     walls: { title: "\u0421\u0422\u0415\u041D\u042B", text: "\u041F\u043E \u043A\u0440\u0430\u044F\u043C \u0432\u044B\u0440\u0430\u0441\u0442\u0430\u044E\u0442 \u043B\u0435\u0434\u044F\u043D\u044B\u0435 \u0441\u0442\u0435\u043D\u044B. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0431\u043B\u0438\u0436\u0435 \u043A \u0446\u0435\u043D\u0442\u0440\u0443." },
-    spikes: { title: "\u0428\u0418\u041F\u042B", text: "\u0427\u0430\u0441\u0442\u044C \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C \u043F\u043E\u043A\u0440\u044B\u0442\u0430 \u0448\u0438\u043F\u0430\u043C\u0438. \u041A\u0430\u0441\u0430\u043D\u0438\u0435 \u0448\u0438\u043F\u0430 \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043A\u0430\u043A \u043F\u0430\u0434\u0435\u043D\u0438\u0435." }
+    spikes: { title: "\u0428\u0418\u041F\u042B", text: "\u0427\u0430\u0441\u0442\u044C \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C \u043F\u043E\u043A\u0440\u044B\u0442\u0430 \u0448\u0438\u043F\u0430\u043C\u0438. \u041A\u0430\u0441\u0430\u043D\u0438\u0435 \u0448\u0438\u043F\u0430 \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043A\u0430\u043A \u043F\u0430\u0434\u0435\u043D\u0438\u0435." },
+    blizzard: { title: "\u041C\u0415\u0422\u0415\u041B\u042C", text: "\u0421\u043D\u0435\u0433 \u0437\u0430\u0441\u0442\u0438\u043B\u0430\u0435\u0442 \u044D\u043A\u0440\u0430\u043D, \u0430 \u0432\u0435\u0442\u0435\u0440 \u0441\u0431\u0438\u0432\u0430\u0435\u0442 \u0441 \u043A\u0443\u0440\u0441\u0430. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0446\u0435\u043D\u0442\u0440\u0430." },
+    iceholes: { title: "\u041F\u041E\u041B\u042B\u041D\u042C\u0418", text: "\u0412\u043E \u043B\u044C\u0434\u0443 \u043F\u043E\u044F\u0432\u043B\u044F\u044E\u0442\u0441\u044F \u043F\u043E\u043B\u044B\u043D\u044C\u0438. \u0421\u0442\u0443\u043F\u0438\u0448\u044C \u0432 \u0442\u0451\u043C\u043D\u0443\u044E \u0432\u043E\u0434\u0443 \u2014 \u0443\u043F\u0430\u0434\u0451\u0448\u044C." }
   };
   var EVENT_ACCENTS = {
     darkness: "#3f6fa8",
     slide: "#2f9dbd",
     avalanche: "#6b8fa8",
     walls: "#4b8fd1",
-    spikes: "#e0575f"
+    spikes: "#e0575f",
+    blizzard: "#8fc9e8",
+    iceholes: "#2f6f9d"
   };
   var EVENT_DURATION_MS = 1e4;
   var EVENT_DURATION_GROWTH_MS = 5e3;
@@ -7906,6 +8081,8 @@ html, body, body * {
   var EVENT_BOUNCE_LIMIT = 4;
   var activeEvents = [];
   var nextEventScore = EVENT_FIRST_SCORE;
+  var iceHolesActive = false;
+  var holeBudget = 0;
   var introKind = "";
   var lastLandedPlatform = null;
   var frameSinceLanding = 0;
@@ -7918,6 +8095,9 @@ html, body, body * {
     nextEventScore = EVENT_FIRST_SCORE;
     introKind = "";
     spikyBudget = 0;
+    iceHolesActive = false;
+    holeBudget = 0;
+    for (const p of platforms) p.hole = false;
     lastLandedPlatform = null;
     frameSinceLanding = 0;
   }
@@ -7949,6 +8129,21 @@ html, body, body * {
     return Math.min(max, (w.total - w.left) / WALLS_GROW_MS * max);
   }
   function updateEventWorld(dt) {
+    if (eventActive("iceholes")) {
+      if (holeBudget > 0) {
+        for (const p of platforms) {
+          if (holeBudget <= 0) break;
+          if (p.hole || p.type === "moving" || p.type === "vanish" || p.y > 560) continue;
+          if (Math.random() < 0.015) {
+            p.hole = true;
+            holeBudget--;
+          }
+        }
+      }
+    } else if (iceHolesActive) {
+      iceHolesActive = false;
+      for (const p of platforms) p.hole = false;
+    }
     if (eventActive("slide")) {
       const power = eventPowerOf("slide");
       for (const [p, dir] of slidingPlatforms) {
@@ -8022,9 +8217,15 @@ html, body, body * {
       spikeSerial++;
       spikyBudget = SPIKY_MAX_PER_EVENT;
     }
+    if (kind === "iceholes") {
+      iceHolesActive = true;
+      holeBudget = 3;
+      for (const p of platforms) p.hole = false;
+    }
     introKind = kind;
     eventIntroMs = 0;
     eventCountdownMs = EVENT_COUNTDOWN_MS;
+    dailyAdd("events", 1);
   }
   function updateRandomEvent() {
     const landed = lastLandedPlatform;
@@ -8082,7 +8283,8 @@ html, body, body * {
     return 1;
   }
   function registerComboLanding() {
-    // Нет-оп: серия больше не считается.
+    stats.platforms++;
+    dailyAdd("platforms", 1);
   }
   var keys = {};
   function resetGame() {
@@ -8107,6 +8309,7 @@ html, body, body * {
     stillRefY = 0;
     dryRowsLeft = 0;
     runCoins = 0;
+    stats.runCounted = false;
     resetPerks();
     resetWind();
     resetQuests();
@@ -9125,6 +9328,7 @@ html, body, body * {
   // Иконки в главном меню: настройки и глобальный рейтинг.
   var MENU_GEAR = { x: 30, y: 88, w: 26, h: 26 };
   var MENU_LB = { x: 64, y: 88, w: 26, h: 26 };
+  var MENU_PROFILE = { x: 98, y: 88, w: 26, h: 26 };
   var menuCursors = {
     avatars: selectedAvatar,
     shop: Math.max(0, FRAMES.findIndex((f) => f.id === selectedFrame)),
@@ -9404,6 +9608,23 @@ html, body, body * {
     ctx.stroke();
     ctx.restore();
   }
+  function drawMenuProfile() {
+    const g = MENU_PROFILE;
+    ctx.save();
+    drawMenuIconChip(g);
+    const cx = g.x + g.w / 2;
+    const cy = g.y + g.h / 2;
+    ctx.strokeStyle = "#0f3d5c";
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.arc(cx, cy - 3.4, 3.2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy + 6.4, 6.2, Math.PI * 1.12, Math.PI * 1.88);
+    ctx.stroke();
+    ctx.restore();
+  }
   function drawMenuTrophy() {
     const g = MENU_LB;
     ctx.save();
@@ -9527,6 +9748,8 @@ html, body, body * {
     bossTrainOpen = false;
     trainingState.active = true;
     trainingState.index = index;
+    stats.trainTries[index] = (stats.trainTries[index] || 0) + 1;
+    saveStats();
     duelCancel();
     currentState = STATE.PLAYING;
     bossState.phase = "fight";
@@ -9986,6 +10209,7 @@ html, body, body * {
     }
     drawMenuGear();
     drawMenuTrophy();
+    drawMenuProfile();
     drawMenuToast();
     if (bossTrainOpen) drawBossTrain();
   }
@@ -10646,6 +10870,21 @@ html, body, body * {
     const skin = PLATFORM_SKIN_BY_ID[equippedPlatformSkinId(p.type)];
     if (!skin || skin.tier === "base") drawPlatformBase(p);
     else drawThemedPlatform(p, skin);
+    if (p.hole) drawIceHole(p);
+  }
+  function drawIceHole(p) {
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
+    const rx = Math.max(8, Math.min(22, p.w * 0.22));
+    ctx.save();
+    ctx.fillStyle = "rgba(8,42,70,.88)";
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, rx, p.h * 0.72 + 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(160,235,255,.85)";
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+    ctx.restore();
   }
   function darkenSkinHex(hex, k) {
     const n = parseInt(hex.slice(1), 16);
@@ -11218,6 +11457,7 @@ html, body, body * {
       if (!unlockedAvatars.includes(selectedAvatar)) selectedAvatar = 0;
       saveProgress();
     }
+    finishRunStats();
     return true;
   }
   function updateCoins(dt) {
@@ -11248,6 +11488,7 @@ html, body, body * {
         const livesBefore = Math.floor(runCoins / perLife);
         runCoins += gained;
         bankCoins += gained;
+        stats.coins += gained;
         dailyAdd("coins", gained);
         const livesAfter = Math.floor(runCoins / perLife);
         const livesGained = Math.max(0, livesAfter - livesBefore);
@@ -11441,6 +11682,8 @@ html, body, body * {
     bossState.charging = 0;
     bossState.phase = "warn";
     bossState.timer = BOSS_WARN_MS;
+    stats.bossTries[index] = (stats.bossTries[index] || 0) + 1;
+    saveStats();
     startScreenShake(2.5, 14);
     hudPop(WORLD_W / 2, 230, "\u041C\u0415\u0413\u0410-\u0411\u041E\u0421\u0421!", "#ff4d6d");
   }
@@ -11456,6 +11699,9 @@ html, body, body * {
     bossState.rewardPerk = true;
     perkState.lastOfferScore = Math.max(perkState.lastOfferScore, Math.floor(player.score / PERK_SCORE_STEP) * PERK_SCORE_STEP);
     bankCoins += bossState.reward;
+    stats.bossWins[bossState.index] = (stats.bossWins[bossState.index] || 0) + 1;
+    dailyAdd("boss", 1);
+    checkAchievements();
     saveProgress();
     startScreenShake(3, 18);
     hudPop(WORLD_W / 2, 230, "\u041F\u041E\u0411\u0415\u0414\u0410! +" + bossState.reward, HUD_COLORS.green);
@@ -11469,6 +11715,11 @@ html, body, body * {
       currentState = STATE.MENU;
       bossTrainOpen = true;
       lastFrameTime = 0;
+      if (won) {
+        stats.trainWins[trainingState.index] = (stats.trainWins[trainingState.index] || 0) + 1;
+        checkAchievements();
+        saveStats();
+      }
       setMenuMessage("ТРЕНИРОВКА", won ? "БОСС ПОВЕРЖЕН" : "ПОРАЖЕНИЕ");
       return;
     }
@@ -11488,6 +11739,18 @@ html, body, body * {
     hudPop(WORLD_W / 2, 230, "\u041F\u041E\u0420\u0410\u0416\u0415\u041D\u0418\u0415", "#ff4d6d");
     endRun();
   }
+  function finishRunStats() {
+    if (stats.runCounted) return;
+    stats.runCounted = true;
+    stats.runs++;
+    stats.playMs += Math.max(0, performance.now() - runStartedAt);
+    const key = String(selectedAvatar);
+    stats.characterRuns[key] = (stats.characterRuns[key] || 0) + 1;
+    runStartedAt = 0;
+    dailyAdd("runs", 1);
+    saveStats();
+    checkAchievements();
+  }
   function endRun() {
     // \u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u0435 \u0437\u0430\u0431\u0435\u0433\u0430 \u043F\u043E\u0441\u043B\u0435 \u043F\u043E\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u0432 \u0434\u0443\u044D\u043B\u0438: \u0442\u043E\u0442 \u0436\u0435 \u0444\u0438\u043D\u0430\u043B, \u0447\u0442\u043E \u0438 \u043F\u0440\u0438 \u043F\u0430\u0434\u0435\u043D\u0438\u0438.
     currentState = STATE.GAMEOVER;
@@ -11502,6 +11765,7 @@ html, body, body * {
       if (!unlockedAvatars.includes(selectedAvatar)) selectedAvatar = 0;
       saveProgress();
     }
+    finishRunStats();
   }
   function updateBoss() {
     const b = bossState;
@@ -11846,6 +12110,13 @@ html, body, body * {
         player.dy = 0;
         break;
       }
+      if (platform.hole && player.dy > 0 && player.x + 25 > platform.x && player.x + 10 < platform.x + platform.w && player.y + 35 > platform.y && player.y + 35 < platform.y + platform.h + player.dy) {
+        hudPop(player.x + 15, 430, "ПОЛЫНЬЯ", "#2f6f9d");
+        sfx.fall();
+        player.y = WORLD_H + 1;
+        player.dy = 0;
+        break;
+      }
       if (player.dy > 0 && !platform.breaking && player.x + 25 > platform.x && player.x + 10 < platform.x + platform.w && player.y + 35 > platform.y && player.y + 35 < platform.y + platform.h + player.dy) {
         player.y = platform.y - 35;
         player.dy = -12.98 * perkBounceScale();
@@ -12006,6 +12277,7 @@ html, body, body * {
         if (!unlockedAvatars.includes(selectedAvatar)) selectedAvatar = 0;
         saveProgress();
       }
+      finishRunStats();
     }
   }
   var UI = {
@@ -13550,6 +13822,11 @@ html, body, body * {
       }
       if (point.x >= MENU_LB.x && point.x <= MENU_LB.x + MENU_LB.w && point.y >= MENU_LB.y && point.y <= MENU_LB.y + MENU_LB.h) {
         lbOpen("global");
+        event.preventDefault();
+        return;
+      }
+      if (point.x >= MENU_PROFILE.x && point.x <= MENU_PROFILE.x + MENU_PROFILE.w && point.y >= MENU_PROFILE.y && point.y <= MENU_PROFILE.y + MENU_PROFILE.h) {
+        openProfile();
         event.preventDefault();
         return;
       }
@@ -15546,7 +15823,9 @@ html, body, body * {
     "morjakaDailyProgress",
     "morjakaDailyDone",
     "morjakaDailyStreak",
-    "morjakaDailyLastDone"
+    "morjakaDailyLastDone",
+    "morjakaStats",
+    "morjakaAchievements"
   ];
   var SAVE_KEYS = PROGRESS_KEYS.concat(["morjakaNick", "morjakaSound", "morjakaKeySens", "morjakaMouseSens"]);
   var saveOverlay = document.getElementById("saveOverlay");
@@ -15724,6 +16003,8 @@ html, body, body * {
     menuState.scroll = 0;
     menuState.tab = "avatars";
     dailyState = { date: "", id: "", progress: 0, done: false, streak: 0, lastDone: "" };
+    stats = defaultStats();
+    achievementsClaimed = [];
     initDaily(true);
     perkState.lastOfferScore = 0;
     resetPerks();
@@ -16019,6 +16300,7 @@ html, body, body * {
     } else {
       drawBackground();
       drawSnow(dt);
+      if (eventActive("blizzard")) drawBlizzard();
       drawWindStreaks();
       ctx.save();
       if (currentState !== STATE.PAUSE) ctx.translate(screenShake.x, screenShake.y);
@@ -16397,6 +16679,119 @@ html, body, body * {
     lbRenderSide();
     lbRefreshGlobal(true);
   }
+  function profileFavoriteCharacter() {
+    let best = -1;
+    let bestCount = 0;
+    for (const key in stats.characterRuns) {
+      const count = stats.characterRuns[key] || 0;
+      if (count > bestCount) { bestCount = count; best = Number(key); }
+    }
+    return best >= 0 && best < avatarImages.length ? avatarName(best) : "—";
+  }
+  function profileBossWinsTotal() {
+    return stats.bossWins.reduce((sum, n) => sum + (n || 0), 0);
+  }
+  function renderProfile() {
+    const statsEl = document.getElementById("profileStats");
+    const bossesEl = document.getElementById("profileBosses");
+    const achEl = document.getElementById("profileAch");
+    const countEl = document.getElementById("profileAchCount");
+    if (!statsEl || !bossesEl || !achEl) return;
+    const rows = [
+      ["ЛУЧШИЙ СЧЁТ", fmt(highScore)],
+      ["СОБРАНО МОНЕТ", fmt(stats.coins)],
+      ["БАЛАНС", fmt(bankCoins)],
+      ["ПЛАТФОРМ", fmt(stats.platforms)],
+      ["ЗАБЕГОВ", fmt(stats.runs)],
+      ["ВРЕМЯ В ИГРЕ", formatPlayTime(stats.playMs)],
+      ["БОССОВ", profileBossWinsTotal() + " / " + DUEL_BOSS_DEFS.length],
+      ["ЛЮБИМЫЙ", profileFavoriteCharacter()]
+    ];
+    statsEl.innerHTML = "";
+    for (const [label, value] of rows) {
+      const cell = document.createElement("div");
+      cell.className = "profileStat";
+      const b = document.createElement("b");
+      b.textContent = value;
+      const span = document.createElement("span");
+      span.textContent = label;
+      cell.appendChild(b);
+      cell.appendChild(span);
+      statsEl.appendChild(cell);
+    }
+    bossesEl.innerHTML = "";
+    DUEL_BOSS_DEFS.forEach((boss, index) => {
+      const row = document.createElement("div");
+      row.className = "profileBossRow";
+      const name = document.createElement("span");
+      name.textContent = boss.name;
+      const value = document.createElement("span");
+      const wins = stats.bossWins[index] || 0;
+      const tries = stats.bossTries[index] || 0;
+      const trainWins = stats.trainWins[index] || 0;
+      const trainTries = stats.trainTries[index] || 0;
+      value.textContent = wins + " / " + tries + (trainTries ? " · трен. " + trainWins + "/" + trainTries : "");
+      row.appendChild(name);
+      row.appendChild(value);
+      bossesEl.appendChild(row);
+    });
+    achEl.innerHTML = "";
+    ACHIEVEMENT_DEFS.forEach((achievement) => {
+      const claimed = achievementsClaimed.includes(achievement.id);
+      const row = document.createElement("div");
+      row.className = "profileAchRow" + (claimed ? " done" : "");
+      const left = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "paName";
+      name.textContent = (claimed ? "✓ " : "") + achievement.name;
+      const desc = document.createElement("div");
+      desc.className = "paDesc";
+      if (claimed) desc.textContent = achievement.desc;
+      else {
+        const progress = achievementProgress(achievement);
+        const current = Math.min(Number(progress[0]) || 0, Number(progress[1]) || 1);
+        const total = Number(progress[1]) || 1;
+        desc.textContent = achievement.desc + " · " + (achievement.id === "play_1h" ? formatPlayTime(current) + " / " + formatPlayTime(total) : fmt(current) + " / " + fmt(total));
+      }
+      left.appendChild(name);
+      left.appendChild(desc);
+      const reward = document.createElement("div");
+      reward.className = "profileAchReward";
+      reward.textContent = claimed ? "ПОЛУЧЕНО" : "+" + achievement.reward;
+      row.appendChild(left);
+      row.appendChild(reward);
+      achEl.appendChild(row);
+    });
+    if (countEl) countEl.textContent = "(" + achievementsClaimed.length + " / " + ACHIEVEMENT_DEFS.length + ")";
+  }
+  function achievementProgress(achievement) {
+    try {
+      const result = achievement.progress();
+      return Array.isArray(result) ? result : [0, 1];
+    } catch {
+      return [0, 1];
+    }
+  }
+  function openProfile() {
+    checkAchievements(false);
+    renderProfile();
+    const ov = document.getElementById("profileOverlay");
+    if (!ov) return;
+    ov.classList.add("open");
+    ov.setAttribute("aria-hidden", "false");
+    sfx.click();
+  }
+  function closeProfile() {
+    const ov = document.getElementById("profileOverlay");
+    if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
+    sfx.click();
+  }
+  function setupProfile() {
+    const close = document.getElementById("profileClose");
+    if (close) close.addEventListener("click", closeProfile);
+    const ov = document.getElementById("profileOverlay");
+    if (ov) ov.addEventListener("pointerdown", (event) => { if (event.target === ov) closeProfile(); });
+  }
   function setupLeaderboard() {
     const trophy = document.getElementById("lbButton"); if (trophy) trophy.addEventListener("click", () => lbOpen("global"));
     const local = document.getElementById("lbTabLocal"); if (local) local.addEventListener("click", () => { lbState.tab = "local"; lbState.globalNote = ""; lbSyncTabs(); lbRender(); });
@@ -16446,8 +16841,10 @@ html, body, body * {
   setupSettings();
   setupSoundSettings();
   setupLeaderboard();
+  setupProfile();
   setupSidePanels();
   setupTutorial();
+  checkAchievements(false);
   loadVibration();
   loadVolume();
   setTimeout(maybeShowTutorial, 500);
