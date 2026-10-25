@@ -15989,7 +15989,7 @@ html, body, body * {
   // Альтернатива — свой воркер: provider:"worker", endpoint (см. leaderboard-worker.js).
   var LB_CONFIG = {
     provider: "firebase",
-    url: "",       // URL базы Realtime Database (см. LEADERBOARD.md)
+    url: "https://moryaka-jump-default-rtdb.asia-southeast1.firebasedatabase.app", // URL базы Realtime Database
     endpoint: "",  // для provider:"worker"
     game: "moryaka-jump"
   };
@@ -16022,6 +16022,7 @@ html, body, body * {
     try {
       let res = await fetch(base + "?orderBy=" + encodeURIComponent('"score"') + "&limitToLast=" + LB_LIMIT, { cache: "no-store" });
       if (!res.ok) res = await fetch(base, { cache: "no-store" });
+      if (res.status === 401 || res.status === 403) throw new Error("нет доступа — опубликуйте правила из firebase-rules.json");
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       const list = data && typeof data === "object"
