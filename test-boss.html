@@ -6191,10 +6191,10 @@ html, body, body * {
   // Номера рамок идут по редкости: базовые → обычные → редкие → эпические → легендарные → божественные.
   FRAMES.sort((a, b) => a.price - b.price || a.id - b.id);
   var QUEST_DEFS = [
-    { id: "coins", label: "\u0421\u041E\u0411\u0415\u0420\u0418 24 \u041C\u041E\u041D\u0415\u0422\u042B", target: 24, reward: 26 },
-    { id: "height", label: "\u041F\u041E\u0414\u041D\u0418\u041C\u0418\u0421\u042C \u041D\u0410 30000", target: 3e4, reward: 45 },
-    { id: "noSpring", label: "12000 \u0411\u0415\u0417 \u041F\u0420\u0423\u0416\u0418\u041D", target: 12e3, reward: 65 },
-    { id: "noBird", label: "8000 \u0411\u0415\u0417 \u0421\u0422\u041E\u041B\u041A\u041D\u041E\u0412\u0415\u041D\u0418\u0419", target: 8e3, reward: 65 }
+    { id: "coins", label: "\u0421\u041E\u0411\u0415\u0420\u0418 24 \u041C\u041E\u041D\u0415\u0422\u042B", target: 24, reward: 13 },
+    { id: "height", label: "\u041F\u041E\u0414\u041D\u0418\u041C\u0418\u0421\u042C \u041D\u0410 30000", target: 3e4, reward: 22 },
+    { id: "noSpring", label: "12000 \u0411\u0415\u0417 \u041F\u0420\u0423\u0416\u0418\u041D", target: 12e3, reward: 30 },
+    { id: "noBird", label: "8000 \u0411\u0415\u0417 \u0421\u0422\u041E\u041B\u041A\u041D\u041E\u0412\u0415\u041D\u0418\u0419", target: 8e3, reward: 30 }
   ];
   var PERK_NEUTRAL = {
     gravity: 1,
@@ -7419,12 +7419,12 @@ html, body, body * {
   }
 
   var DAILY_DEFS = [
-    { id: "coins", short: "МОНЕТЫ", label: "СОБЕРИ 30 МОНЕТ", target: 30, reward: 50 },
-    { id: "height", short: "ВЫСОТА", label: "ПОДНИМИСЬ НА 20000", target: 20000, reward: 50 },
-    { id: "boss", short: "БОСС", label: "ПОБЕДИ БОССА", target: 1, reward: 65 },
-    { id: "platforms", short: "ПЛАТФОРМЫ", label: "ПРИЗЕМЛИСЬ НА 120 ПЛАТФОРМ", target: 120, reward: 50 },
-    { id: "runs", short: "ЗАБЕГИ", label: "ЗАВЕРШИ 2 ЗАБЕГА", target: 2, reward: 40 },
-    { id: "events", short: "СОБЫТИЕ", label: "ПОПАДИ В СОБЫТИЕ", target: 1, reward: 55 }
+    { id: "coins", short: "МОНЕТЫ", label: "СОБЕРИ 30 МОНЕТ", target: 30, reward: 25 },
+    { id: "height", short: "ВЫСОТА", label: "ПОДНИМИСЬ НА 20000", target: 20000, reward: 25 },
+    { id: "boss", short: "БОСС", label: "ПОБЕДИ БОССА", target: 1, reward: 30 },
+    { id: "platforms", short: "ПЛАТФОРМЫ", label: "ПРИЗЕМЛИСЬ НА 120 ПЛАТФОРМ", target: 120, reward: 25 },
+    { id: "runs", short: "ЗАБЕГИ", label: "ЗАВЕРШИ 2 ЗАБЕГА", target: 2, reward: 20 },
+    { id: "events", short: "СОБЫТИЕ", label: "ПОПАДИ В СОБЫТИЕ", target: 1, reward: 25 }
   ];
   function localDateKey(date) {
     const d = date || new Date();
