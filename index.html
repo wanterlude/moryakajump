@@ -149,12 +149,6 @@ html, body, body * {
             <path d="M10.4 10.6v6M13.6 10.6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".75"/>
         </svg>
     </button>
-    <button id="lbButton" type="button" aria-label="Рейтинг" title="Рейтинг">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
-            <path d="M7 4h10v3a5 5 0 0 1-10 0V4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M12 12v4M8 20h8M10 20l1-4h2l1 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
 </div>
 <div id="resetOverlay" role="dialog" aria-modal="true" aria-labelledby="resetTitle" aria-hidden="true">
     <div id="resetCard">
@@ -224,8 +218,8 @@ html, body, body * {
     <div class="sheetCard">
         <h2 id="lbTitle">Рейтинг</h2>
         <div class="lbTabs">
-            <button id="lbTabLocal" type="button" class="cur">ЛОКАЛЬНО</button>
-            <button id="lbTabGlobal" type="button">ГЛОБАЛЬНО</button>
+            <button id="lbTabGlobal" type="button" class="cur">ГЛОБАЛЬНО</button>
+            <button id="lbTabLocal" type="button">ЛОКАЛЬНО</button>
         </div>
         <ul id="lbList" class="lbList"></ul>
         <div id="lbNote" class="lbNote"></div>
@@ -9061,8 +9055,9 @@ html, body, body * {
     barY: 494,
     barH: 52
   };
-  // Шестерёнка настроек в главном меню.
+  // Иконки в главном меню: настройки и глобальный рейтинг.
   var MENU_GEAR = { x: 30, y: 88, w: 26, h: 26 };
+  var MENU_LB = { x: 64, y: 88, w: 26, h: 26 };
   var menuCursors = {
     avatars: selectedAvatar,
     shop: Math.max(0, FRAMES.findIndex((f) => f.id === selectedFrame)),
@@ -9297,31 +9292,81 @@ html, body, body * {
     trackedText(label, chipX + chipW - 10, MENU.titleY + 0.5, 0.4, "right");
     ctx.restore();
   }
+  function drawMenuIconChip(g) {
+    roundedRect(g.x, g.y, g.w, g.h, 13);
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(15,61,92,.2)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
   function drawMenuGear() {
     const g = MENU_GEAR;
     ctx.save();
-    roundedRect(g.x, g.y, g.w, g.h, 13);
-    ctx.fillStyle = "rgba(255,255,255,.86)";
-    ctx.fill();
-    ctx.strokeStyle = "rgba(15,61,92,.18)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    drawMenuIconChip(g);
     const cx = g.x + g.w / 2;
     const cy = g.y + g.h / 2;
-    const r = 8;
+    const teeth = 8;
+    const step = Math.PI * 2 / teeth;
+    const rOut = 9;
+    const rIn = 6.4;
     ctx.strokeStyle = "#0f3d5c";
-    ctx.lineWidth = 1.3;
+    ctx.lineWidth = 1.6;
+    ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.arc(cx, cy, r * 0.42, 0, Math.PI * 2);
-    ctx.stroke();
-    for (let i = 0; i < 8; i++) {
-      const a = i * Math.PI / 4;
-      ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(a) * r * 0.62, cy + Math.sin(a) * r * 0.62);
-      ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
-      ctx.stroke();
+    for (let i = 0; i < teeth; i++) {
+      const a = i * step;
+      const pts = [
+        [rIn, a - 0.27],
+        [rOut, a - 0.16],
+        [rOut, a + 0.16],
+        [rIn, a + 0.27]
+      ];
+      for (let j = 0; j < pts.length; j++) {
+        const x = cx + Math.cos(pts[j][1]) * pts[j][0];
+        const y = cy + Math.sin(pts[j][1]) * pts[j][0];
+        if (i === 0 && j === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
     }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 2.9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawMenuTrophy() {
+    const g = MENU_LB;
+    ctx.save();
+    drawMenuIconChip(g);
+    const cx = g.x + g.w / 2;
+    const cy = g.y + g.h / 2;
+    ctx.strokeStyle = "#0f3d5c";
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - 4.6, cy - 6.2);
+    ctx.lineTo(cx + 4.6, cy - 6.2);
+    ctx.quadraticCurveTo(cx + 4.2, cy - 0.4, cx, cy + 1.4);
+    ctx.quadraticCurveTo(cx - 4.2, cy - 0.4, cx - 4.6, cy - 6.2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - 4.6, cy - 5.2);
+    ctx.bezierCurveTo(cx - 8.2, cy - 5.6, cx - 8.2, cy - 1.2, cx - 4.4, cy - 1.6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx + 4.6, cy - 5.2);
+    ctx.bezierCurveTo(cx + 8.2, cy - 5.6, cx + 8.2, cy - 1.2, cx + 4.4, cy - 1.6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy + 1.4);
+    ctx.lineTo(cx, cy + 5.2);
+    ctx.moveTo(cx - 3.6, cy + 5.9);
+    ctx.lineTo(cx + 3.6, cy + 5.9);
+    ctx.stroke();
     ctx.restore();
   }
   function menuActionButtons() {
@@ -9873,6 +9918,7 @@ html, body, body * {
       ctx.restore();
     }
     drawMenuGear();
+    drawMenuTrophy();
     drawMenuToast();
     if (bossTrainOpen) drawBossTrain();
   }
@@ -13435,6 +13481,11 @@ html, body, body * {
         event.preventDefault();
         return;
       }
+      if (point.x >= MENU_LB.x && point.x <= MENU_LB.x + MENU_LB.w && point.y >= MENU_LB.y && point.y <= MENU_LB.y + MENU_LB.h) {
+        lbOpen("global");
+        event.preventDefault();
+        return;
+      }
       if (point.y >= MENU.tabsY && point.y <= MENU.tabsY + MENU.tabsH && point.x >= MENU.padX && point.x <= WORLD_W - MENU.padX) {
         menuState.swipeMode = "click";
         menuState.swiping = false;
@@ -16025,7 +16076,7 @@ html, body, body * {
     }
     return { scores: [], note: "Глобальный рейтинг не подключён. Настройте Supabase в LB_CONFIG (см. LEADERBOARD.md) или свой воркер." };
   }
-  var lbState = { tab: "local", global: null, globalNote: "", loading: false };
+  var lbState = { tab: "global", global: null, globalNote: "", loading: false };
   function lbRender() {
     const list = document.getElementById("lbList");
     const note = document.getElementById("lbNote");
@@ -16054,7 +16105,7 @@ html, body, body * {
     document.getElementById("lbTabGlobal").classList.toggle("cur", lbState.tab === "global");
   }
   function lbOpen(tab) {
-    lbState.tab = tab || "local";
+    lbState.tab = tab || "global";
     const ov = document.getElementById("leaderboardOverlay");
     if (!ov) return;
     ov.classList.add("open"); ov.setAttribute("aria-hidden", "false");
@@ -16163,7 +16214,7 @@ html, body, body * {
     if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; });
   }
   function setupLeaderboard() {
-    const trophy = document.getElementById("lbButton"); if (trophy) trophy.addEventListener("click", () => lbOpen("local"));
+    const trophy = document.getElementById("lbButton"); if (trophy) trophy.addEventListener("click", () => lbOpen("global"));
     const local = document.getElementById("lbTabLocal"); if (local) local.addEventListener("click", () => { lbState.tab = "local"; lbState.globalNote = ""; lbSyncTabs(); lbRender(); });
     const globalTab = document.getElementById("lbTabGlobal"); if (globalTab) globalTab.addEventListener("click", () => { lbState.tab = "global"; lbSyncTabs(); lbRender(); lbRefreshGlobal(); });
     const refresh = document.getElementById("lbRefresh"); if (refresh) refresh.addEventListener("click", () => { if (lbState.tab === "global") lbRefreshGlobal(); else lbRender(); });
