@@ -9,7 +9,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 ![Canvas 2D](https://img.shields.io/badge/Canvas%202D-4FC3F7?style=for-the-badge&logo=html5&logoColor=000)
-![Version](https://img.shields.io/badge/version-v0.6.1-38bdf8?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v0.6.2-38bdf8?style=for-the-badge)
 
 </div>
 
@@ -23,8 +23,8 @@
 - 👾 **5 боссов × 3 фазы × 10 атак** — все атаки показывают телеграф заранее, у каждого босса своя арена.
 - 🎁 **Награда за босса** — выбор одного из трёх редких усилений.
 - 🥊 **Тренировка боссов** — любой босс из меню, без наград и записи в рекорд.
-- 🪙 **Серии приземлений** — каждые 10 платформ повышают множитель монет, максимум **×3**.
 - 📅 **Ежедневные задания** — награда за выполнение и серия дней подряд.
+- 🏆 **Глобальный рейтинг** — топ-5 игроков через Supabase, отправка результата автоматическая.
 - 🧍 **26 именованных персонажей**, рамки и **70 скинов платформ**.
 - 💾 **Резервная копия** — экспорт и импорт прогресса кодом.
 

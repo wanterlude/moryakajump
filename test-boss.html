@@ -15933,8 +15933,16 @@ html, body, body * {
       if (localStorage.getItem("morjakaSchema") === null) localStorage.setItem("morjakaSchema", String(SCHEMA_VERSION));
     } catch {}
   }
-  // Глобальный рейтинг: укажите endpoint своего воркера (см. leaderboard-worker.js).
-  var LB_CONFIG = { endpoint: "", game: "moryaka-jump" };
+  // Глобальный рейтинг. Поддерживаются два режима:
+  // 1) Supabase (рекомендуется): provider:"supabase", url, anonKey.
+  // 2) Свой воркер: provider:"worker", endpoint (см. leaderboard-worker.js).
+  var LB_CONFIG = {
+    provider: "supabase",
+    url: "",       // https://<project>.supabase.co
+    anonKey: "",   // публичный anon key из Settings → API
+    endpoint: "",  // для provider:"worker"
+    game: "moryaka-jump"
+  };
   var LB_LIMIT = 5;
   function lbReadLocal() {
     try {
@@ -15952,29 +15960,70 @@ html, body, body * {
     list.sort((a, b) => b.s - a.s);
     lbWriteLocal(list);
   }
-  var lbSubmitTimer = 0;
+  function lbSupabaseReady() {
+    return LB_CONFIG.provider === "supabase" && !!LB_CONFIG.url && !!LB_CONFIG.anonKey;
+  }
+  function lbSupabaseHeaders() {
+    return {
+      "apikey": LB_CONFIG.anonKey,
+      "Authorization": "Bearer " + LB_CONFIG.anonKey,
+      "Content-Type": "application/json"
+    };
+  }
+  function lbSupabaseTable() {
+    return String(LB_CONFIG.url).replace(/\/+$/, "") + "/rest/v1/scores";
+  }
+  async function lbSupabaseFetch() {
+    if (!lbSupabaseReady()) return { scores: [], note: "Supabase не настроен: заполните LB_CONFIG.url и LB_CONFIG.anonKey (см. LEADERBOARD.md)." };
+    try {
+      const url = lbSupabaseTable()
+        + "?select=name,score&game=eq." + encodeURIComponent(LB_CONFIG.game)
+        + "&order=score.desc&limit=" + LB_LIMIT;
+      const res = await fetch(url, { headers: lbSupabaseHeaders(), cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      return { scores: Array.isArray(data) ? data : [], note: "" };
+    } catch (e) {
+      return { scores: [], note: "Ошибка загрузки Supabase (" + (e && e.message ? e.message : "сеть") + ")." };
+    }
+  }
+  async function lbSupabaseSubmit(name, score) {
+    if (!lbSupabaseReady()) return;
+    try {
+      await fetch(lbSupabaseTable(), {
+        method: "POST",
+        headers: Object.assign({ "Prefer": "return=minimal" }, lbSupabaseHeaders()),
+        body: JSON.stringify([{ game: LB_CONFIG.game, name, score }])
+      });
+    } catch {}
+  }
   function lbSubmitRun(score) {
     if (!(score > 0)) return;
     lbRecordLocal(score, playerNick);
-    if (!LB_CONFIG.endpoint) return;
+    const name = (playerNick || "Моряка").slice(0, 20);
+    if (lbSupabaseReady()) { lbSupabaseSubmit(name, Math.floor(score)); return; }
+    if (LB_CONFIG.provider !== "worker" || !LB_CONFIG.endpoint) return;
     try {
       fetch(LB_CONFIG.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ game: LB_CONFIG.game, name: (playerNick || "Моряка").slice(0, 20), score: Math.floor(score) })
+        body: JSON.stringify({ game: LB_CONFIG.game, name, score: Math.floor(score) })
       }).catch(() => {});
     } catch {}
   }
   async function lbFetchGlobal() {
-    if (!LB_CONFIG.endpoint) return { scores: [], note: "Глобальный рейтинг не подключён. Укажите LB_CONFIG.endpoint (см. leaderboard-worker.js)." };
-    try {
-      const res = await fetch(LB_CONFIG.endpoint + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_LIMIT, { cache: "no-store" });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      return { scores: Array.isArray(data) ? data : (data.scores || []), note: "" };
-    } catch (e) {
-      return { scores: [], note: "Не удалось загрузить глобальный рейтинг (" + (e && e.message ? e.message : "ошибка") + ")." };
+    if (lbSupabaseReady()) return lbSupabaseFetch();
+    if (LB_CONFIG.provider === "worker" && LB_CONFIG.endpoint) {
+      try {
+        const res = await fetch(LB_CONFIG.endpoint + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_LIMIT, { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        return { scores: Array.isArray(data) ? data : (data.scores || []), note: "" };
+      } catch (e) {
+        return { scores: [], note: "Не удалось загрузить глобальный рейтинг (" + (e && e.message ? e.message : "ошибка") + ")." };
+      }
     }
+    return { scores: [], note: "Глобальный рейтинг не подключён. Настройте Supabase в LB_CONFIG (см. LEADERBOARD.md) или свой воркер." };
   }
   var lbState = { tab: "local", global: null, globalNote: "", loading: false };
   function lbRender() {
