@@ -15,6 +15,18 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #game{display:block;width:min(600px,94vw,calc((100dvh - 75px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
 #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;gap:0;background:#101a35}
 #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-width:none;max-height:none;border-radius:0}
+/* Полноэкранный режим на весь stageWrap: на широком ПК боковые панели остаются видимыми. */
+#stageWrap:fullscreen{width:100vw;height:100vh;height:100dvh;gap:0;padding:0;background:#101a35;align-items:center;justify-content:center}
+#stageWrap:fullscreen #gameStage{flex:0 1 auto}
+#stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*2/3));height:auto;max-width:none;max-height:none;border-radius:0}
+@media (min-width:1180px) and (pointer:fine){
+    #stageWrap:fullscreen{gap:22px;padding:0 16px}
+    #stageWrap:fullscreen #game{width:min(calc(100vw - 556px),calc((100dvh - 80px)*2/3))}
+}
+@media (max-width:600px) and (pointer:coarse){
+    #stageWrap:fullscreen{width:100vw;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+    #stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*2/3));height:auto;border-radius:0}
+}
 #toolbar{display:flex;gap:10px;align-items:center;justify-content:center}
 #fullscreenButton{width:52px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;font:28px Arial,sans-serif;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 #soundButton{width:52px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:0}
@@ -6723,7 +6735,7 @@ html, body, body * {
   var canvas = document.getElementById("game");
   var WORLD_W = 400;
   var WORLD_H = 600;
-  var RENDER_SCALE = Math.max(1, Math.min(3, Math.ceil(
+  var RENDER_SCALE = Math.max(1, Math.min(4, Math.ceil(
     canvas.getBoundingClientRect().width / WORLD_W * (window.devicePixelRatio || 1)
   )));
   canvas.width = WORLD_W * RENDER_SCALE;
@@ -17025,10 +17037,34 @@ html, body, body * {
 
   soundButton.addEventListener("click", () => toggleSound());
   syncSoundButton();
+  // \u041F\u043E\u0434\u0433\u043E\u043D\u044F\u0435\u043C \u0440\u0430\u0437\u0440\u0435\u0448\u0435\u043D\u0438\u0435 canvas \u043F\u043E\u0434 \u0444\u0430\u043A\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u0440\u0430\u0437\u043C\u0435\u0440 \u043D\u0430 \u044D\u043A\u0440\u0430\u043D\u0435: \u0432 \u043F\u043E\u043B\u043D\u043E\u043C \u044D\u043A\u0440\u0430\u043D\u0435
+  // CSS-\u0440\u0430\u0437\u043C\u0435\u0440 \u0437\u0430\u043C\u0435\u0442\u043D\u043E \u0431\u043E\u043B\u044C\u0448\u0435, \u0438 \u0444\u0438\u043A\u0441\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 1600 px \u043D\u0430\u0447\u0438\u043D\u0430\u044E\u0442 \u043C\u044B\u043B\u0438\u0442\u044C\u0441\u044F.
+  function applyRenderScale() {
+    const cssW = canvas.getBoundingClientRect().width || WORLD_W;
+    const dpr = window.devicePixelRatio || 1;
+    const next = Math.max(1, Math.min(4, Math.ceil(cssW / WORLD_W * dpr)));
+    if (next === RENDER_SCALE) return;
+    RENDER_SCALE = next;
+    canvas.width = WORLD_W * RENDER_SCALE;
+    canvas.height = WORLD_H * RENDER_SCALE;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(RENDER_SCALE, RENDER_SCALE);
+    // \u041A\u044D\u0448\u0438 \u0444\u043E\u043D\u0430 \u0438 \u044D\u043A\u0440\u0430\u043D\u0430 \u043F\u043E\u0440\u0430\u0436\u0435\u043D\u0438\u044F \u043E\u0442\u0440\u0438\u0441\u043E\u0432\u0430\u043D\u044B \u0432 \u0441\u0442\u0430\u0440\u043E\u043C \u043C\u0430\u0441\u0448\u0442\u0430\u0431\u0435 \u2014 \u0441\u0431\u0440\u0430\u0441\u044B\u0432\u0430\u0435\u043C.
+    winterScene.canvas = null;
+    biomeScenes[0] = biomeScenes[1] = biomeScenes[2] = biomeScenes[3] = null;
+    gameOverCache.canvas = null;
+    gameOverCache.cacheCtx = null;
+    gameOverCache.key = null;
+    gameOverCache.scrim = null;
+    gradientCache.clear();
+  }
+  window.addEventListener("resize", () => setTimeout(applyRenderScale, 120));
+  window.addEventListener("orientationchange", () => setTimeout(applyRenderScale, 220));
   fullscreenButton.addEventListener("click", async () => {
     try {
       if (!document.fullscreenElement) {
-        if (gameStage.requestFullscreen) await gameStage.requestFullscreen();
+        const target = document.getElementById("stageWrap");
+        if (target.requestFullscreen) await target.requestFullscreen();
         else fullscreenButton.title = "\u041F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u044B\u0439 \u0440\u0435\u0436\u0438\u043C \u043D\u0435 \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u0442\u0441\u044F";
       } else {
         await document.exitFullscreen();
@@ -17038,12 +17074,14 @@ html, body, body * {
     }
   });
   document.addEventListener("fullscreenchange", () => {
-    const isFullscreen = document.fullscreenElement === gameStage;
+    const isFullscreen = !!document.fullscreenElement;
     fullscreenButton.textContent = isFullscreen ? "\xD7" : "\u26F6";
     fullscreenButton.setAttribute(
       "aria-label",
       isFullscreen ? "\u0412\u044B\u0439\u0442\u0438 \u0438\u0437 \u043F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u043E\u0433\u043E \u0440\u0435\u0436\u0438\u043C\u0430" : "\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u043F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u044B\u0439 \u0440\u0435\u0436\u0438\u043C"
     );
+    setTimeout(applyRenderScale, 80);
+    setTimeout(applyRenderScale, 260);
   });
   initDaily();
   scheduleDraw();
