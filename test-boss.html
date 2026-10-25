@@ -6086,6 +6086,13 @@ html, body, body * {
     walls: { title: "\u0421\u0422\u0415\u041D\u042B", text: "\u041F\u043E \u043A\u0440\u0430\u044F\u043C \u0432\u044B\u0440\u0430\u0441\u0442\u0430\u044E\u0442 \u043B\u0435\u0434\u044F\u043D\u044B\u0435 \u0441\u0442\u0435\u043D\u044B. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0431\u043B\u0438\u0436\u0435 \u043A \u0446\u0435\u043D\u0442\u0440\u0443." },
     spikes: { title: "\u0428\u0418\u041F\u042B", text: "\u0427\u0430\u0441\u0442\u044C \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C \u043F\u043E\u043A\u0440\u044B\u0442\u0430 \u0448\u0438\u043F\u0430\u043C\u0438. \u041A\u0430\u0441\u0430\u043D\u0438\u0435 \u0448\u0438\u043F\u0430 \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043A\u0430\u043A \u043F\u0430\u0434\u0435\u043D\u0438\u0435." }
   };
+  var EVENT_ACCENTS = {
+    darkness: "#3f6fa8",
+    slide: "#2f9dbd",
+    avalanche: "#6b8fa8",
+    walls: "#4b8fd1",
+    spikes: "#e0575f"
+  };
   var EVENT_DURATION_MS = 1e4;
   var EVENT_DURATION_GROWTH_MS = 5e3;
   var EVENT_DURATION_MAX_MS = 3e4;
@@ -6228,7 +6235,6 @@ html, body, body * {
     introKind = kind;
     eventIntroMs = 0;
     eventCountdownMs = EVENT_COUNTDOWN_MS;
-    hudPop(player.x + 15, 430, "\u0421\u041E\u0411\u042B\u0422\u0418\u0415: " + (EVENT_HINTS[kind] ?? "\u0421\u041E\u0411\u042B\u0422\u0418\u0415"), HUD_COLORS.green);
   }
   function updateRandomEvent() {
     const landed = lastLandedPlatform;
@@ -13520,35 +13526,94 @@ html, body, body * {
     const fadeIn = reading ? Math.min(1, passed / EVENT_FADE_MS) : 1;
     const fadeOut = reading ? Math.min(1, eventIntroMs / EVENT_FADE_MS) : Math.min(1, eventCountdownMs / EVENT_FADE_MS);
     const alpha = Math.min(fadeIn, fadeOut);
-    const cw = 300, pad = 18;
+    const accent = EVENT_ACCENTS[introKind] || HUD_COLORS.green;
+    const cw = 316, pad = 20;
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = "rgba(6,16,32,0.45)";
+    ctx.fillStyle = "rgba(8,28,46,0.34)";
     ctx.fillRect(0, 0, WORLD_W, WORLD_H);
-    setFont(11.5, "normal");
+    setFont(10.5, "normal");
     const lines = wrapText(info.text, cw - pad * 2);
-    const slotH = 40;
-    const ch = 58 + lines.length * 16 + 10 + slotH;
+    const textBlock = lines.length * 15;
+    const barBlock = reading ? 0 : 42;
+    const ch = 30 + 18 + 24 + 8 + textBlock + barBlock + 18;
     const cx = (WORLD_W - cw) / 2;
-    const cy = 200 - (1 - alpha) * 24;
-    roundedRect(cx, cy, cw, ch, 16);
-    ctx.fillStyle = "rgba(255,255,255,.94)";
+    const cy = 190 - (1 - alpha) * 22;
+    // Мягкая тень и светлая стеклянная карточка.
+    ctx.save();
+    ctx.shadowColor = "rgba(10,40,62,.22)";
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 10;
+    roundedRect(cx, cy, cw, ch, 18);
+    ctx.fillStyle = "rgba(255,255,255,.97)";
     ctx.fill();
+    ctx.restore();
+    ctx.save();
+    roundedRect(cx, cy, cw, ch, 18);
+    ctx.clip();
+    const top = ctx.createLinearGradient(cx, cy, cx, cy + 58);
+    top.addColorStop(0, hexToRgba(accent, 0.20));
+    top.addColorStop(1, hexToRgba(accent, 0));
+    ctx.fillStyle = top;
+    ctx.fillRect(cx, cy, cw, 58);
+    ctx.restore();
+    roundedRect(cx + 0.75, cy + 0.75, cw - 1.5, ch - 1.5, 17.5);
+    ctx.strokeStyle = hexToRgba(accent, 0.35);
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    setFont(16, "bold");
+    // Плашка «новое событие».
+    const label = "НОВОЕ СОБЫТИЕ";
+    setFont(6.4, "bold");
+    const pillW = trackedWidth(label, 1.6) + 16;
+    const pillX = WORLD_W / 2 - pillW / 2;
+    const pillY = cy + 16;
+    roundedRect(pillX, pillY, pillW, 14, 7);
+    ctx.fillStyle = hexToRgba(accent, 0.12);
+    ctx.fill();
+    ctx.strokeStyle = hexToRgba(accent, 0.22);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = accent;
+    trackedText(label, WORLD_W / 2, pillY + 7.5, 1.6);
+    // Заголовок и разделитель.
+    setFont(17, "bold");
     ctx.fillStyle = HUD_COLORS.ink;
-    ctx.fillText(info.title, WORLD_W / 2, cy + 28);
-    setFont(11.5, "normal");
-    ctx.fillStyle = "rgba(40,60,80,.9)";
-    lines.forEach((line, i) => ctx.fillText(line, WORLD_W / 2, cy + 56 + i * 16));
-    const slotY = cy + ch - slotH / 2;
+    ctx.fillText(info.title, WORLD_W / 2, cy + 48);
+    const divY = cy + 61;
+    ctx.strokeStyle = hexToRgba(accent, 0.38);
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(WORLD_W / 2 - 23, divY);
+    ctx.lineTo(WORLD_W / 2 + 23, divY);
+    ctx.stroke();
+    // Описание.
+    setFont(10.5, "normal");
+    ctx.fillStyle = "rgba(38,62,84,.88)";
+    const textY = divY + 16;
+    lines.forEach((line, i) => ctx.fillText(line, WORLD_W / 2, textY + i * 15));
+    // Обратный отсчёт.
     if (!reading) {
       const n = Math.ceil(eventCountdownMs / 1e3);
-      const p = eventCountdownMs / 1e3 - (n - 1);
-      setFont(22 + 4 * p, "bold");
-      ctx.fillStyle = HUD_COLORS.ink;
-      ctx.fillText(String(n), WORLD_W / 2, slotY);
+      const progress = 1 - Math.max(0, eventCountdownMs) / EVENT_COUNTDOWN_MS;
+      const countY = textY + textBlock + 10;
+      setFont(7, "bold");
+      ctx.fillStyle = "rgba(21,85,118,.62)";
+      trackedText("СТАРТ ЧЕРЕЗ " + n, WORLD_W / 2, countY + 6, 1.2);
+      const barX = cx + pad;
+      const barY = countY + 16;
+      const barW = cw - pad * 2;
+      roundedRect(barX, barY, barW, 6, 3);
+      ctx.fillStyle = "rgba(21,85,118,.12)";
+      ctx.fill();
+      const fillW = Math.max(6, barW * progress);
+      const fill = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+      fill.addColorStop(0, hexToRgba(accent, 0.85));
+      fill.addColorStop(1, hexToRgba(accent, 0.45));
+      ctx.fillStyle = fill;
+      roundedRect(barX, barY, fillW, 6, 3);
+      ctx.fill();
     }
     ctx.restore();
   }
