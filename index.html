@@ -9327,9 +9327,10 @@ html, body, body * {
     barH: 52
   };
   // Иконки в главном меню: настройки и глобальный рейтинг.
-  var MENU_GEAR = { x: 30, y: 88, w: 26, h: 26 };
-  var MENU_LB = { x: 64, y: 88, w: 26, h: 26 };
-  var MENU_PROFILE = { x: 98, y: 88, w: 26, h: 26 };
+  // Иконки меню: 22×22 — примерно на 15% меньше прежних 26×26.
+  var MENU_GEAR = { x: 31, y: 90, w: 22, h: 22 };
+  var MENU_LB = { x: 63, y: 90, w: 22, h: 22 };
+  var MENU_PROFILE = { x: 95, y: 90, w: 22, h: 22 };
   var menuCursors = {
     avatars: selectedAvatar,
     shop: Math.max(0, FRAMES.findIndex((f) => f.id === selectedFrame)),
@@ -9565,12 +9566,18 @@ html, body, body * {
     ctx.restore();
   }
   function drawMenuIconChip(g) {
-    roundedRect(g.x, g.y, g.w, g.h, 13);
+    roundedRect(g.x, g.y, g.w, g.h, Math.min(g.w, g.h) / 2);
     ctx.fillStyle = "rgba(255,255,255,.92)";
     ctx.fill();
     ctx.strokeStyle = "rgba(15,61,92,.2)";
     ctx.lineWidth = 1;
     ctx.stroke();
+  }
+  function menuIconScale(g, cx, cy) {
+    const s = g.w / 26;
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    ctx.translate(-cx, -cy);
   }
   function drawMenuGear() {
     const g = MENU_GEAR;
@@ -9578,6 +9585,7 @@ html, body, body * {
     drawMenuIconChip(g);
     const cx = g.x + g.w / 2;
     const cy = g.y + g.h / 2;
+    menuIconScale(g, cx, cy);
     const teeth = 8;
     const step = Math.PI * 2 / teeth;
     const rOut = 9;
@@ -9615,6 +9623,7 @@ html, body, body * {
     drawMenuIconChip(g);
     const cx = g.x + g.w / 2;
     const cy = g.y + g.h / 2;
+    menuIconScale(g, cx, cy);
     ctx.strokeStyle = "#0f3d5c";
     ctx.lineWidth = 1.5;
     ctx.lineCap = "round";
@@ -9632,6 +9641,7 @@ html, body, body * {
     drawMenuIconChip(g);
     const cx = g.x + g.w / 2;
     const cy = g.y + g.h / 2;
+    menuIconScale(g, cx, cy);
     ctx.strokeStyle = "#0f3d5c";
     ctx.lineWidth = 1.5;
     ctx.lineJoin = "round";
