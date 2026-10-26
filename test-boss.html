@@ -10193,7 +10193,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.29";
+  var GAME_VERSION = "1.0.30";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -10497,68 +10497,217 @@ html, body, body * {
     ctx.fillStyle = UI.ink;
     trackedText(label, cx, y + h - 9, type === "chest" ? 0.2 : 0.4);
   }
-  function drawMenuButton(x, y, w, h, label, tone = "green", options = {}) {
-    const { size = 12, tracking = 1.6, sub = "", icon = null, dim = false } = options;
-    const hovered = pauseState.hover === "menu-btn-" + label && !dim;
-    const glass = tone === "glass";
-    if (dim) {
-      uiPill(x, y, w, h, { fill: UI.surfaceDim });
-    } else if (glass) {
-      uiPill(x, y, w, h, { fill: hovered ? UI.surfaceSolid : UI.surface });
-    } else {
-      uiAccentPill(x, y, w, h, { tone, hover: hovered });
+  var CASUAL_BUTTON_TONES = {
+    blue: {
+      top: "#7fd9ff",
+      mid: "#2fa3e0",
+      bottom: "#116ea8",
+      rim: "#08486f",
+      glow: "rgba(42,160,225,.42)"
+    },
+    green: {
+      top: "#8bf5d6",
+      mid: "#23b79c",
+      bottom: "#0b7f70",
+      rim: "#075e54",
+      glow: "rgba(24,180,155,.42)"
+    },
+    gold: {
+      top: "#ffe9a6",
+      mid: "#f9b52c",
+      bottom: "#d47f06",
+      rim: "#965404",
+      glow: "rgba(244,171,28,.46)"
+    },
+    dim: {
+      top: "#c9dbe8",
+      mid: "#a3bdce",
+      bottom: "#7f9bb0",
+      rim: "#5f7c91",
+      glow: "rgba(18,52,76,.12)"
     }
+  };
+  function drawCasualButtonBase(x, y, w, h, toneKey, hovered, glowBoost = 0) {
+    const t = CASUAL_BUTTON_TONES[toneKey] || CASUAL_BUTTON_TONES.blue;
+    const rimH = Math.max(4, Math.min(8, h * 0.14));
+    const bodyH = h - rimH;
+    const r = Math.min(16, bodyH * 0.34);
     ctx.save();
-    ctx.textBaseline = "middle";
-    const cx = x + w / 2;
-    const cy = y + h / 2;
-    const mainY = sub ? cy - 6 : cy;
-    const fg = dim ? UI.inkSoft : glass ? UI.ink : "#ffffff";
-    setFont(size, "bold");
-    const labelW = trackedWidth(label, tracking);
-    const shift = icon ? 8 : 0;
-    ctx.fillStyle = fg;
-    trackedText(label, cx + shift, mainY, tracking);
-    if (icon) {
-      const tx = cx + shift - labelW / 2 - 11;
-      if (icon === "play") {
-        ctx.beginPath();
-        ctx.moveTo(tx, mainY - 5.5);
-        ctx.lineTo(tx + 8.5, mainY);
-        ctx.lineTo(tx, mainY + 5.5);
-        ctx.closePath();
-        ctx.fillStyle = fg;
-        ctx.fill();
-      } else if (icon === "coin") {
-        const cg = ctx.createRadialGradient(tx - 1.2, mainY - 1.2, 0.5, tx, mainY, 4.4);
-        cg.addColorStop(0, "#fff4a3");
-        cg.addColorStop(0.55, "#ffc928");
-        cg.addColorStop(1, "#d88900");
-        ctx.beginPath();
-        ctx.arc(tx, mainY, 4.4, 0, Math.PI * 2);
-        ctx.fillStyle = cg;
-        ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,.8)";
-        ctx.lineWidth = 0.8;
-        ctx.stroke();
-      } else if (icon === "frame") {
-        roundedRect(tx - 4, mainY - 5, 8, 10, 2);
-        ctx.strokeStyle = fg;
-        ctx.lineWidth = 1.4;
-        ctx.stroke();
-      } else if (icon === "platform") {
-        roundedRect(tx - 5, mainY - 2, 10, 4, 2);
-        ctx.fillStyle = fg;
-        ctx.fill();
-      }
+    ctx.shadowColor = t.glow;
+    ctx.shadowBlur = (hovered ? 22 : 14) + glowBoost;
+    ctx.shadowOffsetY = hovered ? 5 : 4;
+    roundedRect(x, y + rimH, w, h - rimH, r);
+    ctx.fillStyle = t.rim;
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    const body = ctx.createLinearGradient(0, y, 0, y + bodyH);
+    body.addColorStop(0, t.top);
+    body.addColorStop(0.48, t.mid);
+    body.addColorStop(1, t.bottom);
+    roundedRect(x, y, w, bodyH, r);
+    ctx.fillStyle = body;
+    ctx.fill();
+    ctx.save();
+    roundedRect(x + 1, y + 1, w - 2, bodyH - 2, Math.max(2, r - 1));
+    ctx.clip();
+    const gloss = ctx.createLinearGradient(0, y, 0, y + bodyH * 0.72);
+    gloss.addColorStop(0, "rgba(255,255,255,.52)");
+    gloss.addColorStop(0.42, "rgba(255,255,255,.16)");
+    gloss.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = gloss;
+    roundedRect(x + 2, y + 1.5, w - 4, bodyH * 0.58, Math.max(2, r - 2));
+    ctx.fill();
+    if (hovered) {
+      ctx.fillStyle = "rgba(255,255,255,.12)";
+      ctx.fillRect(x, y, w, bodyH);
     }
-    if (sub) {
-      setFont(6.6, "bold");
-      ctx.fillStyle = dim || glass ? UI.inkSoft : "rgba(255,255,255,.72)";
-      trackedText(sub, cx, cy + 8, 1.6);
+    ctx.restore();
+    ctx.strokeStyle = "rgba(255,255,255,.55)";
+    ctx.lineWidth = 1.2;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x + r + 2, y + 1.6);
+    ctx.lineTo(x + w - r - 2, y + 1.6);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function drawCasualIcon(icon, cx, cy, r, fg) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = fg;
+    ctx.strokeStyle = fg;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    if (icon === "play") {
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.34, -r * 0.52);
+      ctx.lineTo(r * 0.56, 0);
+      ctx.lineTo(-r * 0.34, r * 0.52);
+      ctx.closePath();
+      ctx.fill();
+    } else if (icon === "spin") {
+      ctx.lineWidth = Math.max(1.3, r * 0.16);
+      for (let i = 0; i < 3; i++) {
+        const a = i * Math.PI / 3;
+        const dx = Math.cos(a), dy = Math.sin(a);
+        ctx.beginPath();
+        ctx.moveTo(-dx * r * 0.72, -dy * r * 0.72);
+        ctx.lineTo(dx * r * 0.72, dy * r * 0.72);
+        ctx.stroke();
+        for (const side of [-1, 1]) {
+          const bx = dx * r * 0.38 * side;
+          const by = dy * r * 0.38 * side;
+          const px = -dy * r * 0.24;
+          const py = dx * r * 0.24;
+          ctx.beginPath();
+          ctx.moveTo(bx, by);
+          ctx.lineTo(bx + px, by + py);
+          ctx.moveTo(bx, by);
+          ctx.lineTo(bx - px, by - py);
+          ctx.stroke();
+        }
+      }
+    } else if (icon === "coin") {
+      const cg = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0.5, 0, 0, r * 0.72);
+      cg.addColorStop(0, "#fff7c2");
+      cg.addColorStop(0.6, "#ffd34e");
+      cg.addColorStop(1, "#e39a00");
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.68, 0, Math.PI * 2);
+      ctx.fillStyle = cg;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(120,70,0,.5)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else if (icon === "frame") {
+      ctx.lineWidth = Math.max(1.2, r * 0.16);
+      roundedRect(-r * 0.55, -r * 0.62, r * 1.1, r * 1.24, r * 0.22);
+      ctx.stroke();
+    } else if (icon === "platform") {
+      roundedRect(-r * 0.66, -r * 0.22, r * 1.32, r * 0.44, r * 0.22);
+      ctx.fill();
+    } else if (icon === "check") {
+      ctx.lineWidth = Math.max(1.6, r * 0.22);
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.45, 0);
+      ctx.lineTo(-r * 0.1, r * 0.36);
+      ctx.lineTo(r * 0.5, -r * 0.4);
+      ctx.stroke();
+    } else if (icon === "lock") {
+      roundedRect(-r * 0.5, -r * 0.08, r, r * 0.72, r * 0.14);
+      ctx.fill();
+      ctx.lineWidth = Math.max(1.2, r * 0.16);
+      ctx.beginPath();
+      ctx.arc(0, -r * 0.08, r * 0.35, Math.PI, 0);
+      ctx.stroke();
     }
     ctx.restore();
   }
+  function drawCasualIconMedallion(icon, cx, cy, r, fg) {
+    ctx.save();
+    const g = ctx.createLinearGradient(0, cy - r, 0, cy + r);
+    g.addColorStop(0, "rgba(255,255,255,.22)");
+    g.addColorStop(0.5, "rgba(0,0,0,.10)");
+    g.addColorStop(1, "rgba(0,0,0,.22)");
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.34)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.shadowColor = "rgba(6,30,48,.4)";
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetY = 1;
+    drawCasualIcon(icon, cx, cy, r * 0.9, fg);
+    ctx.restore();
+  }
+  function drawCasualLabel(text, cx, cy, size, tracking, color) {
+    ctx.save();
+    ctx.textBaseline = "middle";
+    setFont(size, "bold");
+    ctx.fillStyle = color;
+    ctx.shadowColor = "rgba(6,28,44,.55)";
+    ctx.shadowBlur = 2.5;
+    ctx.shadowOffsetY = 1.4;
+    trackedText(text, cx, cy, tracking);
+    ctx.restore();
+  }
+  function drawMenuButton(x, y, w, h, label, tone = "green", options = {}) {
+    const { size = 12, tracking = 1.6, sub = "", icon = null, dim = false, hoverKey = null } = options;
+    const hovered = pauseState.hover === (hoverKey || "menu-btn-" + label) && !dim;
+    const key = dim ? "dim" : tone;
+    drawCasualButtonBase(x, y, w, h, key, hovered);
+    const bodyH = h - Math.max(4, Math.min(8, h * 0.14));
+    const cy = y + bodyH / 2 + (sub ? -3 : 0);
+    const fg = "#ffffff";
+    const medR = Math.min(12, h * 0.24);
+    const gap = 8;
+    setFont(size, "bold");
+    const labelW = trackedWidth(label, tracking);
+    if (icon) {
+      const groupW = medR * 2 + gap + labelW;
+      const gx = x + (w - groupW) / 2;
+      drawCasualIconMedallion(icon, gx + medR, cy, medR, fg);
+      drawCasualLabel(label, gx + medR * 2 + gap + labelW / 2, cy, size, tracking, fg);
+    } else {
+      drawCasualLabel(label, x + w / 2, cy, size, tracking, fg);
+    }
+    if (sub) {
+      ctx.save();
+      ctx.textBaseline = "middle";
+      setFont(6.6, "bold");
+      ctx.fillStyle = "rgba(255,255,255,.72)";
+      ctx.shadowColor = "rgba(6,28,44,.5)";
+      ctx.shadowBlur = 2;
+      ctx.shadowOffsetY = 1;
+      trackedText(sub, x + w / 2, cy + 11, 1.6);
+      ctx.restore();
+    }
+  }
+
   function drawMenuHeader() {
     ctx.save();
     ctx.textBaseline = "middle";
@@ -11155,7 +11304,8 @@ html, body, body * {
         primary.enabled ? "gold" : "green",
         {
           size: 10.5,
-          dim: !primary.enabled
+          dim: !primary.enabled,
+          icon: primary.enabled ? "check" : "lock"
         }
       );
     }
@@ -13972,37 +14122,46 @@ html, body, body * {
   function drawHud() {
     const t = performance.now() / 1e3;
     const bigScore = Math.floor(hudState.score);
-    // Светлая стеклянная карточка счёта — один язык с остальным HUD.
+    // Тёмная стеклянная плашка со светящимся счётом — как раньше, но компактно.
     ctx.save();
-    ctx.shadowColor = "rgba(12,40,64,.14)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 4;
+    ctx.shadowColor = "rgba(6,24,40,.34)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 5;
     roundedRect(10, 8, 132, 46, 13);
-    ctx.fillStyle = "rgba(255,255,255,.78)";
+    const scoreCard = ctx.createLinearGradient(0, 8, 0, 54);
+    scoreCard.addColorStop(0, "rgba(9,36,58,.68)");
+    scoreCard.addColorStop(1, "rgba(7,30,50,.54)");
+    ctx.fillStyle = scoreCard;
     ctx.fill();
     ctx.shadowColor = "transparent";
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
     roundedRect(10.5, 8.5, 131, 45, 12.5);
-    ctx.strokeStyle = "rgba(255,255,255,.95)";
+    ctx.strokeStyle = "rgba(255,255,255,.26)";
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
     setFont(6.6, "bold");
-    ctx.fillStyle = "rgba(18,59,82,.55)";
+    ctx.fillStyle = "rgba(219,242,255,.72)";
     trackedText("СЧЁТ", 18, 17, 2, "left");
     setFont(22, "bold");
-    ctx.fillStyle = "#0f3d5c";
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(2,14,26,.85)";
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 1.5;
     trackedText(fmt(bigScore), 18, 32, 0.5, "left");
+    ctx.shadowColor = "rgba(2,14,26,.7)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
     const beatingRecord = Math.floor(player.score) > highScore && highScore > 0;
     setFont(6.3, "bold");
     if (beatingRecord) {
       const pulse = 0.72 + 0.28 * Math.sin(t * 4);
-      ctx.fillStyle = `rgba(176,122,0,${pulse})`;
+      ctx.fillStyle = `rgba(255,214,102,${pulse})`;
       trackedText("НОВЫЙ РЕКОРД", 18, 45, 1.3, "left");
     } else {
-      ctx.fillStyle = "rgba(18,59,82,.58)";
+      ctx.fillStyle = "rgba(219,242,255,.78)";
       trackedText(`РЕКОРД ${fmt(highScore)}`, 18, 45, 1.1, "left");
     }
     ctx.restore();
@@ -15884,73 +16043,72 @@ html, body, body * {
     trackedText(GACHA_TIER_LABELS[tier], 200, y + h + 32, 2);
     ctx.restore();
   }
+  function drawGachaActionButton(x, y, w, h, label, tone, options = {}) {
+    const { cost = 0, dim = false, busy = false, hoverKey = null } = options;
+    const key = dim || busy ? "dim" : tone;
+    const hovered = hoverKey ? pauseState.hover === hoverKey : false;
+    const pulse = !dim && !busy ? 0.5 + 0.5 * Math.sin(performance.now() / 460) : 0;
+    drawCasualButtonBase(x, y, w, h, key, hovered && !dim && !busy, pulse * 8);
+    const bodyH = h - Math.max(4, Math.min(8, h * 0.14));
+    const cy = y + bodyH / 2;
+    const medR = Math.min(12, h * 0.24);
+    const gap = 8;
+    const text = busy ? "ОТКРЫВАЕМ…" : dim ? "НЕ ХВАТАЕТ" : label;
+    const fg = "#ffffff";
+    setFont(11.5, "bold");
+    const labelW = trackedWidth(text, 1.3);
+    let badgeW = 0;
+    if (!busy && cost) {
+      setFont(10, "bold");
+      badgeW = 20 + trackedWidth(String(cost), 0.4);
+    }
+    const groupW = medR * 2 + gap + labelW + (badgeW ? 10 + badgeW : 0);
+    const gx = x + (w - groupW) / 2;
+    drawCasualIconMedallion("spin", gx + medR, cy, medR, fg);
+    drawCasualLabel(text, gx + medR * 2 + gap + labelW / 2, cy, 11.5, 1.3, fg);
+    if (badgeW) {
+      const bx = gx + groupW - badgeW;
+      const bh = Math.min(22, h - 14);
+      const by = cy - bh / 2;
+      ctx.save();
+      roundedRect(bx, by, badgeW, bh, bh / 2);
+      ctx.fillStyle = "rgba(0,0,0,.2)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,.32)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+      drawCoinBadge(bx + 11, cy, Math.min(6.5, bh * 0.32), 0);
+      ctx.save();
+      ctx.textBaseline = "middle";
+      setFont(10, "bold");
+      ctx.fillStyle = "#ffefb8";
+      ctx.shadowColor = "rgba(60,30,0,.4)";
+      ctx.shadowBlur = 1.5;
+      ctx.shadowOffsetY = 1;
+      trackedText(String(cost), bx + 20, cy + 0.4, 0.4, "left");
+      ctx.restore();
+    }
+  }
   function drawGachaPlayButton() {
-    drawMenuButton(GACHA_UI.playX, GACHA_UI.spinY, GACHA_UI.playW, GACHA_UI.spinH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
+    drawMenuButton(GACHA_UI.playX, GACHA_UI.spinY, GACHA_UI.playW, GACHA_UI.spinH, "ИГРАТЬ", "blue", {
       size: 11,
       tracking: 1,
-      icon: "play"
+      icon: "play",
+      hoverKey: "gacha-play"
     });
   }
   function drawGachaSpinButton() {
-    const y = GACHA_UI.spinY;
-    const h = GACHA_UI.spinH;
-    const sx = GACHA_UI.spinX;
-    const sw = GACHA_UI.spinW;
-    const cx = sx + sw / 2;
-    const now = performance.now();
     const spinning = gachaState.phase === "spin";
     const canSpin = !spinning && bankCoins >= GACHA_COST;
-    const pulse = canSpin ? 0.5 + 0.5 * Math.sin(now / 460) : 0;
-    if (canSpin) {
-      ctx.save();
-      ctx.shadowColor = `rgba(15,138,118,${0.3 + pulse * 0.22})`;
-      ctx.shadowBlur = 18 + pulse * 10;
-      roundedRect(sx, y, sw, h, UI.pill(h));
-      ctx.fillStyle = UI.accent;
-      ctx.fill();
-      ctx.restore();
-      uiAccentPill(sx, y, sw, h);
-    } else if (spinning) {
-      uiPill(sx, y, sw, h, { fill: "rgba(255,255,255,.92)" });
-    } else {
-      uiPill(sx, y, sw, h, { fill: UI.surfaceDim });
-    }
-    ctx.save();
-    ctx.textBaseline = "middle";
-    if (spinning) {
-      setFont(11.5, "bold");
-      ctx.fillStyle = UI.inkSoft;
-      trackedText("\u041E\u0422\u041A\u0420\u042B\u0412\u0410\u0415\u041C", cx, y + h / 2, 2.2);
-    } else if (canSpin) {
-      const label = "\u041A\u0420\u0423\u0422\u0418\u0422\u042C";
-      const labelTrack = 1.8;
-      const priceTrack = 0.6;
-      const coinR = 7;
-      const gapLabel = 9;
-      const gapPrice = 5;
-      setFont(11.5, "bold");
-      const labelW = trackedWidth(label, labelTrack);
-      setFont(10.5, "bold");
-      const priceW = trackedWidth(GACHA_COST + "", priceTrack);
-      const total = labelW + gapLabel + coinR * 2 + gapPrice + priceW;
-      let cursor = cx - total / 2;
-      const midY = y + h / 2;
-      setFont(11.5, "bold");
-      ctx.fillStyle = "#ffffff";
-      trackedText(label, cursor, midY, labelTrack, "left");
-      cursor += labelW + gapLabel;
-      drawCoinBadge(cursor + coinR, midY, coinR, 0);
-      cursor += coinR * 2 + gapPrice;
-      setFont(10.5, "bold");
-      ctx.fillStyle = "#ffe9a8";
-      trackedText(GACHA_COST + "", cursor, midY, priceTrack, "left");
-    } else {
-      setFont(9, "bold");
-      ctx.fillStyle = UI.inkSoft;
-      trackedText("\u041D\u0415 \u0425\u0412\u0410\u0422\u0410\u0415\u0422 \u041C\u041E\u041D\u0415\u0422", cx, y + h / 2, 1.8);
-    }
-    ctx.restore();
+    drawGachaActionButton(GACHA_UI.spinX, GACHA_UI.spinY, GACHA_UI.spinW, GACHA_UI.spinH, "КРУТИТЬ", "green", {
+      cost: GACHA_COST,
+      dim: !canSpin,
+      busy: spinning,
+      hoverKey: "gacha-spin"
+    });
   }
+
   function drawGachaHint() {
     const now = performance.now();
     let text = "\u0414\u0423\u0411\u041B\u0418\u041A\u0410\u0422 \u0412\u041E\u0417\u0412\u0420\u0410\u0429\u0410\u0415\u0422 " + Math.round(GACHA_COST * GACHA_DUPLICATE_REFUND) + " \u041C\u041E\u041D\u0415\u0422";
@@ -16252,15 +16410,11 @@ html, body, body * {
     }
     const spinBusy = platformShop.phase === "spin";
     const canAfford = bankCoins >= PLATFORM_GACHA_COST;
-    drawMenuButton(
-      MENU.padX,
-      MENU.barY,
-      228,
-      MENU.barH,
-      spinBusy ? "\u041A\u0420\u0423\u0422\u0418\u0422\u0421\u042F\u2026" : "\u041A\u0420\u0423\u0422\u0418\u0422\u042C \xB7 " + PLATFORM_GACHA_COST,
-      canAfford && !spinBusy ? "gold" : "green",
-      { size: 12, dim: !canAfford || spinBusy, icon: "coin" }
-    );
+    drawGachaActionButton(MENU.padX, MENU.barY, 228, MENU.barH, "КРУТИТЬ", "gold", {
+      cost: PLATFORM_GACHA_COST,
+      dim: !canAfford,
+      busy: spinBusy
+    });
     drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", { size: 11, tracking: 1, icon: "play" });
     ctx.save();
     ctx.textAlign = "center";
