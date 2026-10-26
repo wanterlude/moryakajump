@@ -12,7 +12,7 @@
     "release": "npm run dist && node release.js"
   },
   "devDependencies": {
-    "electron": "^45.0.0",
+    "electron": "^22.3.27",
     "electron-builder": "^26.18.0"
   },
   "build": {
@@ -20,7 +20,7 @@
     "productName": "Moryaka Jump",
     "artifactName": "Moryaka-Jump-${version}.exe",
     "directories": {
-      "output": "dist"
+      "output": "build-out"
     },
     "files": [
       "main.js",
@@ -38,6 +38,11 @@
         }
       ],
       "icon": "icon.ico"
-    }
+    },
+    "compression": "maximum",
+    "electronLanguages": [
+      "en-US",
+      "ru"
+    ]
   }
 }

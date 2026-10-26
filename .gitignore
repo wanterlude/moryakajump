@@ -3,3 +3,4 @@ desktop/node_modules/
 desktop/dist/
 desktop/index.html
 desktop/*.jpg
+desktop/build-out/
