@@ -2490,6 +2490,939 @@ html, body, body * {
     c.restore();
     return cv;
   }
+  // --- Арены боссов 2 и 4: многослойная живопись вместо плоских заливок ---
+  function duelArenaRand(seed) {
+    let s = seed >>> 0;
+    return function () {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+  function duelArenaCanyon(c) {
+    const W = DUEL_W, H = DUEL_H;
+    const rand = duelArenaRand(0x51ca11);
+    c.save();
+
+    // Закатный каньон: тёплый свет на снегу, синие тени.
+    const sky = c.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, "#5f9fcf");
+    sky.addColorStop(0.3, "#8fc0dd");
+    sky.addColorStop(0.52, "#cfdfe9");
+    sky.addColorStop(0.72, "#f6dcc2");
+    sky.addColorStop(0.9, "#ffe8cf");
+    sky.addColorStop(1, "#fff4e4");
+    c.fillStyle = sky;
+    c.fillRect(0, 0, W, H);
+    // Прохладная полоса за боссом: белая шерсть не сливается с небом.
+    const coolBand = c.createLinearGradient(0, 76, 0, 300);
+    coolBand.addColorStop(0, "rgba(38,110,150,0)");
+    coolBand.addColorStop(0.45, "rgba(38,110,150,.18)");
+    coolBand.addColorStop(1, "rgba(38,110,150,0)");
+    c.fillStyle = coolBand;
+    c.fillRect(0, 76, W, 224);
+
+    const sun = c.createRadialGradient(270, 200, 4, 270, 200, 168);
+    sun.addColorStop(0, "rgba(255,252,236,1)");
+    sun.addColorStop(0.12, "rgba(255,238,198,.9)");
+    sun.addColorStop(0.38, "rgba(255,202,142,.3)");
+    sun.addColorStop(1, "rgba(255,186,120,0)");
+    c.fillStyle = sun;
+    c.fillRect(40, 20, 360, 380);
+    c.fillStyle = "rgba(255,250,236,.95)";
+    c.beginPath();
+    c.arc(270, 200, 20, 0, Math.PI * 2);
+    c.fill();
+
+    // Дальние и средние горы — как в основном фоне.
+    const far = [
+      [-16, 196, 128, 352],
+      [64, 150, 112, 352],
+      [146, 210, 104, 352],
+      [236, 132, 126, 352],
+      [316, 186, 110, 352],
+      [398, 156, 118, 352]
+    ];
+    for (const p of far) drawMountain(c, p[0], p[1], p[2], p[3], "#8daac3", "#ffe3c0");
+    const mid = [
+      [8, 268, 116, W],
+      [104, 214, 108, W],
+      [204, 262, 118, W],
+      [300, 202, 118, W],
+      [396, 258, 110, W]
+    ];
+    for (const p of mid) drawMountain(c, p[0], p[1], p[2], p[3], "#a9c2d6", "#fff0dc");
+    // Ближний хребет за водопадом: средний тон, чтобы босс не терялся.
+    const nearFar = [
+      [150, 268, 74, 360],
+      [250, 236, 88, 360],
+      [340, 272, 66, 360]
+    ];
+    for (const p of nearFar) drawMountain(c, p[0], p[1], p[2], p[3], "#7798b5", "#ffe9c8");
+    const haze = c.createLinearGradient(0, 300, 0, 440);
+    haze.addColorStop(0, "rgba(255,233,206,0)");
+    haze.addColorStop(0.55, "rgba(255,233,206,.32)");
+    haze.addColorStop(1, "rgba(255,242,222,.66)");
+    c.fillStyle = haze;
+    c.fillRect(0, 300, W, 140);
+    for (let i = 0; i < 5; i++) {
+      const baseY = 430 + i * 34;
+      const hill = c.createLinearGradient(0, baseY - 26, 0, baseY + 22);
+      hill.addColorStop(0, "#fffaf0");
+      hill.addColorStop(1, "#e3d6c8");
+      c.fillStyle = hill;
+      c.beginPath();
+      c.ellipse(200 + (i % 2 ? 40 : -40), baseY, 260, 26, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    // Трещины на леднике — чтобы центр не был плоским белым пятном.
+    for (let i = 0; i < 6; i++) {
+      const y = 372 + i * 26;
+      c.strokeStyle = `rgba(84,152,180,${0.12 + (i % 3) * 0.05})`;
+      c.lineWidth = 1.2 + (i % 2) * 0.7;
+      c.beginPath();
+      c.moveTo(160, y);
+      c.bezierCurveTo(200, y + 7, 248, y - 5, 292, y + 3);
+      c.stroke();
+    }
+
+    // Замёрзший водопад в глубине — цветовой акцент арены.
+    const wfPath = () => {
+      c.beginPath();
+      c.moveTo(236, 252);
+      c.bezierCurveTo(262, 286, 244, 330, 264, 366);
+      c.bezierCurveTo(280, 396, 260, 442, 272, 486);
+      c.lineTo(248, 492);
+      c.bezierCurveTo(240, 448, 258, 404, 242, 372);
+      c.bezierCurveTo(226, 336, 246, 292, 222, 260);
+      c.closePath();
+    };
+    c.save();
+    const wfGlow = c.createRadialGradient(252, 370, 6, 252, 380, 140);
+    wfGlow.addColorStop(0, "rgba(150,226,246,.28)");
+    wfGlow.addColorStop(1, "rgba(150,226,246,0)");
+    c.fillStyle = wfGlow;
+    c.fillRect(120, 240, 280, 300);
+    wfPath();
+    const wfGrad = c.createLinearGradient(222, 250, 274, 492);
+    wfGrad.addColorStop(0, "#eefdff");
+    wfGrad.addColorStop(0.3, "#c3ecf8");
+    wfGrad.addColorStop(0.68, "#8ed0e6");
+    wfGrad.addColorStop(1, "#5fb0ce");
+    c.fillStyle = wfGrad;
+    c.fill();
+    c.save();
+    wfPath();
+    c.clip();
+    for (let i = 0; i < 8; i++) {
+      const x = 228 + i * 5.4;
+      c.strokeStyle = i % 2 ? "rgba(255,255,255,.5)" : "rgba(66,150,180,.26)";
+      c.lineWidth = 0.8 + rand() * 1.6;
+      c.beginPath();
+      c.moveTo(x, 258);
+      c.bezierCurveTo(x + 12, 310, x - 6, 370, x + 12, 430);
+      c.bezierCurveTo(x + 18, 460, x + 4, 478, x + 2, 492);
+      c.stroke();
+    }
+    c.restore();
+    // Снежный карниз и сосульки на гребне водопада.
+    c.beginPath();
+    c.moveTo(212, 262);
+    c.lineTo(222, 250);
+    c.lineTo(231, 256);
+    c.lineTo(240, 248);
+    c.lineTo(250, 257);
+    c.lineTo(244, 263);
+    c.lineTo(232, 260);
+    c.lineTo(220, 264);
+    c.closePath();
+    c.fillStyle = "#ffffff";
+    c.fill();
+    c.strokeStyle = "rgba(178,228,242,.6)";
+    c.lineWidth = 1;
+    c.stroke();
+    for (let i = 0; i < 6; i++) {
+      const x = 222 + i * 4.6;
+      const len = 7 + ((i * 9) % 15);
+      c.fillStyle = "rgba(226,250,255,.9)";
+      c.beginPath();
+      c.moveTo(x - 2, 256);
+      c.lineTo(x + 2, 256);
+      c.lineTo(x + 0.3, 256 + len);
+      c.closePath();
+      c.fill();
+    }
+    // Мист и бирюзовая полынья у подножия.
+    c.beginPath();
+    c.ellipse(260, 536, 66, 16, 0, 0, Math.PI * 2);
+    const pool = c.createLinearGradient(196, 526, 324, 552);
+    pool.addColorStop(0, "#bfeef8");
+    pool.addColorStop(0.45, "#7fd0e5");
+    pool.addColorStop(1, "#4ca6c9");
+    c.fillStyle = pool;
+    c.fill();
+    c.strokeStyle = "rgba(255,255,255,.8)";
+    c.lineWidth = 1.6;
+    c.stroke();
+    for (let i = 0; i < 3; i++) {
+      c.strokeStyle = "rgba(255,255,255,.45)";
+      c.lineWidth = 1;
+      c.beginPath();
+      c.ellipse(258, 536, 22 + i * 15, 4 + i * 3.4, 0, 0, Math.PI * 2);
+      c.stroke();
+    }
+    const wfMist = c.createRadialGradient(262, 516, 4, 262, 516, 84);
+    wfMist.addColorStop(0, "rgba(238,253,255,.4)");
+    wfMist.addColorStop(1, "rgba(238,253,255,0)");
+    c.fillStyle = wfMist;
+    c.beginPath();
+    c.ellipse(262, 516, 84, 24, 0, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+
+    // Ледяные стены каньона — светлые, с голубыми тенями.
+    const leftWall = () => {
+      c.beginPath();
+      c.moveTo(112, -20);
+      c.bezierCurveTo(122, 50, 96, 100, 106, 150);
+      c.bezierCurveTo(114, 190, 138, 218, 162, 246);
+      c.bezierCurveTo(190, 278, 186, 318, 158, 348);
+      c.bezierCurveTo(132, 376, 108, 398, 116, 436);
+      c.bezierCurveTo(124, 476, 108, 520, 118, 560);
+      c.bezierCurveTo(122, 582, 114, 602, 112, 620);
+      c.lineTo(-20, 620);
+      c.lineTo(-20, -20);
+      c.closePath();
+    };
+    const rightWall = () => {
+      c.beginPath();
+      c.moveTo(330, 34);
+      c.bezierCurveTo(312, 84, 322, 128, 304, 176);
+      c.bezierCurveTo(288, 218, 270, 246, 282, 280);
+      c.bezierCurveTo(296, 318, 318, 340, 302, 378);
+      c.bezierCurveTo(288, 412, 286, 452, 298, 496);
+      c.bezierCurveTo(306, 532, 290, 566, 298, 620);
+      c.lineTo(420, 620);
+      c.lineTo(420, 22);
+      c.closePath();
+    };
+    const iceWall = (path, side) => {
+      path();
+      const wg = c.createLinearGradient(side < 0 ? 0 : W, 120, side < 0 ? 185 : W - 185, 120);
+      wg.addColorStop(0, "#2b5878");
+      wg.addColorStop(0.5, "#4c7c99");
+      wg.addColorStop(0.8, "#8db1c8");
+      wg.addColorStop(1, "#ffe8c8");
+      c.fillStyle = wg;
+      c.fill();
+      c.save();
+      path();
+      c.clip();
+      // Вертикальные борозды льда.
+      for (let i = 0; i < 34; i++) {
+        const y0 = rand() * H;
+        const x0 = side < 0 ? 6 + rand() * 180 : W - 6 - rand() * 180;
+        const light = i % 3 === 0;
+        c.strokeStyle = light ? "rgba(255,255,255,.24)" : "rgba(54,132,164,.1)";
+        c.lineWidth = 1.5 + rand() * 5;
+        c.beginPath();
+        c.moveTo(x0, y0);
+        c.bezierCurveTo(x0 + (rand() - 0.5) * 8, y0 + 60, x0 + (rand() - 0.5) * 12, y0 + 140, x0 + (rand() - 0.5) * 6, y0 + 230);
+        c.stroke();
+      }
+      // Холодная тень у внешней кромки, тёплый свет — у внутренней.
+      const shade = c.createLinearGradient(side < 0 ? 0 : W, 0, side < 0 ? 190 : W - 190, 0);
+      shade.addColorStop(0, "rgba(18,62,96,.34)");
+      shade.addColorStop(0.55, "rgba(18,62,96,.14)");
+      shade.addColorStop(1, "rgba(18,62,96,0)");
+      c.fillStyle = shade;
+      c.fillRect(0, 0, W, H);
+      const deep = c.createLinearGradient(0, 0, 0, H);
+      deep.addColorStop(0, "rgba(20,72,102,0)");
+      deep.addColorStop(0.7, "rgba(20,72,102,.06)");
+      deep.addColorStop(1, "rgba(20,72,102,.22)");
+      c.fillStyle = deep;
+      c.fillRect(0, 0, W, H);
+      // Морозные кристаллы.
+      for (let i = 0; i < 46; i++) {
+        const xx = side < 0 ? 14 + rand() * 160 : W - 14 - rand() * 160;
+        const yy = rand() * H;
+        c.fillStyle = `rgba(255,255,255,${0.1 + rand() * 0.35})`;
+        c.beginPath();
+        c.arc(xx, yy, 0.6 + rand() * 1.5, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.restore();
+
+      // Светлая кромка.
+      c.save();
+      c.beginPath();
+      if (side < 0) {
+        c.moveTo(112, -20);
+        c.bezierCurveTo(122, 50, 96, 100, 106, 150);
+        c.bezierCurveTo(114, 190, 138, 218, 162, 246);
+        c.bezierCurveTo(190, 278, 186, 318, 158, 348);
+        c.bezierCurveTo(132, 376, 108, 398, 116, 436);
+        c.bezierCurveTo(124, 476, 108, 520, 118, 560);
+        c.bezierCurveTo(122, 582, 114, 602, 112, 620);
+      } else {
+        c.moveTo(330, 34);
+        c.bezierCurveTo(312, 84, 322, 128, 304, 176);
+        c.bezierCurveTo(288, 218, 270, 246, 282, 280);
+        c.bezierCurveTo(296, 318, 318, 340, 302, 378);
+        c.bezierCurveTo(288, 412, 286, 452, 298, 496);
+        c.bezierCurveTo(306, 532, 290, 566, 298, 620);
+      }
+      c.strokeStyle = "rgba(255,240,208,.95)";
+      c.lineWidth = 2.8;
+      c.shadowColor = "rgba(255,214,156,.95)";
+      c.shadowBlur = 12;
+      c.stroke();
+      c.restore();
+    };
+    iceWall(leftWall, -1);
+    iceWall(rightWall, 1);
+
+    // Снежные полки на стенах.
+    const iceShelf = (x, y, dir, w, h) => {
+      c.save();
+      c.beginPath();
+      c.moveTo(x, y - 4);
+      c.quadraticCurveTo(x + dir * w * 0.55, y - h, x + dir * w, y - 2);
+      c.quadraticCurveTo(x + dir * w * 0.7, y + 6, x + dir * w * 0.3, y + 5);
+      c.lineTo(x, y + 6);
+      c.closePath();
+      const sg = c.createLinearGradient(x, y - h, x, y + 6);
+      sg.addColorStop(0, "#fffaf0");
+      sg.addColorStop(0.55, "#f4e4cf");
+      sg.addColorStop(1, "#9fc0d6");
+      c.fillStyle = sg;
+      c.fill();
+      c.strokeStyle = "rgba(255,255,255,.9)";
+      c.lineWidth = 1.2;
+      c.stroke();
+      const tipX = x + dir * w * 0.82;
+      for (let i = 0; i < 4; i++) {
+        const ix = tipX - dir * i * 5;
+        const len = 8 + rand() * (h + 12);
+        c.fillStyle = "rgba(206,242,252,.88)";
+        c.beginPath();
+        c.moveTo(ix - 2.2, y + 2);
+        c.lineTo(ix + 2.2, y + 2);
+        c.lineTo(ix + dir * 0.4, y + 2 + len);
+        c.closePath();
+        c.fill();
+        c.strokeStyle = "rgba(255,255,255,.55)";
+        c.lineWidth = 0.7;
+        c.stroke();
+      }
+      c.restore();
+    };
+    iceShelf(158, 246, 1, 46, 14);
+    iceShelf(158, 348, 1, 38, 12);
+    iceShelf(282, 280, -1, 44, 14);
+    iceShelf(302, 378, -1, 40, 12);
+
+    // Тёмные ели у подножия — ценностный якорь и родная палитра игры.
+    const canyonPine = (x, baseY, h, lean) => {
+      c.save();
+      c.translate(x, baseY);
+      c.rotate(lean);
+      c.fillStyle = "#173f53";
+      c.fillRect(-1.4, -h * 0.92, 2.8, h * 0.92);
+      for (let i = 0; i < 4; i++) {
+        const y = -h * (0.18 + i * 0.19);
+        const half = h * (0.32 - i * 0.055);
+        c.beginPath();
+        c.moveTo(0, y - h * 0.17);
+        c.lineTo(-half, y + h * 0.05);
+        c.lineTo(-half * 0.45, y + h * 0.02);
+        c.lineTo(0, y + h * 0.07);
+        c.lineTo(half * 0.45, y + h * 0.02);
+        c.lineTo(half, y + h * 0.05);
+        c.closePath();
+        c.fill();
+        c.strokeStyle = "rgba(220,244,252,.6)";
+        c.lineWidth = 1.1;
+        c.beginPath();
+        c.moveTo(-half, y + h * 0.04);
+        c.lineTo(-half * 0.35, y + h * 0.015);
+        c.stroke();
+        c.beginPath();
+        c.moveTo(half, y + h * 0.04);
+        c.lineTo(half * 0.35, y + h * 0.015);
+        c.stroke();
+      }
+      c.strokeStyle = "rgba(120,180,200,.26)";
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(-1.4, -h * 0.9);
+      c.lineTo(-1.4, -h * 0.1);
+      c.stroke();
+      c.restore();
+    };
+    const treeRow = [
+      [20, 112, 0.02], [54, 84, -0.03], [88, 126, 0.01], [122, 72, 0.04],
+      [156, 102, -0.02], [308, 96, 0.03], [342, 118, -0.02], [376, 86, 0.01]
+    ];
+    for (const t of treeRow) canyonPine(t[0], 542, t[1], t[2]);
+
+    // Снежная полка, на которой стоит Моряка.
+    const floorTop = (x) => 535 + Math.sin(x * 0.047) * 2.4 + Math.sin(x * 0.15 + 1.2) * 1.2;
+    c.beginPath();
+    c.moveTo(0, H);
+    c.lineTo(0, floorTop(0));
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x));
+    c.lineTo(W, H);
+    c.closePath();
+    const fg = c.createLinearGradient(0, 526, 0, H);
+    fg.addColorStop(0, "#fffaf0");
+    fg.addColorStop(0.2, "#f2e3cf");
+    fg.addColorStop(0.58, "#a8c5d6");
+    fg.addColorStop(1, "#5f8ca6");
+    c.fillStyle = fg;
+    c.fill();
+
+    c.save();
+    c.lineCap = "round";
+    c.strokeStyle = "rgba(255,248,232,.98)";
+    c.lineWidth = 3.6;
+    c.beginPath();
+    c.moveTo(0, floorTop(0));
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x));
+    c.stroke();
+    c.strokeStyle = "rgba(102,186,210,.34)";
+    c.lineWidth = 1.8;
+    c.beginPath();
+    c.moveTo(0, floorTop(0) + 4);
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x) + 4);
+    c.stroke();
+    c.strokeStyle = "rgba(55,120,146,.22)";
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(0, floorTop(0) + 9);
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x) + 9);
+    c.stroke();
+    c.restore();
+
+    for (let i = 0; i < 10; i++) {
+      const x0 = 20 + rand() * 360;
+      const y0 = 552 + rand() * 16;
+      c.strokeStyle = "rgba(64,126,150,.22)";
+      c.lineWidth = 1 + rand() * 1.2;
+      c.beginPath();
+      c.moveTo(x0, y0);
+      let x = x0, y = y0;
+      for (let k = 0; k < 3; k++) {
+        x += (rand() - 0.5) * 20;
+        y += 9 + rand() * 13;
+        c.lineTo(x, y);
+      }
+      c.stroke();
+    }
+    for (let i = 0; i < 26; i++) {
+      const x = 10 + rand() * 380;
+      const y = floorTop(x) - 1 + rand() * 4;
+      c.fillStyle = `rgba(255,255,255,${0.3 + rand() * 0.5})`;
+      c.beginPath();
+      c.ellipse(x, y, 2 + rand() * 8, 1 + rand() * 2.4, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+
+    // Снежные валуны в переднем плане.
+    const snowRock = (x, y, rx, ry, flip) => {
+      c.save();
+      c.beginPath();
+      c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+      const rg = c.createLinearGradient(x - rx, y - ry, x + rx, y + ry);
+      rg.addColorStop(0, "#f4fdff");
+      rg.addColorStop(0.5, "#cbe8f3");
+      rg.addColorStop(1, "#77aec6");
+      c.fillStyle = rg;
+      c.fill();
+      c.strokeStyle = "rgba(255,255,255,.7)";
+      c.lineWidth = 1.2;
+      c.stroke();
+      c.beginPath();
+      c.ellipse(x - flip * rx * 0.2, y - ry * 0.45, rx * 0.72, ry * 0.5, 0, Math.PI, Math.PI * 2);
+      c.fillStyle = "rgba(255,255,255,.9)";
+      c.fill();
+      c.restore();
+    };
+    snowRock(22, 564, 30, 20, 1);
+    snowRock(374, 570, 34, 22, -1);
+    snowRock(62, 588, 20, 13, 1);
+
+    // Холодная дымка и мягкая виньетка.
+    for (let i = 0; i < 6; i++) {
+      const mx = 30 + rand() * 340;
+      const my = 340 + rand() * 190;
+      const mr = 60 + rand() * 90;
+      const mg = c.createRadialGradient(mx, my, 4, mx, my, mr);
+      mg.addColorStop(0, "rgba(240,253,255,.22)");
+      mg.addColorStop(1, "rgba(240,253,255,0)");
+      c.fillStyle = mg;
+      c.fillRect(mx - mr, my - mr, mr * 2, mr * 2);
+    }
+
+    c.save();
+    const edge = c.createRadialGradient(200, 300, 150, 200, 300, 400);
+    edge.addColorStop(0, "rgba(28,86,120,0)");
+    edge.addColorStop(0.7, "rgba(28,86,120,.05)");
+    edge.addColorStop(1, "rgba(28,86,120,.2)");
+    c.fillStyle = edge;
+    c.fillRect(0, 0, W, H);
+    const bottom = c.createLinearGradient(0, 500, 0, H);
+    bottom.addColorStop(0, "rgba(30,90,120,0)");
+    bottom.addColorStop(1, "rgba(30,90,120,.14)");
+    c.fillStyle = bottom;
+    c.fillRect(0, 500, W, H - 500);
+    c.restore();
+
+    for (let i = 0; i < 1000; i++) {
+      c.fillStyle = "rgba(255,255,255,.05)";
+      c.fillRect((i * 97.13 + 11) % W, (i * 57.71 + 5) % H, 1, 1);
+      c.fillStyle = "rgba(40,96,124,.035)";
+      c.fillRect((i * 61.7 + 23) % W, (i * 89.3 + 17) % H, 1, 1);
+    }
+
+    c.restore();
+  }
+  function duelArenaAvalanche(c) {
+    const W = DUEL_W, H = DUEL_H;
+    const rand = duelArenaRand(0xbadc0de);
+    c.save();
+
+    // 1. Ночная буря.
+    const sky = c.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, "#050f1d");
+    sky.addColorStop(0.24, "#0a2237");
+    sky.addColorStop(0.5, "#10354e");
+    sky.addColorStop(0.74, "#174a63");
+    sky.addColorStop(1, "#1f5d75");
+    c.fillStyle = sky;
+    c.fillRect(0, 0, W, H);
+
+    // Луна ниже HUD, чтобы её было видно.
+    const moonX = 72, moonY = 168;
+    const halo = c.createRadialGradient(moonX, moonY, 4, moonX, moonY, 96);
+    halo.addColorStop(0, "rgba(226,248,255,.85)");
+    halo.addColorStop(0.16, "rgba(200,238,255,.4)");
+    halo.addColorStop(0.55, "rgba(150,205,230,.12)");
+    halo.addColorStop(1, "rgba(140,196,226,0)");
+    c.fillStyle = halo;
+    c.fillRect(moonX - 96, moonY - 96, 192, 192);
+    c.fillStyle = "rgba(238,251,255,.9)";
+    c.beginPath();
+    c.arc(moonX, moonY, 11, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "rgba(158,198,220,.32)";
+    c.beginPath();
+    c.arc(moonX - 3.5, moonY - 2, 3, 0, Math.PI * 2);
+    c.fill();
+    c.beginPath();
+    c.arc(moonX + 4, moonY + 4, 2, 0, Math.PI * 2);
+    c.fill();
+
+    // 2. Тучи.
+    for (let i = 0; i < 12; i++) {
+      const x = -24 + rand() * 448;
+      const y = 28 + rand() * 170;
+      const rx = 56 + rand() * 86;
+      const ry = 14 + rand() * 26;
+      const cg = c.createRadialGradient(x, y - ry * 0.3, 2, x, y, rx);
+      cg.addColorStop(0, `rgba(94,136,162,${0.12 + rand() * 0.14})`);
+      cg.addColorStop(0.55, "rgba(20,48,70,.34)");
+      cg.addColorStop(1, "rgba(10,30,48,0)");
+      c.fillStyle = cg;
+      c.beginPath();
+      c.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    for (let i = 0; i < 8; i++) {
+      const x = 10 + rand() * 380;
+      const y = 52 + rand() * 150;
+      const rx = 42 + rand() * 60;
+      c.strokeStyle = `rgba(178,220,240,${0.08 + rand() * 0.1})`;
+      c.lineWidth = 1.2 + rand() * 1.6;
+      c.beginPath();
+      c.ellipse(x, y, rx, 10 + rand() * 10, 0, Math.PI * 1.05, Math.PI * 1.9);
+      c.stroke();
+    }
+
+    // 3. Горные хребты — мягкие планы с дымкой.
+    const far = [
+      [-10, 240, 124, 382],
+      [78, 198, 114, 382],
+      [168, 252, 114, 382],
+      [256, 190, 122, 382],
+      [348, 236, 112, 382]
+    ];
+    for (const p of far) drawMountain(c, p[0], p[1], p[2], p[3], "#2c5b74", "#a9d1e2");
+    const mid = [
+      [0, 320, 126, 432],
+      [112, 266, 118, 432],
+      [224, 328, 122, 432],
+      [338, 276, 118, 432]
+    ];
+    for (const p of mid) drawMountain(c, p[0], p[1], p[2], p[3], "#1d465e", "#c3e4f0");
+    const haze = c.createLinearGradient(0, 300, 0, 450);
+    haze.addColorStop(0, "rgba(8,28,44,0)");
+    haze.addColorStop(0.55, "rgba(8,28,44,.34)");
+    haze.addColorStop(1, "rgba(8,28,44,.62)");
+    c.fillStyle = haze;
+    c.fillRect(0, 300, W, 150);
+    const midBand = c.createLinearGradient(0, 380, 0, 536);
+    midBand.addColorStop(0, "rgba(10,34,50,.3)");
+    midBand.addColorStop(1, "rgba(8,26,40,.92)");
+    c.fillStyle = midBand;
+    c.fillRect(0, 380, W, 156);
+
+    // 4. Лавинная волна: нависающий гребень и крупные клубы.
+    const plumeEdge = () => {
+      c.beginPath();
+      c.moveTo(W + 8, 48);
+      c.bezierCurveTo(352, 56, 318, 88, 326, 124);
+      c.bezierCurveTo(300, 138, 286, 170, 296, 200);
+      c.bezierCurveTo(266, 220, 254, 258, 268, 288);
+      c.bezierCurveTo(240, 310, 236, 352, 254, 382);
+      c.bezierCurveTo(240, 408, 238, 446, 258, 474);
+      c.bezierCurveTo(270, 500, 266, 530, 284, 556);
+      c.lineTo(300, 610);
+    };
+    const plumeFill = () => {
+      plumeEdge();
+      c.lineTo(W + 8, H + 8);
+      c.closePath();
+    };
+    plumeFill();
+    const plumeGrad = c.createLinearGradient(300, 40, 392, 560);
+    plumeGrad.addColorStop(0, "#ffffff");
+    plumeGrad.addColorStop(0.22, "#f2fbff");
+    plumeGrad.addColorStop(0.48, "#d3ebf6");
+    plumeGrad.addColorStop(0.74, "#a8c9da");
+    plumeGrad.addColorStop(1, "#7da4ba");
+    c.fillStyle = plumeGrad;
+    c.fill();
+
+    const edgePts = [
+      [400, 48], [352, 56], [318, 88], [326, 124], [300, 138], [286, 170],
+      [296, 200], [266, 220], [254, 258], [268, 288], [240, 310], [236, 352],
+      [254, 382], [240, 408], [238, 446], [258, 474], [270, 500], [266, 530],
+      [284, 556], [300, 610]
+    ];
+    c.save();
+    plumeFill();
+    c.clip();
+    // Глубокие холодные впадины.
+    for (let i = 0; i < 30; i++) {
+      const p = edgePts[Math.floor((i / 30) * (edgePts.length - 1))];
+      const x = Math.min(W - 4, p[0] + 26 + rand() * 58);
+      const y = p[1] + (rand() - 0.5) * 40;
+      const r = 28 + rand() * 44;
+      const sg = c.createRadialGradient(x, y, 2, x, y, r);
+      sg.addColorStop(0, "rgba(80,126,150,.58)");
+      sg.addColorStop(0.55, "rgba(105,150,172,.26)");
+      sg.addColorStop(1, "rgba(112,156,178,0)");
+      c.fillStyle = sg;
+      c.beginPath();
+      c.arc(x, y, r, 0, Math.PI * 2);
+      c.fill();
+    }
+    // Большая внутренняя тень — объём.
+    const cav = c.createRadialGradient(348, 330, 8, 348, 330, 110);
+    cav.addColorStop(0, "rgba(80,124,148,.44)");
+    cav.addColorStop(1, "rgba(86,130,154,0)");
+    c.fillStyle = cav;
+    c.fillRect(230, 210, 180, 250);
+    // Светлые клубы.
+    for (let i = 0; i < 40; i++) {
+      const p = edgePts[Math.floor((i / 40) * (edgePts.length - 1))];
+      const x = Math.min(W + 4, p[0] + 4 + rand() * 52);
+      const y = p[1] + (rand() - 0.5) * 34;
+      const r = 22 + rand() * 40;
+      const hg = c.createRadialGradient(x - r * 0.24, y - r * 0.28, 1, x, y, r);
+      hg.addColorStop(0, "rgba(255,255,255,.95)");
+      hg.addColorStop(0.45, "rgba(248,253,255,.5)");
+      hg.addColorStop(1, "rgba(235,250,255,0)");
+      c.fillStyle = hg;
+      c.beginPath();
+      c.arc(x, y, r, 0, Math.PI * 2);
+      c.fill();
+    }
+    // Потоки движения внутри.
+    for (let i = 0; i < 12; i++) {
+      const y = 78 + i * 42 + rand() * 16;
+      c.strokeStyle = i % 2 ? "rgba(255,255,255,.26)" : "rgba(88,134,158,.26)";
+      c.lineWidth = 1 + rand() * 2.4;
+      c.beginPath();
+      c.moveTo(268 + rand() * 16, y);
+      c.bezierCurveTo(306, y + 16, 334, y + 36, 378, y + 50);
+      c.stroke();
+    }
+    c.restore();
+
+    // Светлая кромка гребня.
+    c.save();
+    plumeEdge();
+    c.strokeStyle = "rgba(255,255,255,.6)";
+    c.lineWidth = 2.4;
+    c.shadowColor = "rgba(222,246,255,.95)";
+    c.shadowBlur = 14;
+    c.stroke();
+    c.restore();
+
+    // Нависающие клубы пыли: ломают вертикальную стену, дают объём.
+    const puff = (x, y, r, a) => {
+      const pg = c.createRadialGradient(x - r * 0.22, y - r * 0.26, 1, x, y, r);
+      pg.addColorStop(0, `rgba(255,255,255,${a})`);
+      pg.addColorStop(0.5, `rgba(245,252,255,${a * 0.62})`);
+      pg.addColorStop(1, "rgba(230,248,255,0)");
+      c.fillStyle = pg;
+      c.beginPath();
+      c.arc(x, y, r, 0, Math.PI * 2);
+      c.fill();
+    };
+    puff(318, 152, 52, 0.8);
+    puff(296, 214, 44, 0.65);
+    puff(286, 302, 48, 0.7);
+    puff(272, 388, 42, 0.62);
+    puff(276, 470, 46, 0.66);
+    puff(290, 540, 50, 0.7);
+    for (let i = 0; i < 60; i++) {
+      const a = rand() * Math.PI * 2;
+      const rr = 20 + rand() * 60;
+      const px = 286 + Math.cos(a) * rr;
+      const py = 300 + Math.sin(a) * rr * 2.2;
+      if (px > 330) continue;
+      c.globalAlpha = 0.12 + rand() * 0.4;
+      c.fillStyle = "#ffffff";
+      c.beginPath();
+      c.arc(px, py, 0.6 + rand() * 1.5, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+
+    // Снежная пыль, летящая влево от кромки.
+    for (let i = 0; i < 170; i++) {
+      const p = edgePts[Math.floor(rand() * edgePts.length)];
+      const sx = p[0] - 46 + rand() * 74;
+      const sy = p[1] + (rand() - 0.5) * 36;
+      c.globalAlpha = 0.1 + rand() * 0.45;
+      c.fillStyle = i % 4 ? "#ffffff" : "#d8f2ff";
+      c.beginPath();
+      c.arc(sx, sy, 0.6 + rand() * 1.7, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+    for (let i = 0; i < 14; i++) {
+      const p = edgePts[Math.floor(rand() * edgePts.length)];
+      const y = p[1] + (rand() - 0.5) * 26;
+      const x = p[0] - 10 - rand() * 40;
+      c.strokeStyle = `rgba(230,248,255,${0.08 + rand() * 0.14})`;
+      c.lineWidth = 1 + rand() * 1.8;
+      c.beginPath();
+      c.moveTo(x, y);
+      c.lineTo(x - 14 - rand() * 22, y + 3 + rand() * 8);
+      c.stroke();
+    }
+
+
+    // 5. Берег, ели и снежная полка.
+    const pine = (x, baseY, h, lean) => {
+      c.save();
+      c.translate(x, baseY);
+      c.rotate(lean);
+      c.fillStyle = "#071b28";
+      c.fillRect(-1.5, -h * 0.92, 3, h * 0.92);
+      for (let i = 0; i < 4; i++) {
+        const y = -h * (0.16 + i * 0.19);
+        const half = h * (0.34 - i * 0.06);
+        c.beginPath();
+        c.moveTo(0, y - h * 0.17);
+        c.lineTo(-half, y + h * 0.05);
+        c.lineTo(-half * 0.45, y + h * 0.02);
+        c.lineTo(0, y + h * 0.07);
+        c.lineTo(half * 0.45, y + h * 0.02);
+        c.lineTo(half, y + h * 0.05);
+        c.closePath();
+        c.fill();
+        c.strokeStyle = "rgba(196,230,242,.5)";
+        c.lineWidth = 1.1;
+        c.beginPath();
+        c.moveTo(-half, y + h * 0.045);
+        c.lineTo(-half * 0.35, y + h * 0.02);
+        c.stroke();
+      }
+      c.strokeStyle = "rgba(210,240,250,.2)";
+      c.lineWidth = 1;
+      c.beginPath();
+      c.moveTo(-1.5, -h * 0.9);
+      c.lineTo(-1.5, -h * 0.1);
+      c.stroke();
+      c.restore();
+    };
+    pine(34, 536, 128, -0.04);
+    pine(66, 548, 96, 0.05);
+    pine(96, 540, 74, -0.02);
+
+    const floorTop = (x) => 536 + Math.sin(x * 0.05) * 2.6 + Math.sin(x * 0.17 + 0.8) * 1.3;
+    c.beginPath();
+    c.moveTo(0, H);
+    c.lineTo(0, floorTop(0));
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x));
+    c.lineTo(W, H);
+    c.closePath();
+    const fg = c.createLinearGradient(0, 526, 0, H);
+    fg.addColorStop(0, "#f8feff");
+    fg.addColorStop(0.16, "#e2f4fb");
+    fg.addColorStop(0.55, "#b6d6e4");
+    fg.addColorStop(1, "#739cb0");
+    c.fillStyle = fg;
+    c.fill();
+
+    c.save();
+    c.lineCap = "round";
+    c.strokeStyle = "rgba(255,255,255,.95)";
+    c.lineWidth = 3.6;
+    c.beginPath();
+    c.moveTo(0, floorTop(0));
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x));
+    c.stroke();
+    c.strokeStyle = "rgba(44,100,128,.28)";
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(0, floorTop(0) + 4);
+    for (let x = 4; x <= W; x += 4) c.lineTo(x, floorTop(x) + 4);
+    c.stroke();
+    c.restore();
+
+    for (let i = 0; i < 9; i++) {
+      const y = 548 + rand() * 34;
+      const x = 20 + rand() * 340;
+      const w = 34 + rand() * 90;
+      c.strokeStyle = `rgba(226,246,253,${0.12 + rand() * 0.2})`;
+      c.lineWidth = 1 + rand() * 2;
+      c.beginPath();
+      c.moveTo(x, y);
+      c.lineTo(x + w, y + (rand() - 0.5) * 6);
+      c.stroke();
+    }
+    for (let i = 0; i < 34; i++) {
+      const x = 8 + rand() * 384;
+      const y = floorTop(x) - 1 + rand() * 4;
+      c.fillStyle = `rgba(255,255,255,${0.2 + rand() * 0.6})`;
+      c.beginPath();
+      c.ellipse(x, y, 2 + rand() * 8, 1 + rand() * 2.6, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+
+    // Снежный язык лавины на полке.
+    c.beginPath();
+    c.moveTo(258, 600);
+    c.bezierCurveTo(268, 566, 304, 548, 340, 552);
+    c.bezierCurveTo(370, 556, 388, 576, 400, 600);
+    c.closePath();
+    const spill = c.createLinearGradient(300, 548, 340, 600);
+    spill.addColorStop(0, "#ffffff");
+    spill.addColorStop(0.5, "#e6f7fd");
+    spill.addColorStop(1, "#b9dbe9");
+    c.fillStyle = spill;
+    c.fill();
+    c.strokeStyle = "rgba(255,255,255,.6)";
+    c.lineWidth = 1.2;
+    c.stroke();
+
+    // Тёмные передние камни.
+    const cornerRock = (side) => {
+      const pts = side < 0
+        ? [[0, 600], [0, 540], [10, 528], [24, 536], [36, 556], [56, 564], [64, 584], [72, 600]]
+        : [[400, 600], [400, 536], [390, 524], [376, 534], [364, 554], [344, 562], [336, 582], [328, 600]];
+      c.beginPath();
+      c.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+      c.closePath();
+      const rg = c.createLinearGradient(side < 0 ? 0 : W, 520, side < 0 ? 74 : W - 74, 600);
+      rg.addColorStop(0, "#081f2e");
+      rg.addColorStop(0.55, "#123548");
+      rg.addColorStop(1, "#1d4a60");
+      c.fillStyle = rg;
+      c.fill();
+      c.strokeStyle = "rgba(220,245,255,.4)";
+      c.lineWidth = 1.4;
+      c.stroke();
+      c.fillStyle = "rgba(240,253,255,.8)";
+      c.beginPath();
+      c.ellipse(side < 0 ? 16 : 384, 532, 10, 2.6, 0, 0, Math.PI * 2);
+      c.fill();
+    };
+    cornerRock(-1);
+    cornerRock(1);
+
+    // 6. Позёмка, штрихи бури, лунный свет.
+    for (let i = 0; i < 8; i++) {
+      const y = 420 + rand() * 100;
+      const x = 20 + rand() * 320;
+      const w = 40 + rand() * 90;
+      const wg = c.createLinearGradient(x - w, y, x + w, y);
+      wg.addColorStop(0, "rgba(220,242,252,0)");
+      wg.addColorStop(0.5, `rgba(220,242,252,${0.08 + rand() * 0.07})`);
+      wg.addColorStop(1, "rgba(220,242,252,0)");
+      c.fillStyle = wg;
+      c.beginPath();
+      c.ellipse(x, y, w, 2 + rand() * 3, 0, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.strokeStyle = "rgba(212,240,252,.1)";
+    c.lineWidth = 1;
+    for (let i = 0; i < 52; i++) {
+      const sx = (i * 57.3 + 11) % W;
+      const sy = (i * 97.1) % H;
+      c.beginPath();
+      c.moveTo(sx, sy);
+      c.lineTo(sx - 12, sy + 24);
+      c.stroke();
+    }
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    const moonBeam = c.createLinearGradient(moonX, moonY, 170, 560);
+    moonBeam.addColorStop(0, "rgba(200,238,255,.14)");
+    moonBeam.addColorStop(0.55, "rgba(170,220,245,.04)");
+    moonBeam.addColorStop(1, "rgba(150,205,235,0)");
+    c.fillStyle = moonBeam;
+    c.beginPath();
+    c.moveTo(moonX - 26, moonY);
+    c.lineTo(moonX + 26, moonY);
+    c.lineTo(300, 600);
+    c.lineTo(170, 600);
+    c.closePath();
+    c.fill();
+    c.restore();
+
+    // 7. Виньетка и зерно.
+    c.save();
+    const vig = c.createRadialGradient(200, 300, 120, 200, 300, 430);
+    vig.addColorStop(0, "rgba(2,10,20,0)");
+    vig.addColorStop(0.62, "rgba(2,10,20,.12)");
+    vig.addColorStop(1, "rgba(2,10,20,.5)");
+    c.fillStyle = vig;
+    c.fillRect(0, 0, W, H);
+    const bottom = c.createLinearGradient(0, 500, 0, H);
+    bottom.addColorStop(0, "rgba(2,12,22,0)");
+    bottom.addColorStop(1, "rgba(2,12,22,.3)");
+    c.fillStyle = bottom;
+    c.fillRect(0, 500, W, H - 500);
+    c.restore();
+
+    for (let i = 0; i < 1200; i++) {
+      c.fillStyle = "rgba(255,255,255,.04)";
+      c.fillRect((i * 89.31 + 7) % W, (i * 53.17 + 19) % H, 1, 1);
+      c.fillStyle = "rgba(2,14,26,.06)";
+      c.fillRect((i * 67.9 + 29) % W, (i * 101.3 + 3) % H, 1, 1);
+    }
+
+    c.restore();
+  }
+
   var duelBackdropCache = {};
   function duelBackdropFor(arena) {
     const key = arena || "shore";
@@ -2501,132 +3434,7 @@ html, body, body * {
     const c = cv.getContext("2d");
     c.drawImage(duelBackdropCanvas, 0, 0);
     if (key === "canyon") {
-      // Ледяной каньон: светлая вертикальная расщелина, ступенчатые стены,
-      // сосульки и замёрзший водопад. Заметно светлее и «выше» других арен.
-      c.save();
-      const canyonSky = c.createLinearGradient(0, 0, 0, DUEL_H);
-      canyonSky.addColorStop(0, "#f8feff");
-      canyonSky.addColorStop(0.32, "#dcf3fd");
-      canyonSky.addColorStop(0.68, "#bfe2f2");
-      canyonSky.addColorStop(1, "#a6cbdf");
-      c.fillStyle = canyonSky;
-      c.fillRect(0, 0, DUEL_W, DUEL_H);
-      // Солнце в проёме каньона
-      const canyonSun = c.createRadialGradient(200, 34, 4, 200, 34, 165);
-      canyonSun.addColorStop(0, "rgba(255,255,255,.98)");
-      canyonSun.addColorStop(0.35, "rgba(232,252,255,.62)");
-      canyonSun.addColorStop(1, "rgba(220,248,255,0)");
-      c.fillStyle = canyonSun;
-      c.fillRect(0, 0, DUEL_W, 260);
-      // Дальние стены — бледные, в дымке
-      c.fillStyle = "rgba(213,240,250,.75)";
-      c.beginPath();
-      c.moveTo(0, 0); c.lineTo(150, 0); c.lineTo(118, 120); c.lineTo(96, 240);
-      c.lineTo(126, 360); c.lineTo(96, 480); c.lineTo(120, 600); c.lineTo(0, 600);
-      c.closePath(); c.fill();
-      c.beginPath();
-      c.moveTo(400, 0); c.lineTo(252, 0); c.lineTo(286, 120); c.lineTo(306, 250);
-      c.lineTo(276, 380); c.lineTo(302, 500); c.lineTo(282, 600); c.lineTo(400, 600);
-      c.closePath(); c.fill();
-      // Передние ступенчатые стены
-      const canyonWall = (side) => {
-        const pts = side < 0
-          ? [[0, 86], [62, 96], [46, 142], [92, 154], [74, 202], [116, 214], [98, 268], [128, 282], [110, 338], [134, 356], [118, 416], [138, 438], [126, 500], [132, 552], [120, 600], [0, 600]]
-          : [[400, 78], [336, 92], [352, 136], [308, 150], [326, 198], [284, 212], [304, 264], [272, 280], [290, 334], [266, 352], [284, 412], [262, 432], [274, 496], [268, 550], [280, 600], [400, 600]];
-        c.beginPath();
-        c.moveTo(pts[0][0], pts[0][1]);
-        for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
-        c.closePath();
-        const wg = c.createLinearGradient(side < 0 ? 0 : 400, 90, side < 0 ? 138 : 262, 600);
-        wg.addColorStop(0, "#f4fdff");
-        wg.addColorStop(0.22, "#d4eef9");
-        wg.addColorStop(0.55, "#a5cde2");
-        wg.addColorStop(0.82, "#7ba8c2");
-        wg.addColorStop(1, "#5d8aa5");
-        c.fillStyle = wg;
-        c.fill();
-        c.strokeStyle = "rgba(255,255,255,.75)";
-        c.lineWidth = 1.6;
-        c.stroke();
-        // Снежные кромки на каждой ступени
-        c.save();
-        c.strokeStyle = "rgba(255,255,255,.95)";
-        c.lineWidth = 3.4;
-        c.lineCap = "round";
-        for (let i = 0; i < pts.length - 2; i += 2) {
-          c.beginPath();
-          c.moveTo(pts[i][0], pts[i][1]);
-          c.lineTo(pts[i + 1][0], pts[i + 1][1]);
-          c.stroke();
-        }
-        // Сосульки
-        for (let i = 1; i < pts.length - 2; i += 3) {
-          const bx = pts[i][0] + (side < 0 ? 8 : -8);
-          const by = pts[i][1] + 4;
-          const h = 10 + ((i * 7) % 22);
-          c.fillStyle = "rgba(214,246,255,.9)";
-          c.beginPath();
-          c.moveTo(bx - 3.4, by);
-          c.lineTo(bx + 3.4, by);
-          c.lineTo(bx + 0.6, by + h);
-          c.closePath();
-          c.fill();
-          c.strokeStyle = "rgba(255,255,255,.8)";
-          c.lineWidth = 0.8;
-          c.stroke();
-        }
-        c.restore();
-      };
-      canyonWall(-1);
-      canyonWall(1);
-      // Замёрзший водопад на правой стене
-      c.save();
-      const fall = c.createLinearGradient(330, 250, 352, 470);
-      fall.addColorStop(0, "rgba(240,254,255,.95)");
-      fall.addColorStop(0.5, "rgba(178,228,247,.8)");
-      fall.addColorStop(1, "rgba(120,185,215,.25)");
-      c.fillStyle = fall;
-      c.beginPath();
-      c.moveTo(318, 268);
-      c.bezierCurveTo(344, 292, 330, 360, 350, 392);
-      c.bezierCurveTo(362, 416, 346, 448, 356, 480);
-      c.lineTo(336, 470);
-      c.bezierCurveTo(326, 436, 342, 404, 330, 374);
-      c.bezierCurveTo(318, 342, 330, 306, 312, 282);
-      c.closePath();
-      c.fill();
-      c.strokeStyle = "rgba(255,255,255,.75)";
-      c.lineWidth = 1;
-      for (let i = 0; i < 4; i++) {
-        c.beginPath();
-        c.moveTo(320 + i * 6, 286 + i * 8);
-        c.bezierCurveTo(338 + i * 4, 330, 330 + i * 5, 400, 344 + i * 2, 468);
-        c.stroke();
-      }
-      c.restore();
-      // Световой столб сверху
-      c.save();
-      c.globalCompositeOperation = "lighter";
-      const shaft = c.createLinearGradient(200, 0, 200, 420);
-      shaft.addColorStop(0, "rgba(255,255,255,.32)");
-      shaft.addColorStop(1, "rgba(255,255,255,0)");
-      c.fillStyle = shaft;
-      c.beginPath();
-      c.moveTo(164, 0); c.lineTo(236, 0); c.lineTo(278, 420); c.lineTo(122, 420);
-      c.closePath(); c.fill();
-      c.restore();
-      // Снежинки-искры
-      c.fillStyle = "rgba(255,255,255,.9)";
-      for (let i = 0; i < 46; i++) {
-        const sx = (i * 73.1 + 17) % DUEL_W;
-        const sy = (i * 121.7) % DUEL_H;
-        c.globalAlpha = 0.18 + (i % 4) * 0.14;
-        c.beginPath();
-        c.arc(sx, sy, 0.7 + (i % 3) * 0.5, 0, Math.PI * 2);
-        c.fill();
-      }
-      c.globalAlpha = 1;
-      c.restore();
+      duelArenaCanyon(c);
     } else if (key === "storm") {
       c.save();
       c.fillStyle = "rgba(8,22,48,0.46)";
@@ -2685,130 +3493,7 @@ html, body, body * {
       c.restore();
       c.restore();
     } else if (key === "avalanche") {
-      // Лавина: тёмное штормовое небо и огромная белая стена снега справа.
-      // Контраст тёмного неба и массы снега не повторяется на других аренах.
-      c.save();
-      const avSky = c.createLinearGradient(0, 0, 0, DUEL_H);
-      avSky.addColorStop(0, "#132a40");
-      avSky.addColorStop(0.34, "#1d3a52");
-      avSky.addColorStop(0.7, "#2b5068");
-      avSky.addColorStop(1, "#3a6478");
-      c.fillStyle = avSky;
-      c.fillRect(0, 0, DUEL_W, DUEL_H);
-      // Клубящиеся тучи
-      for (let i = 0; i < 6; i++) {
-        const cx2 = 20 + i * 74;
-        const cy2 = 42 + (i % 3) * 26;
-        const cg = c.createRadialGradient(cx2, cy2, 6, cx2, cy2, 78);
-        cg.addColorStop(0, "rgba(96,132,158,.42)");
-        cg.addColorStop(1, "rgba(30,60,84,0)");
-        c.fillStyle = cg;
-        c.beginPath();
-        c.ellipse(cx2, cy2, 90, 40, 0, 0, Math.PI * 2);
-        c.fill();
-      }
-      // Дальние вершины
-      c.fillStyle = "rgba(58,94,120,.75)";
-      c.beginPath();
-      c.moveTo(0, 340); c.lineTo(62, 214); c.lineTo(122, 286); c.lineTo(186, 196);
-      c.lineTo(248, 280); c.lineTo(306, 220); c.lineTo(360, 300); c.lineTo(400, 270);
-      c.lineTo(400, 380); c.lineTo(0, 380);
-      c.closePath(); c.fill();
-      // Гигантская снежная стена
-      const wave = c.createLinearGradient(250, 60, 400, 560);
-      wave.addColorStop(0, "#ffffff");
-      wave.addColorStop(0.3, "#f1fbff");
-      wave.addColorStop(0.62, "#cfe9f7");
-      wave.addColorStop(1, "#93bdd4");
-      c.fillStyle = wave;
-      c.beginPath();
-      c.moveTo(400, 54);
-      c.bezierCurveTo(318, 74, 286, 150, 300, 222);
-      c.bezierCurveTo(312, 286, 286, 332, 300, 390);
-      c.bezierCurveTo(312, 442, 292, 486, 318, 528);
-      c.lineTo(400, 560);
-      c.closePath();
-      c.fill();
-      // Слои пены
-      c.save();
-      c.strokeStyle = "rgba(255,255,255,.78)";
-      c.lineWidth = 5;
-      c.lineCap = "round";
-      for (let i = 0; i < 5; i++) {
-        c.beginPath();
-        c.moveTo(400, 110 + i * 74);
-        c.bezierCurveTo(340 - i * 8, 140 + i * 66, 318 + i * 4, 210 + i * 62, 330 + i * 3, 268 + i * 60);
-        c.stroke();
-      }
-      c.restore();
-      // Глыбы льда внутри волны
-      const block = (bx, by, s, rot) => {
-        c.save();
-        c.translate(bx, by);
-        c.rotate(rot);
-        c.scale(s, s);
-        const bg = c.createLinearGradient(-12, -12, 12, 12);
-        bg.addColorStop(0, "#eaf9ff");
-        bg.addColorStop(0.5, "#b6d7e8");
-        bg.addColorStop(1, "#7fa6bd");
-        c.fillStyle = bg;
-        c.beginPath();
-        c.moveTo(-11, -4); c.lineTo(-6, -11); c.lineTo(5, -12); c.lineTo(12, -3);
-        c.lineTo(10, 8); c.lineTo(0, 12); c.lineTo(-9, 7);
-        c.closePath();
-        c.fill();
-        c.strokeStyle = "rgba(255,255,255,.85)";
-        c.lineWidth = 1.1;
-        c.stroke();
-        c.fillStyle = "rgba(255,255,255,.85)";
-        c.beginPath();
-        c.moveTo(-6, -11); c.lineTo(5, -12); c.lineTo(8, -7); c.lineTo(-4, -6);
-        c.closePath();
-        c.fill();
-        c.restore();
-      };
-      block(336, 186, 1.1, 0.3);
-      block(312, 318, 1.35, -0.45);
-      block(344, 430, 1.2, 0.2);
-      block(322, 512, 1.5, -0.2);
-      // Снежная пыль у кромки
-      for (let i = 0; i < 120; i++) {
-        const sx = 282 + ((i * 37.3) % 118);
-        const sy = 90 + ((i * 71.9) % 500);
-        const edge = 300 + Math.sin(i * 0.7) * 26;
-        if (sx < edge - 22) continue;
-        c.globalAlpha = 0.12 + (i % 5) * 0.05;
-        c.fillStyle = i % 3 ? "#ffffff" : "#d8f2ff";
-        c.beginPath();
-        c.arc(sx, sy, 0.8 + (i % 4) * 0.55, 0, Math.PI * 2);
-        c.fill();
-      }
-      c.globalAlpha = 1;
-      // Косые штрихи бури
-      c.strokeStyle = "rgba(220,244,255,.16)";
-      c.lineWidth = 1.2;
-      for (let i = 0; i < 70; i++) {
-        const sx = (i * 61.7 + 13) % DUEL_W;
-        const sy = (i * 103.3) % DUEL_H;
-        c.beginPath();
-        c.moveTo(sx, sy);
-        c.lineTo(sx - 13, sy + 26);
-        c.stroke();
-      }
-      // Скалы и сломанное дерево слева
-      c.fillStyle = "rgba(9,26,42,.82)";
-      c.beginPath();
-      c.moveTo(0, 600); c.lineTo(0, 470); c.lineTo(26, 442); c.lineTo(52, 468);
-      c.lineTo(58, 520); c.lineTo(86, 548); c.lineTo(92, 600);
-      c.closePath(); c.fill();
-      c.strokeStyle = "rgba(9,26,42,.82)";
-      c.lineWidth = 4;
-      c.beginPath();
-      c.moveTo(40, 470); c.lineTo(30, 402); c.lineTo(46, 356);
-      c.moveTo(34, 414); c.lineTo(12, 388);
-      c.moveTo(44, 372); c.lineTo(64, 344);
-      c.stroke();
-      c.restore();
+      duelArenaAvalanche(c);
     } else if (key === "abyss") {
       c.save();
       // Глубина: от светлой воды вверху к чёрной бездне внизу.
@@ -2870,8 +3555,11 @@ html, body, body * {
     c.drawImage(duelBackdropFor(duelState.arena), 0, 0);
     const t = duelState.frame;
 
-    duelAuroraCloud(c, t, 0, "#6ff0c4", "#9de8ff", 1.25);
-    duelAuroraCloud(c, t, 42, "#9d9bff", "#b6eaff", 0.85);
+    // Каньон и лавина — дневные арены: аврора им не идёт.
+    if (duelState.arena !== "canyon" && duelState.arena !== "avalanche") {
+      duelAuroraCloud(c, t, 0, "#6ff0c4", "#9de8ff", 1.25);
+      duelAuroraCloud(c, t, 42, "#9d9bff", "#b6eaff", 0.85);
+    }
 
     const tint = DUEL_PHASE_TINTS[duelState.level] || DUEL_PHASE_TINTS[0];
     if (tint !== DUEL_PHASE_TINTS[0]) {
@@ -2879,16 +3567,73 @@ html, body, body * {
       c.fillRect(0, 0, DUEL_W, DUEL_H);
     }
 
-    // Мягкий свет за боссом
-    c.save();
-    c.globalCompositeOperation = "lighter";
-    c.globalAlpha = 0.07 + 0.025 * Math.sin(t / 80);
-    const spot = c.createRadialGradient(DUEL_W / 2, 200, 30, DUEL_W / 2, 200, 170);
-    spot.addColorStop(0, "rgba(198,240,255,0.55)");
-    spot.addColorStop(1, "rgba(198,240,255,0)");
-    c.fillStyle = spot;
-    c.fillRect(0, 30, DUEL_W, 360);
-    c.restore();
+    // Мягкий свет за боссом (на светлых аренах он только «съедает» силуэт).
+    if (duelState.arena !== "canyon" && duelState.arena !== "avalanche") {
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      c.globalAlpha = 0.07 + 0.025 * Math.sin(t / 80);
+      const spot = c.createRadialGradient(DUEL_W / 2, 200, 30, DUEL_W / 2, 200, 170);
+      spot.addColorStop(0, "rgba(198,240,255,0.55)");
+      spot.addColorStop(1, "rgba(198,240,255,0)");
+      c.fillStyle = spot;
+      c.fillRect(0, 30, DUEL_W, 360);
+      c.restore();
+    }
+
+    // Живая атмосфера арен: свет в каньоне и позёмка у лавины.
+    if (duelState.arena === "canyon") {
+      c.save();
+      c.globalCompositeOperation = "lighter";
+      const pulse = 0.035 + 0.02 * Math.sin(t / 120) + 0.01 * Math.sin(t / 31);
+      const shaft = c.createLinearGradient(300, 70, 170, 560);
+      shaft.addColorStop(0, `rgba(255,246,214,${pulse * 2.2})`);
+      shaft.addColorStop(0.55, `rgba(255,242,210,${pulse})`);
+      shaft.addColorStop(1, "rgba(240,252,255,0)");
+      c.fillStyle = shaft;
+      c.beginPath();
+      c.moveTo(278, 58);
+      c.lineTo(318, 58);
+      c.lineTo(258, 560);
+      c.lineTo(104, 560);
+      c.closePath();
+      c.fill();
+      for (let i = 0; i < 12; i++) {
+        const p = (i * 0.081 + t * 0.00003) % 1;
+        const px = 292 - p * 150 + Math.sin(i * 2.3 + t / 140) * 18;
+        const py = 70 + p * 460;
+        c.globalAlpha = 0.08 + 0.08 * Math.sin(t / 55 + i * 1.7);
+        c.fillStyle = "#fff6dc";
+        c.beginPath();
+        c.arc(px, py, 0.7 + (i % 3) * 0.5, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.restore();
+    } else if (duelState.arena === "avalanche") {
+      c.save();
+      for (let i = 0; i < 6; i++) {
+        const px = 288 + Math.sin(t / 150 + i * 1.7) * 16 + (i % 2) * 20;
+        const py = 140 + i * 72 + Math.cos(t / 180 + i) * 12;
+        const pr = 26 + (i % 3) * 12;
+        const pg = c.createRadialGradient(px, py, 2, px, py, pr);
+        pg.addColorStop(0, "rgba(235,250,255,.12)");
+        pg.addColorStop(1, "rgba(235,250,255,0)");
+        c.fillStyle = pg;
+        c.beginPath();
+        c.arc(px, py, pr, 0, Math.PI * 2);
+        c.fill();
+      }
+      c.strokeStyle = "rgba(214,240,252,.16)";
+      c.lineWidth = 1;
+      for (let i = 0; i < 26; i++) {
+        const sx = (i * 43.7 + t * (3.2 + (i % 3))) % (DUEL_W + 60) - 30;
+        const sy = (i * 71.3) % DUEL_H;
+        c.beginPath();
+        c.moveTo(sx, sy);
+        c.lineTo(sx - 16, sy + 30);
+        c.stroke();
+      }
+      c.restore();
+    }
 
     // Снегопад
     c.save();
@@ -9462,7 +10207,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.26";
+  var GAME_VERSION = "1.0.27";
   var MENU = {
     padX: 20,
     titleY: 20,
