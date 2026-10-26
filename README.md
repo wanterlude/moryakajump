@@ -10,6 +10,7 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 ![Canvas 2D](https://img.shields.io/badge/Canvas%202D-4FC3F7?style=for-the-badge&logo=html5&logoColor=000)
 ![Version](https://img.shields.io/badge/version-v1.0.22-38bdf8?style=for-the-badge)
+[![Windows EXE](https://img.shields.io/badge/Windows-EXE-0078D6?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/wanterlude/moryakajump/releases/latest)
 
 </div>
 
