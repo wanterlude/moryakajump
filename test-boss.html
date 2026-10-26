@@ -7559,9 +7559,10 @@ html, body, body * {
   var squash = 0;
   var fallCooldown = 0;
   var WIND_FROM_SCORE = 1e4;
-  var WIND_FULL_SCORE = 1e5;
+  // Пик ветра — на 140 000, сила растёт до 4,8 px/кадра (было 5,8 к 100 000).
+  var WIND_FULL_SCORE = 14e4;
   var WIND_STRENGTH_MIN = 0.9;
-  var WIND_STRENGTH_MAX = 5.8;
+  var WIND_STRENGTH_MAX = 4.8;
   var WIND_REST_LONG_MIN = 750;
   var WIND_REST_LONG_MAX = 1050;
   var WIND_REST_FAST_MIN = 90;
@@ -8201,8 +8202,8 @@ html, body, body * {
           waveSpeed: 0,
           phase: 0,
           size: 1.1,
-          flap: 0,
-          flapSpeed: 0,
+          flap: Math.random() * Math.PI * 2,
+          flapSpeed: 0.025 + Math.random() * 0.035,
           hitCooldown: 0
         };
         birds.push(rock);
@@ -9334,7 +9335,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.24";
+  var GAME_VERSION = "1.0.25";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -10679,7 +10680,80 @@ html, body, body * {
       ctx.restore();
     }
   }
+  // Камни лавины: рисуем отдельно от птиц — снежный валун с гранями и снежной шапкой.
+  function drawAvalancheRock(rock) {
+    const size = (rock.size || 1) * 1.1;
+    ctx.save();
+    ctx.translate(rock.x, rock.y);
+    ctx.rotate((rock.flap || 0) * 1.8);
+    ctx.scale(size, size);
+    ctx.shadowColor = "rgba(30,70,100,.30)";
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
+    const stone = ctx.createLinearGradient(-14, -16, 14, 16);
+    stone.addColorStop(0, "#e8f3fb");
+    stone.addColorStop(0.34, "#b9cdda");
+    stone.addColorStop(0.72, "#8399ab");
+    stone.addColorStop(1, "#5b7286");
+    ctx.beginPath();
+    ctx.moveTo(-13, -3);
+    ctx.lineTo(-9, -12);
+    ctx.lineTo(0, -15);
+    ctx.lineTo(10, -10);
+    ctx.lineTo(15, 0);
+    ctx.lineTo(11, 10);
+    ctx.lineTo(1, 14);
+    ctx.lineTo(-8, 11);
+    ctx.lineTo(-14, 4);
+    ctx.closePath();
+    ctx.fillStyle = stone;
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = "rgba(42,76,102,.55)";
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+    // Грани
+    ctx.strokeStyle = "rgba(48,82,108,.30)";
+    ctx.lineWidth = 0.9;
+    ctx.beginPath();
+    ctx.moveTo(-9, -12);
+    ctx.lineTo(-2, -4);
+    ctx.lineTo(1, 14);
+    ctx.moveTo(-2, -4);
+    ctx.lineTo(10, -10);
+    ctx.moveTo(-2, -4);
+    ctx.lineTo(-13, -3);
+    ctx.stroke();
+    // Снежная шапка
+    ctx.beginPath();
+    ctx.moveTo(-9, -12);
+    ctx.quadraticCurveTo(-4, -17, 2, -15);
+    ctx.quadraticCurveTo(6, -13.5, 8, -9.5);
+    ctx.quadraticCurveTo(1, -11.5, -4, -9.8);
+    ctx.quadraticCurveTo(-7, -10.6, -9, -12);
+    ctx.closePath();
+    ctx.fillStyle = "rgba(250,254,255,.92)";
+    ctx.fill();
+    // Блик и льдинка
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    ctx.beginPath();
+    ctx.ellipse(-4, 3, 4.6, 2.2, -0.45, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "rgba(210,244,255,.9)";
+    ctx.beginPath();
+    ctx.moveTo(6, 2);
+    ctx.lineTo(8.6, 5.2);
+    ctx.lineTo(6.2, 7.4);
+    ctx.lineTo(4, 4.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
   function drawBird(bird) {
+    if (avalancheRocks.has(bird)) {
+      drawAvalancheRock(bird);
+      return;
+    }
     const flap = Math.sin(bird.flap);
     const size = bird.size || 1;
     const body = bird.color;
@@ -10697,7 +10771,6 @@ html, body, body * {
       ctx.ellipse(0, shadowY, 11, 2.6, 0, 0, Math.PI * 2);
       ctx.fill();
     }
-    if (avalancheRocks.has(bird)) ctx.rotate(Math.PI / 2);
     const tailLen = bird.kind === "raven" ? 15 : bird.kind === "swift" ? 11 : 13;
     ctx.fillStyle = body;
     ctx.beginPath();
