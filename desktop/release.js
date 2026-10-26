@@ -14,17 +14,23 @@ if (!fs.existsSync(exe)) {
 }
 
 function gh(args, silent) {
-  const res = spawnSync("gh", args, { stdio: silent ? "ignore" : "inherit", shell: true });
+  const res = spawnSync("gh", args, { stdio: silent ? "ignore" : "inherit" });
+  if (res.error) console.error(res.error.message);
   return res.status === 0;
 }
 
 function changelogNotes() {
   try {
-    const text = fs.readFileSync(path.join(__dirname, "..", "Changelog"), "utf8");
-    const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const match = text.match(new RegExp("^\\[Версия " + escaped + "\\]\\n([\\s\\S]*?)(?=^\\[Версия |\\s*$)", "m"));
-    if (match && match[1].trim()) {
-      return match[1].trim().replace(/^> ?/gm, "");
+    const lines = fs.readFileSync(path.join(__dirname, "..", "Changelog"), "utf8").split(/\r?\n/);
+    const start = lines.findIndex((line) => line.trim() === "[" + "Версия " + version + "]");
+    if (start >= 0) {
+      const out = [];
+      for (let i = start + 1; i < lines.length; i++) {
+        if (/^\[Версия /.test(lines[i])) break;
+        out.push(lines[i].replace(/^> ?/, ""));
+      }
+      const body = out.join("\n").trim();
+      if (body) return body;
     }
   } catch (e) {}
   return `Moryaka Jump ${version}.`;
