@@ -9,7 +9,7 @@
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
 ![Canvas 2D](https://img.shields.io/badge/Canvas%202D-4FC3F7?style=for-the-badge&logo=html5&logoColor=000)
-![Version](https://img.shields.io/badge/version-v1.0.21-38bdf8?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v1.0.22-38bdf8?style=for-the-badge)
 
 </div>
 
@@ -62,11 +62,18 @@
 | `test-boss.html` | тестовая сборка: панель выбора босса и количества жизней |
 | `test-frames.html` | тестовая галерея всех 211 рамок: анимация эффектов и номера по редкости |
 
+### 🖥️ Windows EXE
+
+Готовая портативная сборка — в [GitHub Releases](https://github.com/wanterlude/moryakajump/releases/latest) (`Moryaka-Jump-<версия>.exe`). Установка не нужна: запустил файл — играешь.
+
+Пересобрать и опубликовать: `cd desktop && npm install && npm run release` (для публикации нужен авторизованный `gh`).
+
 ## 📁 Структура
 
 - `index.html` — вся игра: HTML, CSS и JavaScript в одном файле.
 - `test-boss.html` — тестовая сборка для проверки боссов.
 - `test-frames.html` — галерея всех рамок и их эффектов.
+- `desktop/` — оболочка Electron и скрипты сборки Windows-exe.
 - `Changelog` — история изменений, новые версии сверху.
 - `1.jpg`–`27.jpg`, `fon.jpg` — локальные материалы игры.
 

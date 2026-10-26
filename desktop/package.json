@@ -1,0 +1,43 @@
+{
+  "name": "moryaka-jump",
+  "version": "1.0.22",
+  "description": "Moryaka Jump — зимний бесконечный платформер",
+  "author": "Wanterlude",
+  "license": "MIT",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "prepare:app": "node prepare.js",
+    "dist": "npm run prepare:app && electron-builder --win portable",
+    "release": "npm run dist && node release.js"
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.wanterlude.moryakajump",
+    "productName": "Moryaka Jump",
+    "artifactName": "Moryaka-Jump-${version}.exe",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "icon.ico",
+      "*.jpg"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.ico"
+    }
+  }
+}
