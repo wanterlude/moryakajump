@@ -123,7 +123,7 @@ const hook = String.raw`
       m.lifeEvents = [];
       m.steps = 0;
       m.lastBirdStep = -9999;
-      m.run = { maxBoss: -1, maxScore: 0, birdHits: 0, events: new Set(), lastType: "", landings: 0, duelHits: [], shieldHits: 0, duelReached: false, bossMinHp: null, duelStartLives: null, coinsAtBoss: null };
+      m.run = { maxBoss: -1, maxScore: 0, birdHits: 0, events: new Set(), lastType: "", landings: 0, duelHits: [], shieldHits: 0, duelReached: false, bossMinHp: null, duelStartLives: null, coinsAtBoss: null, startLives: lives, lifeLog: [], duels: [] };
     };
 
     m.bot = function () {
@@ -149,7 +149,31 @@ const hook = String.raw`
         return;
       }
       if (s.duel) {
+        m.duelTick = (m.duelTick || 0) + 1;
+        var threatNear = false;
+        for (var tn = 0; tn < s.bullets.length; tn++) {
+          var tb = s.bullets[tn];
+          if (!tb.own && tb.delay <= 0 && tb.y > 300 && Math.abs(tb.x - (s.duelPx + 15)) < 170) { threatNear = true; break; }
+        }
+        if (m.duelTick % 2 === 1 && !threatNear && !s.telegraph) {
+          window.__sim.mouse(m.aimPrev || 200);
+          return;
+        }
         var cur = s.duelPx + 15;
+        // С большим запасом жизней хватает быстрого реактивного уклонения.
+        if (s.duelLives >= 4) {
+          var cheapBest = null;
+          var cheapCands = [cur, cur - 60, cur + 60, cur - 120, cur + 120, 200, 70, 330];
+          for (var qc = 0; qc < cheapCands.length; qc++) {
+            var qx = Math.max(18, Math.min(382, cheapCands[qc]));
+            var qrisk = duelRisk(qx, s.bullets);
+            var qcost = qrisk * 10 + Math.abs(qx - cur) * 0.3 + Math.abs(qx - 200) * 0.02;
+            if (!cheapBest || qcost < cheapBest.cost) cheapBest = { x: qx, cost: qcost };
+          }
+          m.aimPrev = cheapBest.x;
+          window.__sim.mouse(cheapBest.x);
+          return;
+        }
         var planX = 200;
         var T = s.telegraph;
         if (T && T.left > 2) {
@@ -190,7 +214,7 @@ const hook = String.raw`
             events: duelState.events.slice()
           };
         }
-        function restoreDuel(sn) {
+        function restoreDuel(sn, light) {
           duelState.px = sn.px; duelState.invuln = sn.invuln; duelState.fireCd = sn.fireCd;
           duelState.bx = sn.bx; duelState.by = sn.by; duelState.bhp = sn.bhp; duelState.bmax = sn.bmax;
           duelState.index = sn.index; duelState.level = sn.level; duelState.bossKind = sn.bossKind;
@@ -200,19 +224,20 @@ const hook = String.raw`
           duelState.lives = sn.lives; duelState.shield = sn.shield;
           duelState.telegraph = sn.telegraph ? JSON.parse(JSON.stringify(sn.telegraph)) : null;
           duelState.bullets = sn.bullets.map(function (b) { return Object.assign({}, b); });
+          if (light) return;
           duelState.particles.length = 0;
           for (var pe = 0; pe < sn.particles.length; pe++) duelState.particles.push(Object.assign({}, sn.particles[pe]));
           duelState.events.length = 0;
           for (var ee = 0; ee < sn.events.length; ee++) duelState.events.push(sn.events[ee]);
         }
         var snapshot = snapDuel();
-        var cands = [cur, cur - 30, cur + 30, cur - 70, cur + 70, cur - 120, cur + 120, cur - 180, cur + 180, 200, 60, 340, planX];
+        var cands = [cur, cur - 45, cur + 45, cur - 100, cur + 100, cur - 160, cur + 160, 200, planX];
         var bestMove = null;
         for (var k2 = 0; k2 < cands.length; k2++) {
           var cx2 = Math.max(16, Math.min(384, cands[k2]));
-          restoreDuel(snapshot);
+          restoreDuel(snapshot, true);
           var hits = 0;
-          for (var ft2 = 0; ft2 < 40; ft2++) {
+          for (var ft2 = 0; ft2 < 28; ft2++) {
             var lv0 = duelState.lives, sh0 = duelState.shield;
             duelUpdate(1, { left: false, right: false, targetX: cx2 });
             if (duelState.lives < lv0) hits += 3;
@@ -223,7 +248,7 @@ const hook = String.raw`
           if (Math.abs(cx2 - planX) <= 1) cost2 -= 18;
           if (!bestMove || cost2 < bestMove.cost) bestMove = { x: cx2, cost: cost2 };
         }
-        restoreDuel(snapshot);
+        restoreDuel(snapshot, false);
         m.aimPrev = bestMove.x;
         window.__sim.mouse(bestMove.x);
         return;
@@ -353,13 +378,29 @@ const hook = String.raw`
       var birdAfter = after.birds.some(function (b) { return b.hitCd > 40; });
       if (birdAfter && !birdBefore) { m.run.birdHits++; m.lastBirdStep = m.steps; }
       var birdRecent = (m.steps - m.lastBirdStep) < 110;
-      if (after.lives < before.lives && !before.duel) m.lifeEvents.push(attribute(before, after, birdRecent));
-      if (!before.duel && after.duel) { m.run.duelStartLives = after.duelLives; m.run.coinsAtBoss = before.runCoins; }
+      if (after.lives < before.lives && !before.duel) {
+        var lc = attribute(before, after, birdRecent);
+        m.lifeEvents.push(lc);
+        m.run.lifeLog.push({ score: Math.round(before.score), cause: lc, event: before.eventKind || "", wind: !!before.windActive });
+      }
+      if (!before.duel && after.duel) {
+        m.run.duelStartLives = after.duelLives;
+        m.run.coinsAtBoss = before.runCoins;
+        m.run.duels.push({ startLives: after.duelLives, hits: 0, shieldHits: 0, minHp: after.bossHp, startScore: Math.round(after.score), boss: after.bossIndex });
+      }
+      if (before.duel && !after.duel) {
+        var dlast = m.run.duels[m.run.duels.length - 1];
+        if (dlast) { dlast.won = dlast.minHp <= 0; dlast.endScore = Math.round(after.score); dlast.endLives = after.duelLives; }
+      }
       if (before.duel) {
         m.run.duelReached = true;
         if (before.bossMax && (m.run.bossMinHp == null || before.bossHp < m.run.bossMinHp)) m.run.bossMinHp = before.bossHp;
-        if (after.duelShield < before.duelShield) m.run.shieldHits++;
+        var dcur = m.run.duels[m.run.duels.length - 1];
+        if (dcur && before.bossHp < dcur.minHp) dcur.minHp = before.bossHp;
+        if (after.duelShield < before.duelShield) { m.run.shieldHits++; if (dcur) dcur.shieldHits++; }
         if (after.duelLives < before.duelLives) {
+          m.run.lifeLog.push({ score: Math.round(before.score), cause: "duel", event: before.eventKind || "", wind: !!before.windActive });
+          if (dcur) dcur.hits++;
           m.lifeEvents.push("duel");
           var nearKind = "?";
           var nd = 1e9;
@@ -401,7 +442,12 @@ const hook = String.raw`
           shieldHits: m.run.shieldHits,
           bossMinHp: m.run.bossMinHp,
           duelStartLives: m.run.duelStartLives,
-          coinsAtBoss: m.run.coinsAtBoss
+          coinsAtBoss: m.run.coinsAtBoss,
+          startLives: m.run.startLives,
+          lifeLog: m.run.lifeLog,
+          duels: m.run.duels,
+          deathEvent: before.eventKind || "",
+          deathWind: !!before.windActive
         });
         m.finished++;
         m.run = null;
