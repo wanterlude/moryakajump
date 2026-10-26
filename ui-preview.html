@@ -44,46 +44,46 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #gameStage:fullscreen #toolbar{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10}
 #resetOverlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #resetOverlay.open{display:flex}
-#resetCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
+#resetCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(8,30,60,.28);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
 @keyframes resetIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
-#resetCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
-#resetCard p{margin:0 0 18px;font-size:12.5px;line-height:1.5;color:rgba(210,228,246,.78)}
-#resetCard .warn{display:block;margin-top:6px;font-size:11px;color:#ffb3b8}
+#resetCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#0f3d5c}
+#resetCard p{margin:0 0 18px;font-size:12.5px;line-height:1.5;color:rgba(15,61,92,.62)}
+#resetCard .warn{display:block;margin-top:6px;font-size:11px;color:#b02a34}
 #resetActions{display:flex;gap:10px}
 #resetActions button{flex:1;padding:12px 10px;border-radius:13px;border:1px solid transparent;font:bold 12.5px Arial,sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
 #resetActions button:active{transform:scale(.97)}
-#resetCancel{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#resetCancel{background:rgba(255,255,255,.9);border-color:rgba(15,61,92,.18);color:#0f3d5c}
 #resetCancel:hover{background:rgba(255,255,255,.18)}
 #resetConfirm{background:linear-gradient(180deg,#e85a63,#c8323c);color:#fff}
 #resetConfirm:hover{filter:brightness(1.08)}
 #nickOverlay{position:fixed;inset:0;z-index:210;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #nickOverlay.open{display:flex}
-#nickCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
-#nickCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
-#nickCard p{margin:0 0 14px;font-size:12.5px;line-height:1.5;color:rgba(210,228,246,.78)}
-#nickInput{width:100%;padding:12px 14px;border-radius:13px;border:1px solid rgba(255,255,255,.22);background:rgba(6,16,32,.55);color:#fff;font:bold 16px "Trebuchet MS","Segoe UI",Arial,sans-serif;text-align:center;letter-spacing:.6px;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation}
-#nickInput::placeholder{color:rgba(210,228,246,.42);font-weight:normal;letter-spacing:.3px}
-#nickInput:focus{border-color:rgba(120,220,255,.6);box-shadow:0 0 0 3px rgba(80,190,240,.18)}
+#nickCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(8,30,60,.28);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
+#nickCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#0f3d5c}
+#nickCard p{margin:0 0 14px;font-size:12.5px;line-height:1.5;color:rgba(15,61,92,.62)}
+#nickInput{width:100%;padding:12px 14px;border-radius:13px;border:1px solid rgba(15,61,92,.2);background:rgba(255,255,255,.92);color:#0f3d5c;font:bold 16px "Trebuchet MS","Segoe UI",Arial,sans-serif;text-align:center;letter-spacing:.6px;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation}
+#nickInput::placeholder{color:rgba(15,61,92,.4);font-weight:normal;letter-spacing:.3px}
+#nickInput:focus{border-color:rgba(35,150,190,.55);box-shadow:0 0 0 3px rgba(80,190,240,.15)}
 #nickActions{display:flex;gap:10px;margin-top:14px}
 #nickActions button{flex:1;padding:12px 10px;border-radius:13px;border:1px solid transparent;font:bold 12.5px Arial,sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
 #nickActions button:active{transform:scale(.97)}
-#nickCancel{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#nickCancel{background:rgba(255,255,255,.9);border-color:rgba(15,61,92,.18);color:#0f3d5c}
 #nickCancel:hover{background:rgba(255,255,255,.18)}
 #nickConfirm{background:linear-gradient(180deg,#22a884,#0f8a76);color:#fff}
 #nickConfirm:hover{filter:brightness(1.08)}
 #saveOverlay{position:fixed;inset:0;z-index:220;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #saveOverlay.open{display:flex}
-#saveCard{width:min(380px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
-#saveCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
-#saveCard p{margin:0 0 12px;font-size:12px;line-height:1.5;color:rgba(210,228,246,.78)}
-#saveText{width:100%;height:88px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(6,16,32,.55);color:#eaf4ff;font:11px Consolas,monospace;line-height:1.35;resize:none;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation;word-break:break-all}
-#saveText:focus{border-color:rgba(120,220,255,.6);box-shadow:0 0 0 3px rgba(80,190,240,.18)}
+#saveCard{width:min(380px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(8,30,60,.28);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
+#saveCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#0f3d5c}
+#saveCard p{margin:0 0 12px;font-size:12px;line-height:1.5;color:rgba(15,61,92,.62)}
+#saveText{width:100%;height:88px;padding:10px;border-radius:12px;border:1px solid rgba(15,61,92,.2);background:rgba(255,255,255,.92);color:#0f3d5c;font:11px Consolas,monospace;line-height:1.35;resize:none;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation;word-break:break-all}
+#saveText:focus{border-color:rgba(35,150,190,.55);box-shadow:0 0 0 3px rgba(80,190,240,.15)}
 #saveActions{display:flex;gap:10px;margin-top:12px}
 #saveActions button,#saveClose{flex:1;padding:12px 8px;border-radius:13px;border:1px solid transparent;font:bold 11px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
 #saveActions button:active,#saveClose:active{transform:scale(.97)}
 #saveCopy{background:linear-gradient(180deg,#22a884,#0f8a76);color:#fff}
 #saveLoad{background:linear-gradient(180deg,#3d8ec0,#1d6b9c);color:#fff}
-#saveClose{margin-top:10px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#saveClose{margin-top:10px;background:rgba(255,255,255,.9);border-color:rgba(15,61,92,.18);color:#0f3d5c}
 #pauseButton,#tiltButton{display:none!important}
 @media (max-width:600px) and (pointer:coarse){
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
@@ -125,7 +125,7 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .lbList li{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.72);margin-bottom:6px;font-size:12px}
 .lbList li .nm{font-weight:bold;color:#0f3d5c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lbList li .sc{color:#b45309;font-weight:bold;flex:0 0 auto}
-.lbList li.me{outline:2px solid rgba(15,138,118,.55);background:rgba(219,250,244,.92)}
+.lbList li.me{background:rgba(219,250,244,.9)}
 /* Топ-3: золото, серебро и бронза — подсветка строки и боковая полоса. */
 .lbList li.lbP1{background:linear-gradient(90deg,rgba(255,231,153,.95),rgba(255,252,240,.82));box-shadow:inset 3px 0 0 #e2a600}
 .lbList li.lbP2{background:linear-gradient(90deg,rgba(228,237,246,.96),rgba(255,255,255,.82));box-shadow:inset 3px 0 0 #94a7b9}
@@ -184,7 +184,7 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .profileAch{padding-right:2px}
 .profileAch::-webkit-scrollbar{width:5px}
 .profileAch::-webkit-scrollbar-thumb{background:rgba(15,61,92,.25);border-radius:3px}
-.sheetCloseX{position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.92);color:#0f3d5c;font:bold 20px/1 Arial,sans-serif;box-shadow:0 6px 18px rgba(8,30,60,.18);cursor:pointer;z-index:10;touch-action:manipulation}
+.sheetCloseX{position:sticky;top:0;float:right;margin:-8px -8px 6px 0;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.92);color:#0f3d5c;font:bold 18px/1 Arial,sans-serif;box-shadow:0 4px 14px rgba(8,30,60,.14);cursor:pointer;z-index:10;touch-action:manipulation}
 .sheetCloseX:active{transform:scale(.94)}
 .profileAchRow{display:flex;gap:8px;align-items:flex-start;padding:6px 2px;border-bottom:1px solid rgba(15,61,92,.08);text-align:left}
 .profileAchRow:last-child{border-bottom:0}
@@ -345,8 +345,8 @@ html, body, body * {
     </div>
 </div>
 <div id="profileOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="profileTitle" aria-hidden="true">
-    <button id="profileX" class="sheetCloseX" type="button" aria-label="Закрыть профиль">×</button>
     <div class="sheetCard profileCard">
+        <button id="profileX" class="sheetCloseX" type="button" aria-label="Закрыть профиль">×</button>
         <h2 id="profileTitle">ПРОФИЛЬ</h2>
         <div id="profileStats" class="profileStats"></div>
         <div class="profileSection">ЖУРНАЛ БОССОВ · ПОБЕДЫ / БОИ</div>
@@ -8694,6 +8694,7 @@ html, body, body * {
     questState.progress = 0;
     questState.done = false;
     questState.failed = false;
+    questState.failedAt = 0;
     questState.springUsed = false;
     questState.birdHit = false;
     questState.doneAt = 0;
@@ -8710,6 +8711,7 @@ html, body, body * {
     if (!quest || questState.done) return;
     if (questFailedNow()) {
       questState.failed = true;
+      questState.failedAt = performance.now();
       hudPop(player.x + 15, player.y - 24, "\u0417\u0410\u0414\u0410\u041D\u0418\u0415 \u041F\u0420\u041E\u0412\u0410\u041B\u0415\u041D\u041E", "#e63946");
       return;
     }
@@ -10211,9 +10213,24 @@ html, body, body * {
   };
   // Иконки в главном меню: настройки и глобальный рейтинг.
   // Иконки меню: 22×22 — примерно на 15% меньше прежних 26×26.
-  var MENU_GEAR = { x: 29, y: 88, w: 28, h: 28 };
-  var MENU_LB = { x: 63, y: 88, w: 28, h: 28 };
-  var MENU_PROFILE = { x: 97, y: 88, w: 28, h: 28 };
+  var MENU_GEAR = { x: 223, y: 13, w: 22, h: 22 };
+  var MENU_LB = { x: 249, y: 13, w: 22, h: 22 };
+  var MENU_PROFILE = { x: 275, y: 13, w: 22, h: 22 };
+  function updateMenuIconRects() {
+    const label = fmt(bankCoins);
+    setFont(11, "bold");
+    const tw = trackedWidth(label, 0.4);
+    const chipW = 30 + tw + 12;
+    const chipX = WORLD_W - MENU.padX - chipW;
+    const size = 22, gap = 4;
+    const profileX = chipX - 8 - size;
+    const lbX = profileX - gap - size;
+    const gearX = lbX - gap - size;
+    const y = MENU.titleY - 11;
+    MENU_GEAR = { x: gearX, y, w: size, h: size };
+    MENU_LB = { x: lbX, y, w: size, h: size };
+    MENU_PROFILE = { x: profileX, y, w: size, h: size };
+  }
   var menuCursors = {
     avatars: selectedAvatar,
     shop: Math.max(0, FRAMES.findIndex((f) => f.id === selectedFrame)),
@@ -10386,6 +10403,100 @@ html, body, body * {
     setMenuMessage("Аватар выбран", avatarName(i));
     sfx.click();
   }
+  function drawMenuGateIcon(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    const g = ctx.createLinearGradient(-16, -16, 16, 16);
+    g.addColorStop(0, "#f4fdff");
+    g.addColorStop(0.45, "#bfe5f2");
+    g.addColorStop(1, "#5f9bb7");
+    ctx.fillStyle = g;
+    roundedRect(-15, -16, 6, 30, 3);
+    ctx.fill();
+    roundedRect(9, -16, 6, 30, 3);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-15, -8);
+    ctx.quadraticCurveTo(0, -30, 15, -8);
+    ctx.lineTo(15, -1);
+    ctx.quadraticCurveTo(0, -23, -15, -1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "rgba(8,30,48,.8)";
+    ctx.beginPath();
+    ctx.moveTo(-8, 14);
+    ctx.lineTo(-8, -4);
+    ctx.quadraticCurveTo(0, -14, 8, -4);
+    ctx.lineTo(8, 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#ffc247";
+    ctx.beginPath();
+    ctx.arc(-3, -1, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(3, -1, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(-11, -16, 5, 2.2, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(11, -16, 5, 2.2, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawMenuChestIcon(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    const body = ctx.createLinearGradient(0, -10, 0, 14);
+    body.addColorStop(0, "#c98f58");
+    body.addColorStop(0.55, "#9a6039");
+    body.addColorStop(1, "#6a4128");
+    ctx.fillStyle = body;
+    roundedRect(-16, -6, 32, 20, 4);
+    ctx.fill();
+    const lid = ctx.createLinearGradient(0, -18, 0, -4);
+    lid.addColorStop(0, "#d8a06a");
+    lid.addColorStop(1, "#8f5834");
+    ctx.fillStyle = lid;
+    ctx.beginPath();
+    ctx.moveTo(-16, -6);
+    ctx.quadraticCurveTo(-16, -18, 0, -18);
+    ctx.quadraticCurveTo(16, -18, 16, -6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#e0b45c";
+    ctx.fillRect(-16, -7, 32, 2.4);
+    ctx.fillRect(-3, -18, 6, 32);
+    ctx.fillStyle = "#f2c14e";
+    roundedRect(-4, 1, 8, 8, 2);
+    ctx.fill();
+    ctx.fillStyle = "#6a4128";
+    ctx.beginPath();
+    ctx.arc(0, 4.5, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(0, -18, 12, 2.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawMenuObjectButton(x, y, w, h, label, type) {
+    const hovered = pauseState.hover === "menu-btn-" + label;
+    uiPill(x, y, w, h, {
+      fill: hovered ? UI.surfaceSolid : "rgba(255,255,255,.62)",
+      radius: 13
+    });
+    const cx = x + w / 2;
+    if (type === "gate") drawMenuGateIcon(cx, y + 24, 0.78);
+    else drawMenuChestIcon(cx, y + 21, 0.78);
+    setFont(type === "chest" ? 6.0 : 6.4, "bold");
+    ctx.fillStyle = UI.ink;
+    trackedText(label, cx, y + h - 9, type === "chest" ? 0.2 : 0.4);
+  }
   function drawMenuButton(x, y, w, h, label, tone = "green", options = {}) {
     const { size = 12, tracking = 1.6, sub = "", icon = null, dim = false } = options;
     const hovered = pauseState.hover === "menu-btn-" + label && !dim;
@@ -10405,18 +10516,41 @@ html, body, body * {
     const fg = dim ? UI.inkSoft : glass ? UI.ink : "#ffffff";
     setFont(size, "bold");
     const labelW = trackedWidth(label, tracking);
-    const shift = icon === "play" ? 9 : 0;
+    const shift = icon ? 8 : 0;
     ctx.fillStyle = fg;
     trackedText(label, cx + shift, mainY, tracking);
-    if (icon === "play") {
+    if (icon) {
       const tx = cx + shift - labelW / 2 - 11;
-      ctx.beginPath();
-      ctx.moveTo(tx, mainY - 5.5);
-      ctx.lineTo(tx + 8.5, mainY);
-      ctx.lineTo(tx, mainY + 5.5);
-      ctx.closePath();
-      ctx.fillStyle = fg;
-      ctx.fill();
+      if (icon === "play") {
+        ctx.beginPath();
+        ctx.moveTo(tx, mainY - 5.5);
+        ctx.lineTo(tx + 8.5, mainY);
+        ctx.lineTo(tx, mainY + 5.5);
+        ctx.closePath();
+        ctx.fillStyle = fg;
+        ctx.fill();
+      } else if (icon === "coin") {
+        const cg = ctx.createRadialGradient(tx - 1.2, mainY - 1.2, 0.5, tx, mainY, 4.4);
+        cg.addColorStop(0, "#fff4a3");
+        cg.addColorStop(0.55, "#ffc928");
+        cg.addColorStop(1, "#d88900");
+        ctx.beginPath();
+        ctx.arc(tx, mainY, 4.4, 0, Math.PI * 2);
+        ctx.fillStyle = cg;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.8)";
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      } else if (icon === "frame") {
+        roundedRect(tx - 4, mainY - 5, 8, 10, 2);
+        ctx.strokeStyle = fg;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+      } else if (icon === "platform") {
+        roundedRect(tx - 5, mainY - 2, 10, 4, 2);
+        ctx.fillStyle = fg;
+        ctx.fill();
+      }
     }
     if (sub) {
       setFont(6.6, "bold");
@@ -11030,14 +11164,8 @@ html, body, body * {
       tracking: 1.2,
       icon: "play"
     });
-    drawMenuButton(286, MENU.barY, 44, MENU.barH, "БОССЫ", "green", {
-      size: 7.2,
-      tracking: 0.5
-    });
-    drawMenuButton(334, MENU.barY, 54, MENU.barH, "СОХРАНИТЬ", "glass", {
-      size: 6.8,
-      tracking: 0.2
-    });
+    drawMenuObjectButton(286, MENU.barY, 44, MENU.barH, "БОССЫ", "gate");
+    drawMenuObjectButton(334, MENU.barY, 54, MENU.barH, "СОХРАНИТЬ", "chest");
     ctx.save();
     ctx.textBaseline = "middle";
     setFont(7.5, "bold");
@@ -11123,6 +11251,7 @@ html, body, body * {
     }
   }
   function drawMenu() {
+    updateMenuIconRects();
     drawBackground();
     const glow = ctx.createRadialGradient(200, 60, 10, 200, 60, 240);
     glow.addColorStop(0, "rgba(255,255,255,.5)");
@@ -13742,13 +13871,48 @@ html, body, body * {
     }
     ctx.restore();
   }
-  function drawDailyQuest() {
+  function drawDailyQuest(compact = false) {
     const def = dailyDef();
     // Карточка скрывается сразу после выполнения и до следующего дня.
     if (!def || dailyState.done) return;
     const d = dailyState;
-    const x = 15, y = 100, h = 20;
     const shown = Math.min(d.progress, def.target);
+    if (compact) {
+      const cx0 = 150, cy0 = 14, ch = 20;
+      const frac = Math.max(0, Math.min(1, shown / def.target));
+      const label = Math.floor(frac * 100) + "%" + (d.streak > 0 ? " ·" + d.streak : "");
+      setFont(6.6, "bold");
+      const tw = trackedWidth(label, 0.4);
+      const w = 20 + tw + 12;
+      drawHudChip(cx0, cy0, w, ch, null);
+      const ix = cx0 + 11, iy = cy0 + ch / 2 - 0.5;
+      ctx.save();
+      ctx.strokeStyle = "#b07a00";
+      ctx.lineWidth = 1;
+      ctx.lineCap = "round";
+      for (let i = 0; i < 3; i++) {
+        const a = i * Math.PI / 3;
+        ctx.beginPath();
+        ctx.moveTo(ix - Math.cos(a) * 3, iy - Math.sin(a) * 3);
+        ctx.lineTo(ix + Math.cos(a) * 3, iy + Math.sin(a) * 3);
+        ctx.stroke();
+      }
+      ctx.restore();
+      setFont(6.6, "bold");
+      ctx.fillStyle = "rgba(15,61,92,.86)";
+      trackedText(label, cx0 + 20, iy, 0.4, "left");
+      const barW = w - 20;
+      roundedRect(cx0 + 10, cy0 + ch - 4, barW, 2.2, 1.1);
+      ctx.fillStyle = "rgba(15,61,92,.10)";
+      ctx.fill();
+      if (frac > 0) {
+        roundedRect(cx0 + 10, cy0 + ch - 4, Math.max(2, barW * frac), 2.2, 1.1);
+        ctx.fillStyle = "#e0a91f";
+        ctx.fill();
+      }
+      return;
+    }
+    const x = 15, y = 84, h = 20;
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
     setFont(6.5, "bold");
     const head = `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
@@ -13813,37 +13977,37 @@ html, body, body * {
     ctx.shadowColor = "rgba(12,40,64,.14)";
     ctx.shadowBlur = 12;
     ctx.shadowOffsetY = 4;
-    roundedRect(10, 8, 154, 58, 14);
+    roundedRect(10, 8, 132, 46, 13);
     ctx.fillStyle = "rgba(255,255,255,.78)";
     ctx.fill();
     ctx.shadowColor = "transparent";
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
-    roundedRect(10.5, 8.5, 153, 57, 13.5);
+    roundedRect(10.5, 8.5, 131, 45, 12.5);
     ctx.strokeStyle = "rgba(255,255,255,.95)";
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
-    setFont(7.2, "bold");
+    setFont(6.6, "bold");
     ctx.fillStyle = "rgba(18,59,82,.55)";
-    trackedText("СЧЁТ", 20, 20, 2, "left");
-    setFont(26, "bold");
+    trackedText("СЧЁТ", 18, 17, 2, "left");
+    setFont(22, "bold");
     ctx.fillStyle = "#0f3d5c";
-    trackedText(fmt(bigScore), 20, 39, 0.5, "left");
+    trackedText(fmt(bigScore), 18, 32, 0.5, "left");
     const beatingRecord = Math.floor(player.score) > highScore && highScore > 0;
-    setFont(7, "bold");
+    setFont(6.3, "bold");
     if (beatingRecord) {
       const pulse = 0.72 + 0.28 * Math.sin(t * 4);
       ctx.fillStyle = `rgba(176,122,0,${pulse})`;
-      trackedText("НОВЫЙ РЕКОРД", 20, 55, 1.4, "left");
+      trackedText("НОВЫЙ РЕКОРД", 18, 45, 1.3, "left");
     } else {
       ctx.fillStyle = "rgba(18,59,82,.58)";
-      trackedText(`РЕКОРД ${fmt(highScore)}`, 20, 55, 1.2, "left");
+      trackedText(`РЕКОРД ${fmt(highScore)}`, 18, 45, 1.1, "left");
     }
     ctx.restore();
     let chipX = 15;
-    const chipY = 72, chipH = 22;
+    const chipY = 58, chipH = 20;
     setFont(11, "bold");
     const livesText = String(Math.min(lives, 999));
     const livesW = Math.max(46, 30 + ctx.measureText(livesText).width + 12);
@@ -13939,12 +14103,19 @@ html, body, body * {
         questPlateAlpha = (QUEST_DONE_SHOW_MS - elapsed) / QUEST_DONE_FADE_MS;
       }
     }
+    if (questState.active && questState.failed && questState.failedAt) {
+      const elapsed = performance.now() - questState.failedAt;
+      if (elapsed >= 3000) questPlateAlpha = 0;
+      else if (elapsed > 2200) questPlateAlpha = (3000 - elapsed) / 800;
+    }
     const hasQuest = !!questState.active && questPlateAlpha > 0;
     const hasWind = wind.active;
     // Ежедневка висит выше плашек ветра и задания на забег; когда она скрыта
     // (выполнена), плашки поднимаются на её место, чтобы не было пустоты.
-    const dailyShown = !dailyState.done && !!dailyDef();
-    const infoY = dailyShown ? 126 : 100;
+    const dailyActive = !dailyState.done && !!dailyDef();
+    const dailyCompact = dailyActive && runStartedAt > 0 && performance.now() - runStartedAt > 4000;
+    const dailyFull = dailyActive && !dailyCompact;
+    const infoY = dailyFull ? 108 : 84;
     if (hasQuest || hasWind) {
       ctx.save();
       ctx.textBaseline = "middle";
@@ -14008,7 +14179,7 @@ html, body, body * {
       }
       ctx.restore();
     }
-    drawDailyQuest();
+    drawDailyQuest(dailyCompact);
     drawHudButtons();
     if (performance.now() < tiltFeedbackUntil) {
       ctx.save();
@@ -15716,7 +15887,8 @@ html, body, body * {
   function drawGachaPlayButton() {
     drawMenuButton(GACHA_UI.playX, GACHA_UI.spinY, GACHA_UI.playW, GACHA_UI.spinH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
       size: 11,
-      tracking: 1
+      tracking: 1,
+      icon: "play"
     });
   }
   function drawGachaSpinButton() {
@@ -16087,9 +16259,9 @@ html, body, body * {
       MENU.barH,
       spinBusy ? "\u041A\u0420\u0423\u0422\u0418\u0422\u0421\u042F\u2026" : "\u041A\u0420\u0423\u0422\u0418\u0422\u042C \xB7 " + PLATFORM_GACHA_COST,
       canAfford && !spinBusy ? "gold" : "green",
-      { size: 12, dim: !canAfford || spinBusy }
+      { size: 12, dim: !canAfford || spinBusy, icon: "coin" }
     );
-    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", { size: 11, tracking: 1 });
+    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", { size: 11, tracking: 1, icon: "play" });
     ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";

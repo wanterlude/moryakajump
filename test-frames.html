@@ -44,46 +44,46 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 #gameStage:fullscreen #toolbar{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10}
 #resetOverlay{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #resetOverlay.open{display:flex}
-#resetCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
+#resetCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(8,30,60,.28);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
 @keyframes resetIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
-#resetCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
-#resetCard p{margin:0 0 18px;font-size:12.5px;line-height:1.5;color:rgba(210,228,246,.78)}
-#resetCard .warn{display:block;margin-top:6px;font-size:11px;color:#ffb3b8}
+#resetCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#0f3d5c}
+#resetCard p{margin:0 0 18px;font-size:12.5px;line-height:1.5;color:rgba(15,61,92,.62)}
+#resetCard .warn{display:block;margin-top:6px;font-size:11px;color:#b02a34}
 #resetActions{display:flex;gap:10px}
 #resetActions button{flex:1;padding:12px 10px;border-radius:13px;border:1px solid transparent;font:bold 12.5px Arial,sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
 #resetActions button:active{transform:scale(.97)}
-#resetCancel{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#resetCancel{background:rgba(255,255,255,.9);border-color:rgba(15,61,92,.18);color:#0f3d5c}
 #resetCancel:hover{background:rgba(255,255,255,.18)}
 #resetConfirm{background:linear-gradient(180deg,#e85a63,#c8323c);color:#fff}
 #resetConfirm:hover{filter:brightness(1.08)}
 #nickOverlay{position:fixed;inset:0;z-index:210;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #nickOverlay.open{display:flex}
-#nickCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
-#nickCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
-#nickCard p{margin:0 0 14px;font-size:12.5px;line-height:1.5;color:rgba(210,228,246,.78)}
-#nickInput{width:100%;padding:12px 14px;border-radius:13px;border:1px solid rgba(255,255,255,.22);background:rgba(6,16,32,.55);color:#fff;font:bold 16px "Trebuchet MS","Segoe UI",Arial,sans-serif;text-align:center;letter-spacing:.6px;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation}
-#nickInput::placeholder{color:rgba(210,228,246,.42);font-weight:normal;letter-spacing:.3px}
-#nickInput:focus{border-color:rgba(120,220,255,.6);box-shadow:0 0 0 3px rgba(80,190,240,.18)}
+#nickCard{width:min(340px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(8,30,60,.28);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
+#nickCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#0f3d5c}
+#nickCard p{margin:0 0 14px;font-size:12.5px;line-height:1.5;color:rgba(15,61,92,.62)}
+#nickInput{width:100%;padding:12px 14px;border-radius:13px;border:1px solid rgba(15,61,92,.2);background:rgba(255,255,255,.92);color:#0f3d5c;font:bold 16px "Trebuchet MS","Segoe UI",Arial,sans-serif;text-align:center;letter-spacing:.6px;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation}
+#nickInput::placeholder{color:rgba(15,61,92,.4);font-weight:normal;letter-spacing:.3px}
+#nickInput:focus{border-color:rgba(35,150,190,.55);box-shadow:0 0 0 3px rgba(80,190,240,.15)}
 #nickActions{display:flex;gap:10px;margin-top:14px}
 #nickActions button{flex:1;padding:12px 10px;border-radius:13px;border:1px solid transparent;font:bold 12.5px Arial,sans-serif;letter-spacing:.5px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
 #nickActions button:active{transform:scale(.97)}
-#nickCancel{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#nickCancel{background:rgba(255,255,255,.9);border-color:rgba(15,61,92,.18);color:#0f3d5c}
 #nickCancel:hover{background:rgba(255,255,255,.18)}
 #nickConfirm{background:linear-gradient(180deg,#22a884,#0f8a76);color:#fff}
 #nickConfirm:hover{filter:brightness(1.08)}
 #saveOverlay{position:fixed;inset:0;z-index:220;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,32,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 #saveOverlay.open{display:flex}
-#saveCard{width:min(380px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,#1b2f4d,#132540);border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.55);text-align:center;color:#eaf4ff;animation:resetIn .18s ease-out}
-#saveCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#fff}
-#saveCard p{margin:0 0 12px;font-size:12px;line-height:1.5;color:rgba(210,228,246,.78)}
-#saveText{width:100%;height:88px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(6,16,32,.55);color:#eaf4ff;font:11px Consolas,monospace;line-height:1.35;resize:none;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation;word-break:break-all}
-#saveText:focus{border-color:rgba(120,220,255,.6);box-shadow:0 0 0 3px rgba(80,190,240,.18)}
+#saveCard{width:min(380px,92vw);padding:22px 22px 18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(236,248,255,.96));border:1px solid rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(8,30,60,.28);text-align:center;color:#0f3d5c;animation:resetIn .18s ease-out}
+#saveCard h2{margin:0 0 8px;font-size:17px;letter-spacing:.4px;color:#0f3d5c}
+#saveCard p{margin:0 0 12px;font-size:12px;line-height:1.5;color:rgba(15,61,92,.62)}
+#saveText{width:100%;height:88px;padding:10px;border-radius:12px;border:1px solid rgba(15,61,92,.2);background:rgba(255,255,255,.92);color:#0f3d5c;font:11px Consolas,monospace;line-height:1.35;resize:none;outline:none;user-select:text;-webkit-user-select:text;touch-action:manipulation;word-break:break-all}
+#saveText:focus{border-color:rgba(35,150,190,.55);box-shadow:0 0 0 3px rgba(80,190,240,.15)}
 #saveActions{display:flex;gap:10px;margin-top:12px}
 #saveActions button,#saveClose{flex:1;padding:12px 8px;border-radius:13px;border:1px solid transparent;font:bold 11px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;touch-action:manipulation;transition:filter .15s ease,transform .1s ease}
 #saveActions button:active,#saveClose:active{transform:scale(.97)}
 #saveCopy{background:linear-gradient(180deg,#22a884,#0f8a76);color:#fff}
 #saveLoad{background:linear-gradient(180deg,#3d8ec0,#1d6b9c);color:#fff}
-#saveClose{margin-top:10px;background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.22);color:#dce9f7}
+#saveClose{margin-top:10px;background:rgba(255,255,255,.9);border-color:rgba(15,61,92,.18);color:#0f3d5c}
 #pauseButton,#tiltButton{display:none!important}
 @media (max-width:600px) and (pointer:coarse){
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
@@ -124,8 +124,8 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .lbList{list-style:none;margin:0;padding:0;text-align:left}
 .lbList li{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.72);margin-bottom:6px;font-size:12px}
 .lbList li .nm{font-weight:bold;color:#0f3d5c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lbList li .sc{color:#b07a00;font-weight:bold;flex:0 0 auto}
-.lbList li.me{outline:2px solid rgba(15,138,118,.55);background:rgba(219,250,244,.92)}
+.lbList li .sc{color:#b45309;font-weight:bold;flex:0 0 auto}
+.lbList li.me{background:rgba(219,250,244,.9)}
 /* Топ-3: золото, серебро и бронза — подсветка строки и боковая полоса. */
 .lbList li.lbP1{background:linear-gradient(90deg,rgba(255,231,153,.95),rgba(255,252,240,.82));box-shadow:inset 3px 0 0 #e2a600}
 .lbList li.lbP2{background:linear-gradient(90deg,rgba(228,237,246,.96),rgba(255,255,255,.82));box-shadow:inset 3px 0 0 #94a7b9}
@@ -133,9 +133,13 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .lbList li.lbP1 .nm{color:#7a5200}
 .lbList li.lbP2 .nm{color:#43586b}
 .lbList li.lbP3 .nm{color:#7a4a22}
-.lbList li.lbP1 .sc{color:#a87600}
-.lbList li.lbP2 .sc{color:#5c7183}
-.lbList li.lbP3 .sc{color:#a3612f}
+.lbList li.lbP1 .sc{color:#7a5200}
+.lbList li.lbP2 .sc{color:#43586b}
+.lbList li.lbP3 .sc{color:#7a4a22}
+.lbList li.me .nm::after{content:"ВЫ";display:inline-block;margin-left:6px;padding:1px 5px;border-radius:6px;background:rgba(15,138,118,.14);color:#0f8a76;font:bold 8px Arial,sans-serif;letter-spacing:.4px;vertical-align:1px}
+.sheetCard .lbList::-webkit-scrollbar{width:5px}
+.sheetCard .lbList::-webkit-scrollbar-thumb{background:rgba(15,61,92,.25);border-radius:3px}
+.sheetCard .lbList::-webkit-scrollbar-track{background:transparent}
 .lbNote{font-size:11px;color:rgba(15,61,92,.55);margin-top:6px;min-height:14px}
 .sheetCard .lbList{max-height:360px;overflow-y:auto;padding-right:2px}
 /* Боковые панели на широком экране: рейтинг слева, настройки справа. */
@@ -172,17 +176,25 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .profileStat{background:rgba(255,255,255,.72);border-radius:10px;padding:7px 9px;text-align:left;min-width:0}
 .profileStat b{display:block;font-size:14px;color:#0f3d5c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .profileStat span{display:block;font-size:8.5px;letter-spacing:.55px;color:rgba(15,61,92,.55);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profileStat:last-child{grid-column:span 2}
 .profileSection{font:bold 9.5px Arial,sans-serif;letter-spacing:1px;color:rgba(15,61,92,.6);margin:10px 0 5px;text-align:left}
 .profileBossRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 2px;border-bottom:1px solid rgba(15,61,92,.08);font-size:10.5px;color:#0f3d5c;text-align:left}
 .profileBossRow:last-child{border-bottom:0}
 .profileBossRow span:last-child{font-weight:bold;white-space:nowrap;color:rgba(15,61,92,.72)}
-.profileAch{max-height:220px;overflow-y:auto;padding-right:2px}
+.profileAch{padding-right:2px}
+.profileAch::-webkit-scrollbar{width:5px}
+.profileAch::-webkit-scrollbar-thumb{background:rgba(15,61,92,.25);border-radius:3px}
+.sheetCloseX{position:sticky;top:0;float:right;margin:-8px -8px 6px 0;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.92);color:#0f3d5c;font:bold 18px/1 Arial,sans-serif;box-shadow:0 4px 14px rgba(8,30,60,.14);cursor:pointer;z-index:10;touch-action:manipulation}
+.sheetCloseX:active{transform:scale(.94)}
 .profileAchRow{display:flex;gap:8px;align-items:flex-start;padding:6px 2px;border-bottom:1px solid rgba(15,61,92,.08);text-align:left}
 .profileAchRow:last-child{border-bottom:0}
 .profileAchRow .paName{font:bold 10.5px Arial,sans-serif;color:#0f3d5c}
 .profileAchRow .paDesc{font-size:9px;color:rgba(15,61,92,.55);margin-top:1px}
 .profileAchRow.done .paName{color:#0f8a76}
 .profileAchReward{margin-left:auto;font:bold 9.5px Arial,sans-serif;color:#b07a00;white-space:nowrap;padding-top:1px}
+.profileAchReward.done{color:#0f8a76;font-size:12px}
+.paBar{height:4px;border-radius:2px;background:rgba(15,61,92,.12);margin-top:4px;overflow:hidden}
+.paBar i{display:block;height:100%;border-radius:2px;background:#2fbfa0}
 #tutCard{width:min(330px,92vw)}
 #tutStep{display:flex;gap:6px;justify-content:center;margin:4px 0 10px}
 #tutStep i{width:7px;height:7px;border-radius:50%;background:rgba(15,61,92,.18)}
@@ -334,9 +346,10 @@ html, body, body * {
 </div>
 <div id="profileOverlay" class="sheetOverlay" role="dialog" aria-modal="true" aria-labelledby="profileTitle" aria-hidden="true">
     <div class="sheetCard profileCard">
+        <button id="profileX" class="sheetCloseX" type="button" aria-label="Закрыть профиль">×</button>
         <h2 id="profileTitle">ПРОФИЛЬ</h2>
         <div id="profileStats" class="profileStats"></div>
-        <div class="profileSection">ЖУРНАЛ БОССОВ</div>
+        <div class="profileSection">ЖУРНАЛ БОССОВ · ПОБЕДЫ / БОИ</div>
         <div id="profileBosses"></div>
         <div class="profileSection">ДОСТИЖЕНИЯ <span id="profileAchCount"></span></div>
         <div id="profileAch" class="profileAch"></div>
@@ -3959,7 +3972,14 @@ html, body, body * {
     const label = DUEL_ATTACK_LABELS[attackKind] || "";
     if (label) {
       c.save();
-      c.globalAlpha = 0.62 + pulse * 0.32;
+      const pillW = Math.max(56, label.length * 6.4 + 20);
+      duelRoundRect(c, DUEL_W / 2 - pillW / 2, by + 83, pillW, 18, 9);
+      c.fillStyle = "rgba(8,30,48,.62)";
+      c.fill();
+      c.strokeStyle = "rgba(255,255,255,.18)";
+      c.lineWidth = 1;
+      c.stroke();
+      c.globalAlpha = 0.72 + pulse * 0.28;
       duelText(c, label, DUEL_W / 2, by + 92, 9.5, accent, "center", 2.6);
       c.restore();
     }
@@ -6222,6 +6242,9 @@ html, body, body * {
   }
   function duelDrawBullets(c) {
     c.save();
+    c.shadowColor = "rgba(6,30,48,.45)";
+    c.shadowBlur = 3;
+    c.shadowOffsetY = 1;
     for (const b of duelState.bullets) {
       if (b.delay > 0) continue;
       const kind = b.kind || "shard";
@@ -6718,8 +6741,8 @@ html, body, body * {
     if (duelState.frame < 320) {
       c.globalAlpha = Math.min(1, (320 - duelState.frame) / 80) * 0.75;
       const hint = isCoarsePointer()
-        ? "ТАП СЛЕВА/СПРАВА · СТРЕЛЬБА АВТОМАТИЧЕСКАЯ"
-        : "← → ИЛИ МЫШЬ · СТРЕЛЬБА АВТОМАТИЧЕСКАЯ";
+        ? "ТАП СЛЕВА/СПРАВА · ОГОНЬ САМ"
+        : "A/D ИЛИ МЫШЬ · ОГОНЬ САМ";
       duelRoundRect(c, DUEL_W / 2 - 116, DUEL_H - 54, 232, 16, 8);
       c.fillStyle = "rgba(255,255,255,.68)";
       c.fill();
@@ -8671,6 +8694,7 @@ html, body, body * {
     questState.progress = 0;
     questState.done = false;
     questState.failed = false;
+    questState.failedAt = 0;
     questState.springUsed = false;
     questState.birdHit = false;
     questState.doneAt = 0;
@@ -8687,6 +8711,7 @@ html, body, body * {
     if (!quest || questState.done) return;
     if (questFailedNow()) {
       questState.failed = true;
+      questState.failedAt = performance.now();
       hudPop(player.x + 15, player.y - 24, "\u0417\u0410\u0414\u0410\u041D\u0418\u0415 \u041F\u0420\u041E\u0412\u0410\u041B\u0415\u041D\u041E", "#e63946");
       return;
     }
@@ -10168,7 +10193,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.28";
+  var GAME_VERSION = "1.0.29";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -10188,9 +10213,24 @@ html, body, body * {
   };
   // Иконки в главном меню: настройки и глобальный рейтинг.
   // Иконки меню: 22×22 — примерно на 15% меньше прежних 26×26.
-  var MENU_GEAR = { x: 31, y: 90, w: 22, h: 22 };
-  var MENU_LB = { x: 63, y: 90, w: 22, h: 22 };
-  var MENU_PROFILE = { x: 95, y: 90, w: 22, h: 22 };
+  var MENU_GEAR = { x: 223, y: 13, w: 22, h: 22 };
+  var MENU_LB = { x: 249, y: 13, w: 22, h: 22 };
+  var MENU_PROFILE = { x: 275, y: 13, w: 22, h: 22 };
+  function updateMenuIconRects() {
+    const label = fmt(bankCoins);
+    setFont(11, "bold");
+    const tw = trackedWidth(label, 0.4);
+    const chipW = 30 + tw + 12;
+    const chipX = WORLD_W - MENU.padX - chipW;
+    const size = 22, gap = 4;
+    const profileX = chipX - 8 - size;
+    const lbX = profileX - gap - size;
+    const gearX = lbX - gap - size;
+    const y = MENU.titleY - 11;
+    MENU_GEAR = { x: gearX, y, w: size, h: size };
+    MENU_LB = { x: lbX, y, w: size, h: size };
+    MENU_PROFILE = { x: profileX, y, w: size, h: size };
+  }
   var menuCursors = {
     avatars: selectedAvatar,
     shop: Math.max(0, FRAMES.findIndex((f) => f.id === selectedFrame)),
@@ -10340,7 +10380,7 @@ html, body, body * {
   function menuPrimary() {
     const i = menuCursor();
     if (!unlockedAvatars.includes(i)) return { label: "\u0417\u0410\u041A\u0420\u042B\u0422\u041E", enabled: false };
-    if (selectedAvatar === i) return { label: "\u0412\u042B\u0411\u0420\u0410\u041D\u0410", enabled: false };
+    if (selectedAvatar === i) return { label: "ВЫБРАН", enabled: false, passive: true };
     return { label: "\u0412\u042B\u0411\u0420\u0410\u0422\u042C", enabled: true };
   }
   function runPrimary() {
@@ -10363,11 +10403,108 @@ html, body, body * {
     setMenuMessage("Аватар выбран", avatarName(i));
     sfx.click();
   }
+  function drawMenuGateIcon(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    const g = ctx.createLinearGradient(-16, -16, 16, 16);
+    g.addColorStop(0, "#f4fdff");
+    g.addColorStop(0.45, "#bfe5f2");
+    g.addColorStop(1, "#5f9bb7");
+    ctx.fillStyle = g;
+    roundedRect(-15, -16, 6, 30, 3);
+    ctx.fill();
+    roundedRect(9, -16, 6, 30, 3);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-15, -8);
+    ctx.quadraticCurveTo(0, -30, 15, -8);
+    ctx.lineTo(15, -1);
+    ctx.quadraticCurveTo(0, -23, -15, -1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "rgba(8,30,48,.8)";
+    ctx.beginPath();
+    ctx.moveTo(-8, 14);
+    ctx.lineTo(-8, -4);
+    ctx.quadraticCurveTo(0, -14, 8, -4);
+    ctx.lineTo(8, 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#ffc247";
+    ctx.beginPath();
+    ctx.arc(-3, -1, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(3, -1, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(-11, -16, 5, 2.2, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(11, -16, 5, 2.2, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawMenuChestIcon(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    const body = ctx.createLinearGradient(0, -10, 0, 14);
+    body.addColorStop(0, "#c98f58");
+    body.addColorStop(0.55, "#9a6039");
+    body.addColorStop(1, "#6a4128");
+    ctx.fillStyle = body;
+    roundedRect(-16, -6, 32, 20, 4);
+    ctx.fill();
+    const lid = ctx.createLinearGradient(0, -18, 0, -4);
+    lid.addColorStop(0, "#d8a06a");
+    lid.addColorStop(1, "#8f5834");
+    ctx.fillStyle = lid;
+    ctx.beginPath();
+    ctx.moveTo(-16, -6);
+    ctx.quadraticCurveTo(-16, -18, 0, -18);
+    ctx.quadraticCurveTo(16, -18, 16, -6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#e0b45c";
+    ctx.fillRect(-16, -7, 32, 2.4);
+    ctx.fillRect(-3, -18, 6, 32);
+    ctx.fillStyle = "#f2c14e";
+    roundedRect(-4, 1, 8, 8, 2);
+    ctx.fill();
+    ctx.fillStyle = "#6a4128";
+    ctx.beginPath();
+    ctx.arc(0, 4.5, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(0, -18, 12, 2.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawMenuObjectButton(x, y, w, h, label, type) {
+    const hovered = pauseState.hover === "menu-btn-" + label;
+    uiPill(x, y, w, h, {
+      fill: hovered ? UI.surfaceSolid : "rgba(255,255,255,.62)",
+      radius: 13
+    });
+    const cx = x + w / 2;
+    if (type === "gate") drawMenuGateIcon(cx, y + 24, 0.78);
+    else drawMenuChestIcon(cx, y + 21, 0.78);
+    setFont(type === "chest" ? 6.0 : 6.4, "bold");
+    ctx.fillStyle = UI.ink;
+    trackedText(label, cx, y + h - 9, type === "chest" ? 0.2 : 0.4);
+  }
   function drawMenuButton(x, y, w, h, label, tone = "green", options = {}) {
     const { size = 12, tracking = 1.6, sub = "", icon = null, dim = false } = options;
     const hovered = pauseState.hover === "menu-btn-" + label && !dim;
+    const glass = tone === "glass";
     if (dim) {
       uiPill(x, y, w, h, { fill: UI.surfaceDim });
+    } else if (glass) {
+      uiPill(x, y, w, h, { fill: hovered ? UI.surfaceSolid : UI.surface });
     } else {
       uiAccentPill(x, y, w, h, { tone, hover: hovered });
     }
@@ -10376,25 +10513,48 @@ html, body, body * {
     const cx = x + w / 2;
     const cy = y + h / 2;
     const mainY = sub ? cy - 6 : cy;
-    const fg = dim ? UI.inkSoft : "#ffffff";
+    const fg = dim ? UI.inkSoft : glass ? UI.ink : "#ffffff";
     setFont(size, "bold");
     const labelW = trackedWidth(label, tracking);
-    const shift = icon === "play" ? 9 : 0;
+    const shift = icon ? 8 : 0;
     ctx.fillStyle = fg;
     trackedText(label, cx + shift, mainY, tracking);
-    if (icon === "play") {
+    if (icon) {
       const tx = cx + shift - labelW / 2 - 11;
-      ctx.beginPath();
-      ctx.moveTo(tx, mainY - 5.5);
-      ctx.lineTo(tx + 8.5, mainY);
-      ctx.lineTo(tx, mainY + 5.5);
-      ctx.closePath();
-      ctx.fillStyle = fg;
-      ctx.fill();
+      if (icon === "play") {
+        ctx.beginPath();
+        ctx.moveTo(tx, mainY - 5.5);
+        ctx.lineTo(tx + 8.5, mainY);
+        ctx.lineTo(tx, mainY + 5.5);
+        ctx.closePath();
+        ctx.fillStyle = fg;
+        ctx.fill();
+      } else if (icon === "coin") {
+        const cg = ctx.createRadialGradient(tx - 1.2, mainY - 1.2, 0.5, tx, mainY, 4.4);
+        cg.addColorStop(0, "#fff4a3");
+        cg.addColorStop(0.55, "#ffc928");
+        cg.addColorStop(1, "#d88900");
+        ctx.beginPath();
+        ctx.arc(tx, mainY, 4.4, 0, Math.PI * 2);
+        ctx.fillStyle = cg;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.8)";
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      } else if (icon === "frame") {
+        roundedRect(tx - 4, mainY - 5, 8, 10, 2);
+        ctx.strokeStyle = fg;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+      } else if (icon === "platform") {
+        roundedRect(tx - 5, mainY - 2, 10, 4, 2);
+        ctx.fillStyle = fg;
+        ctx.fill();
+      }
     }
     if (sub) {
       setFont(6.6, "bold");
-      ctx.fillStyle = dim ? UI.inkSoft : "rgba(255,255,255,.72)";
+      ctx.fillStyle = dim || glass ? UI.inkSoft : "rgba(255,255,255,.72)";
       trackedText(sub, cx, cy + 8, 1.6);
     }
     ctx.restore();
@@ -10532,8 +10692,8 @@ html, body, body * {
     return [
       { id: "primary", x: MENU.padX, y: MENU.barY, w: 110, h: MENU.barH, label: menuPrimary().label },
       { id: "play", x: 136, y: MENU.barY, w: 146, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" },
-      { id: "train", x: 288, y: MENU.barY + 8, w: 46, h: MENU.barH - 16, label: "\u0411\u041E\u0421\u0421\u042B" },
-      { id: "save", x: 340, y: MENU.barY + 8, w: 40, h: MENU.barH - 16, label: "\u0411\u042D\u041A\u0410\u041F" }
+      { id: "train", x: 286, y: MENU.barY, w: 44, h: MENU.barH, label: "БОССЫ" },
+      { id: "save", x: 334, y: MENU.barY, w: 54, h: MENU.barH, label: "СОХРАНИТЬ" }
     ];
   }
   function bossTrainRows() {
@@ -10758,9 +10918,16 @@ html, body, body * {
     ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    setFont(7, "bold");
-    ctx.fillStyle = "rgba(21,85,118,.42)";
-    trackedText(i + 1 + " / " + menuTabCount(), x + w - 16, y + 14, 1.2, "right");
+    setFont(8.5, "bold");
+    ctx.fillStyle = "rgba(21,85,118,.66)";
+    trackedText((i + 1) + " / " + menuTabCount(), x + w - 16, y + 14, 1.2, "right");
+    const cbarW = 46, cbarX = x + w - 16 - cbarW, cbarY = y + 23;
+    ctx.fillStyle = "rgba(15,61,92,.12)";
+    roundedRect(cbarX, cbarY, cbarW, 3, 1.5);
+    ctx.fill();
+    ctx.fillStyle = "#0f8a76";
+    roundedRect(cbarX, cbarY, Math.max(2, cbarW * (i + 1) / menuTabCount()), 3, 1.5);
+    ctx.fill();
     const title = isShop ? FRAMES[i].name.toUpperCase() : avatarName(i).toUpperCase();
     // У открытых аватаров блок из двух строк — опускаем его ниже, чтобы не оставалось пустоты снизу.
     const titleY = !isShop && !locked ? y + h - 44 : L.titleY;
@@ -10960,36 +11127,50 @@ html, body, body * {
   }
   function drawMenuActions() {
     const primary = menuPrimary();
-    drawMenuButton(
-      MENU.padX,
-      MENU.barY,
-      110,
-      MENU.barH,
-      primary.label,
-      primary.enabled ? "gold" : "green",
-      {
-        size: 10.5,
-        dim: !primary.enabled
-      }
-    );
-    drawMenuButton(136, MENU.barY, 146, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
+    if (primary.passive) {
+      uiPill(MENU.padX, MENU.barY, 110, MENU.barH, { fill: "rgba(255,255,255,.55)" });
+      ctx.save();
+      ctx.textBaseline = "middle";
+      const cy = MENU.barY + MENU.barH / 2;
+      ctx.strokeStyle = UI.accent;
+      ctx.lineWidth = 1.6;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(MENU.padX + 18, cy + 1);
+      ctx.lineTo(MENU.padX + 22, cy + 5);
+      ctx.lineTo(MENU.padX + 30, cy - 5);
+      ctx.stroke();
+      setFont(8.2, "bold");
+      ctx.fillStyle = UI.inkSoft;
+      trackedText("ВЫБРАН", MENU.padX + 40, cy + 0.5, 1.1, "left");
+      ctx.restore();
+    } else {
+      drawMenuButton(
+        MENU.padX,
+        MENU.barY,
+        110,
+        MENU.barH,
+        primary.label,
+        primary.enabled ? "gold" : "green",
+        {
+          size: 10.5,
+          dim: !primary.enabled
+        }
+      );
+    }
+    drawMenuButton(136, MENU.barY, 146, MENU.barH, "ИГРАТЬ", "blue", {
       size: 12,
       tracking: 1.2,
       icon: "play"
     });
-    drawMenuButton(288, MENU.barY + 8, 46, MENU.barH - 16, "\u0411\u041E\u0421\u0421\u042B", "green", {
-      size: 7.6,
-      tracking: 0.6
-    });
-    drawMenuButton(340, MENU.barY + 8, 40, MENU.barH - 16, "\u0411\u042D\u041A\u0410\u041F", "gold", {
-      size: 7.4,
-      tracking: 0.5
-    });
+    drawMenuObjectButton(286, MENU.barY, 44, MENU.barH, "БОССЫ", "gate");
+    drawMenuObjectButton(334, MENU.barY, 54, MENU.barH, "СОХРАНИТЬ", "chest");
     ctx.save();
     ctx.textBaseline = "middle";
-    setFont(7, "bold");
-    ctx.fillStyle = "rgba(21,85,118,.45)";
-    trackedText("\u0420\u0415\u041A\u041E\u0420\u0414 " + fmt(highScore), MENU.padX, 566, 1.2, "left");
+    setFont(7.5, "bold");
+    ctx.fillStyle = "rgba(21,85,118,.7)";
+    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, 566, 1.2, "left");
     trackedText(
       isCoarsePointer() ? "\u041F\u0420\u041E\u0412\u0415\u0414\u0418 \u041F\u041E \u0421\u0415\u0422\u041A\u0415 \u2014 \u041F\u0420\u041E\u041A\u0420\u0423\u0422\u041A\u0410" : "\u2190 \u2192 \u0412\u042B\u0411\u041E\u0420 \xB7 ENTER \u0414\u0415\u0419\u0421\u0422\u0412\u0418\u0415",
       WORLD_W - MENU.padX,
@@ -11070,6 +11251,7 @@ html, body, body * {
     }
   }
   function drawMenu() {
+    updateMenuIconRects();
     drawBackground();
     const glow = ctx.createRadialGradient(200, 60, 10, 200, 60, 240);
     glow.addColorStop(0, "rgba(255,255,255,.5)");
@@ -11147,8 +11329,8 @@ html, body, body * {
     roundedRect(x, y + 2, w, h - 1, 7);
     ctx.fillStyle = body;
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.75)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(23,63,84,.5)";
+    ctx.lineWidth = 1.6;
     ctx.stroke();
     ctx.save();
     roundedRect(x, y + 2, w, h - 1, 7);
@@ -12651,6 +12833,10 @@ html, body, body * {
     bossState.charging = 0;
     bossState.phase = "warn";
     bossState.timer = BOSS_WARN_MS;
+    if (lives <= 0) {
+      lives = 1;
+      hudPop(WORLD_W / 2, 262, "СТРАХОВКА: +1 ЖИЗНЬ", "#0f8a76");
+    }
     stats.bossTries[index] = (stats.bossTries[index] || 0) + 1;
     saveStats();
     startScreenShake(2.5, 14);
@@ -13662,36 +13848,71 @@ html, body, body * {
     ctx.shadowBlur = 10;
     ctx.shadowOffsetY = 3;
     roundedRect(px, py, pw, ph, 12);
-    ctx.fillStyle = playing ? "rgba(15,35,55,.46)" : "rgba(15,35,55,.26)";
+    ctx.fillStyle = playing ? "rgba(255,255,255,.82)" : "rgba(255,255,255,.62)";
     ctx.fill();
     ctx.restore();
     roundedRect(px + 0.5, py + 0.5, pw - 1, ph - 1, 12);
-    ctx.strokeStyle = "rgba(255,255,255,.55)";
+    ctx.strokeStyle = "rgba(255,255,255,.95)";
     ctx.lineWidth = 1;
     ctx.stroke();
-    drawPauseGlyph(px + pw / 2, py + ph / 2, 12, "rgba(255,255,255,.92)");
+    drawPauseGlyph(px + pw / 2, py + ph / 2, 12, "#0f3d5c");
     if (isCoarsePointer()) {
       const tx = TILT_ZONE.x, ty = TILT_ZONE.y;
       const tw = TILT_ZONE.w, th = TILT_ZONE.h;
       ctx.save();
       roundedRect(tx, ty, tw, th, th / 2);
-      ctx.fillStyle = tiltEnabled ? "rgba(15,138,118,.55)" : "rgba(15,35,55,.34)";
+      ctx.fillStyle = tiltEnabled ? "rgba(15,138,118,.18)" : "rgba(255,255,255,.72)";
       ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,.45)";
+      ctx.strokeStyle = "rgba(255,255,255,.9)";
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.restore();
-      drawTiltGlyph(tx + tw / 2, ty + th / 2, 11, tiltEnabled ? "#ffffff" : "rgba(255,255,255,.72)");
+      drawTiltGlyph(tx + tw / 2, ty + th / 2, 11, tiltEnabled ? "#0f8a76" : "rgba(15,61,92,.55)");
     }
     ctx.restore();
   }
-  function drawDailyQuest() {
+  function drawDailyQuest(compact = false) {
     const def = dailyDef();
     // Карточка скрывается сразу после выполнения и до следующего дня.
     if (!def || dailyState.done) return;
     const d = dailyState;
-    const x = 15, y = 92, h = 20;
     const shown = Math.min(d.progress, def.target);
+    if (compact) {
+      const cx0 = 150, cy0 = 14, ch = 20;
+      const frac = Math.max(0, Math.min(1, shown / def.target));
+      const label = Math.floor(frac * 100) + "%" + (d.streak > 0 ? " ·" + d.streak : "");
+      setFont(6.6, "bold");
+      const tw = trackedWidth(label, 0.4);
+      const w = 20 + tw + 12;
+      drawHudChip(cx0, cy0, w, ch, null);
+      const ix = cx0 + 11, iy = cy0 + ch / 2 - 0.5;
+      ctx.save();
+      ctx.strokeStyle = "#b07a00";
+      ctx.lineWidth = 1;
+      ctx.lineCap = "round";
+      for (let i = 0; i < 3; i++) {
+        const a = i * Math.PI / 3;
+        ctx.beginPath();
+        ctx.moveTo(ix - Math.cos(a) * 3, iy - Math.sin(a) * 3);
+        ctx.lineTo(ix + Math.cos(a) * 3, iy + Math.sin(a) * 3);
+        ctx.stroke();
+      }
+      ctx.restore();
+      setFont(6.6, "bold");
+      ctx.fillStyle = "rgba(15,61,92,.86)";
+      trackedText(label, cx0 + 20, iy, 0.4, "left");
+      const barW = w - 20;
+      roundedRect(cx0 + 10, cy0 + ch - 4, barW, 2.2, 1.1);
+      ctx.fillStyle = "rgba(15,61,92,.10)";
+      ctx.fill();
+      if (frac > 0) {
+        roundedRect(cx0 + 10, cy0 + ch - 4, Math.max(2, barW * frac), 2.2, 1.1);
+        ctx.fillStyle = "#e0a91f";
+        ctx.fill();
+      }
+      return;
+    }
+    const x = 15, y = 84, h = 20;
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
     setFont(6.5, "bold");
     const head = `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
@@ -13751,43 +13972,42 @@ html, body, body * {
   function drawHud() {
     const t = performance.now() / 1e3;
     const bigScore = Math.floor(hudState.score);
-    const scrim = ctx.createLinearGradient(0, 0, 0, 120);
-    scrim.addColorStop(0, "rgba(6,26,44,.52)");
-    scrim.addColorStop(0.66, "rgba(6,26,44,.30)");
-    scrim.addColorStop(1, "rgba(6,26,44,0)");
-    ctx.fillStyle = scrim;
-    ctx.fillRect(0, 0, WORLD_W, 120);
+    // Светлая стеклянная карточка счёта — один язык с остальным HUD.
     ctx.save();
+    ctx.shadowColor = "rgba(12,40,64,.14)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+    roundedRect(10, 8, 132, 46, 13);
+    ctx.fillStyle = "rgba(255,255,255,.78)";
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    roundedRect(10.5, 8.5, 131, 45, 12.5);
+    ctx.strokeStyle = "rgba(255,255,255,.95)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
-    ctx.shadowColor = "rgba(4,20,36,.85)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetY = 1;
-    setFont(7.5, "bold");
-    ctx.fillStyle = "rgba(255,255,255,.92)";
-    trackedText("\u0421\u0427\u0401\u0422", 15, 15, 2, "left");
-    setFont(27, "bold");
-    ctx.fillStyle = "#ffffff";
-    ctx.shadowColor = "rgba(4,20,36,.9)";
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 1.5;
-    trackedText(fmt(bigScore), 15, 36, 0.6, "left");
-    ctx.shadowColor = "rgba(4,20,36,.85)";
-    ctx.shadowBlur = 4;
-    ctx.shadowOffsetY = 1;
+    setFont(6.6, "bold");
+    ctx.fillStyle = "rgba(18,59,82,.55)";
+    trackedText("СЧЁТ", 18, 17, 2, "left");
+    setFont(22, "bold");
+    ctx.fillStyle = "#0f3d5c";
+    trackedText(fmt(bigScore), 18, 32, 0.5, "left");
     const beatingRecord = Math.floor(player.score) > highScore && highScore > 0;
-    setFont(7.5, "bold");
+    setFont(6.3, "bold");
     if (beatingRecord) {
       const pulse = 0.72 + 0.28 * Math.sin(t * 4);
-      ctx.fillStyle = `rgba(255,214,102,${pulse})`;
-      trackedText("\u041D\u041E\u0412\u042B\u0419 \u0420\u0415\u041A\u041E\u0420\u0414", 15, 53, 1.6, "left");
+      ctx.fillStyle = `rgba(176,122,0,${pulse})`;
+      trackedText("НОВЫЙ РЕКОРД", 18, 45, 1.3, "left");
     } else {
-      ctx.fillStyle = "rgba(255,255,255,.85)";
-      trackedText(`\u0420\u0415\u041A\u041E\u0420\u0414 ${fmt(highScore)}`, 15, 53, 1.4, "left");
+      ctx.fillStyle = "rgba(18,59,82,.58)";
+      trackedText(`РЕКОРД ${fmt(highScore)}`, 18, 45, 1.1, "left");
     }
     ctx.restore();
     let chipX = 15;
-    const chipY = 64, chipH = 22;
+    const chipY = 58, chipH = 20;
     setFont(11, "bold");
     const livesText = String(Math.min(lives, 999));
     const livesW = Math.max(46, 30 + ctx.measureText(livesText).width + 12);
@@ -13883,12 +14103,19 @@ html, body, body * {
         questPlateAlpha = (QUEST_DONE_SHOW_MS - elapsed) / QUEST_DONE_FADE_MS;
       }
     }
+    if (questState.active && questState.failed && questState.failedAt) {
+      const elapsed = performance.now() - questState.failedAt;
+      if (elapsed >= 3000) questPlateAlpha = 0;
+      else if (elapsed > 2200) questPlateAlpha = (3000 - elapsed) / 800;
+    }
     const hasQuest = !!questState.active && questPlateAlpha > 0;
     const hasWind = wind.active;
     // Ежедневка висит выше плашек ветра и задания на забег; когда она скрыта
     // (выполнена), плашки поднимаются на её место, чтобы не было пустоты.
-    const dailyShown = !dailyState.done && !!dailyDef();
-    const infoY = dailyShown ? 118 : 92;
+    const dailyActive = !dailyState.done && !!dailyDef();
+    const dailyCompact = dailyActive && runStartedAt > 0 && performance.now() - runStartedAt > 4000;
+    const dailyFull = dailyActive && !dailyCompact;
+    const infoY = dailyFull ? 108 : 84;
     if (hasQuest || hasWind) {
       ctx.save();
       ctx.textBaseline = "middle";
@@ -13905,11 +14132,12 @@ html, body, body * {
         color = failed ? "#b3202a" : done ? "#0a6b4a" : "#0f3d5c";
       }
       const labelWidth = label ? trackedWidth(label, 1.2) : 0;
-      const arrow = wind.dir < 0 ? "\u2190" : wind.dir > 0 ? "\u2192" : "\xB7";
-      const windLabel = hasWind ? "\u0412\u0415\u0422\u0415\u0420 " + arrow : "";
+      const arrow = wind.dir < 0 ? "←" : wind.dir > 0 ? "→" : "·";
+      const windLabel = hasWind ? "ВЕТЕР " + arrow : "";
       const windWidth = windLabel ? trackedWidth(windLabel, 2) : 0;
+      const windBarsW = hasWind ? 18 : 0;
       const padX = 9, gap = 14;
-      const totalWidth = labelWidth + (label && windLabel ? gap : 0) + windWidth;
+      const totalWidth = labelWidth + (label && windLabel ? gap : 0) + windWidth + (hasWind ? 5 + windBarsW : 0);
       const plateW = totalWidth + padX * 2;
       const plateX = 15;
       const textX = plateX + padX;
@@ -13939,10 +14167,19 @@ html, body, body * {
         }
         setFont(7, "normal");
         trackedText(windLabel, textX + labelWidth + (label ? gap : 0), infoY + 8.5, 2, "left");
+        const barsX = textX + labelWidth + (label ? gap : 0) + windWidth + 5;
+        const strength = Math.min(1, Math.abs(wind.force) / 4.8);
+        for (let i = 0; i < 3; i++) {
+          const bh = 3 + i * 2.2;
+          const on = strength > (i + 1) / 4;
+          ctx.fillStyle = on ? (warning ? "#a86b00" : "rgba(32,128,168,.9)") : "rgba(15,61,92,.14)";
+          roundedRect(barsX + i * 5, infoY + 12 - bh, 3, bh, 1.2);
+          ctx.fill();
+        }
       }
       ctx.restore();
     }
-    drawDailyQuest();
+    drawDailyQuest(dailyCompact);
     drawHudButtons();
     if (performance.now() < tiltFeedbackUntil) {
       ctx.save();
@@ -15650,7 +15887,8 @@ html, body, body * {
   function drawGachaPlayButton() {
     drawMenuButton(GACHA_UI.playX, GACHA_UI.spinY, GACHA_UI.playW, GACHA_UI.spinH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", {
       size: 11,
-      tracking: 1
+      tracking: 1,
+      icon: "play"
     });
   }
   function drawGachaSpinButton() {
@@ -16021,9 +16259,9 @@ html, body, body * {
       MENU.barH,
       spinBusy ? "\u041A\u0420\u0423\u0422\u0418\u0422\u0421\u042F\u2026" : "\u041A\u0420\u0423\u0422\u0418\u0422\u042C \xB7 " + PLATFORM_GACHA_COST,
       canAfford && !spinBusy ? "gold" : "green",
-      { size: 12, dim: !canAfford || spinBusy }
+      { size: 12, dim: !canAfford || spinBusy, icon: "coin" }
     );
-    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", { size: 11, tracking: 1 });
+    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", { size: 11, tracking: 1, icon: "play" });
     ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -17275,6 +17513,14 @@ html, body, body * {
       drawMenu();
     } else {
       drawBackground();
+      if (!duelIsActive() && (currentState === STATE.PLAYING || currentState === STATE.PAUSE)) {
+        const vg = ctx.createRadialGradient(200, 300, 160, 200, 300, 420);
+        vg.addColorStop(0, "rgba(15,61,92,0)");
+        vg.addColorStop(0.72, "rgba(15,61,92,.04)");
+        vg.addColorStop(1, "rgba(15,61,92,.12)");
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+      }
       drawSnow(dt);
       if (eventActive("blizzard")) drawBlizzard();
       drawWindStreaks();
@@ -17451,7 +17697,8 @@ html, body, body * {
       const sc = document.createElement("span"); sc.className = "sc";
       sc.textContent = fmt(Number(r.s != null ? r.s : r.score) || 0);
       if (i < 3) li.className = "lbP" + (i + 1);
-      if (markMe && (r.n || r.name) === playerNick) li.classList.add("me");
+      const rowName = String((r.n || r.name) || "").trim().toLowerCase();
+      if (markMe && rowName === String(playerNick || "").trim().toLowerCase()) li.classList.add("me");
       li.appendChild(nm); li.appendChild(sc); list.appendChild(li);
     });
   }
@@ -17459,7 +17706,7 @@ html, body, body * {
     const list = document.getElementById("sideLbList");
     const note = document.getElementById("sideLbNote");
     if (!list) return;
-    lbFillRows(list, (lbState.global || []).slice(0, LB_MAX), false, lbState.loading);
+    lbFillRows(list, (lbState.global || []).slice(0, LB_MAX), true, lbState.loading);
     if (note) note.textContent = lbState.loading ? "Загрузка…" : (lbState.globalNote || "");
   }
   function lbRender() {
@@ -17468,8 +17715,16 @@ html, body, body * {
     if (!list) return;
     const local = lbState.tab === "local";
     const rows = (local ? lbReadLocal() : (lbState.global || [])).slice(0, local ? LB_LOCAL_MAX : LB_MAX);
-    lbFillRows(list, rows, local, local ? false : lbState.loading);
-    if (note) note.textContent = lbState.tab === "global" ? (lbState.loading ? "Загрузка…" : (lbState.globalNote || "")) : "Локальный топ-5 ваших забегов.";
+    lbFillRows(list, rows, true, local ? false : lbState.loading);
+    if (note) {
+      if (lbState.tab === "global") {
+        const base = lbState.loading ? "Загрузка…" : (lbState.globalNote || "");
+        const more = (lbState.global || []).length > 10 ? " · прокрутите список" : "";
+        note.textContent = base + more;
+      } else {
+        note.textContent = "Локальный топ-5 ваших забегов.";
+      }
+    }
     lbRenderSide();
   }
   function lbSyncTabs() {
@@ -17726,15 +17981,17 @@ html, body, body * {
     const achEl = document.getElementById("profileAch");
     const countEl = document.getElementById("profileAchCount");
     if (!statsEl || !bossesEl || !achEl) return;
+    const playTimeValid = !(stats.runs > 50 && stats.playMs < stats.runs * 2000);
     const rows = [
-      ["ЛУЧШИЙ СЧЁТ", fmt(highScore)],
-      ["СОБРАНО МОНЕТ", fmt(stats.coins)],
-      ["БАЛАНС", fmt(bankCoins)],
+      ["РЕКОРД", fmt(highScore)],
+      ["ВСЕГО СОБРАНО", fmt(stats.coins)],
+      ["НА СЧЕТУ", fmt(bankCoins)],
       ["ПЛАТФОРМ", fmt(stats.platforms)],
       ["ЗАБЕГОВ", fmt(stats.runs)],
-      ["ВРЕМЯ В ИГРЕ", formatPlayTime(stats.playMs)],
-      ["БОССОВ", profileBossWinsTotal() + " / " + DUEL_BOSS_DEFS.length],
-      ["ЛЮБИМЫЙ", profileFavoriteCharacter()]
+      ["ВРЕМЯ В ИГРЕ", playTimeValid ? formatPlayTime(stats.playMs) : "—"],
+      ["ПОБЕД НАД БОССАМИ", fmt(profileBossWinsTotal())],
+      ["БОССОВ ПРОЙДЕНО", stats.bossWins.filter((n) => n > 0).length + " / " + DUEL_BOSS_DEFS.length],
+      ["ЛЮБИМЫЙ ПЕРСОНАЖ", profileFavoriteCharacter()]
     ];
     statsEl.innerHTML = "";
     for (const [label, value] of rows) {
@@ -17744,6 +18001,7 @@ html, body, body * {
       b.textContent = value;
       const span = document.createElement("span");
       span.textContent = label;
+      if (label === "ВРЕМЯ В ИГРЕ" && !playTimeValid) cell.title = "Статистика времени ведётся с 1.0.29";
       cell.appendChild(b);
       cell.appendChild(span);
       statsEl.appendChild(cell);
@@ -17759,7 +18017,8 @@ html, body, body * {
       const tries = stats.bossTries[index] || 0;
       const trainWins = stats.trainWins[index] || 0;
       const trainTries = stats.trainTries[index] || 0;
-      value.textContent = wins + " / " + tries + (trainTries ? " · трен. " + trainWins + "/" + trainTries : "");
+      const pct = tries > 0 ? Math.round(wins / tries * 100) : 0;
+      value.textContent = wins + " / " + tries + " · " + pct + "%" + (trainTries ? " · трен. " + trainWins + "/" + trainTries : "");
       row.appendChild(name);
       row.appendChild(value);
       bossesEl.appendChild(row);
@@ -17775,18 +18034,28 @@ html, body, body * {
       name.textContent = (claimed ? "✓ " : "") + achievement.name;
       const desc = document.createElement("div");
       desc.className = "paDesc";
+      let barPct = 0;
       if (claimed) desc.textContent = achievement.desc;
       else {
         const progress = achievementProgress(achievement);
         const current = Math.min(Number(progress[0]) || 0, Number(progress[1]) || 1);
         const total = Number(progress[1]) || 1;
+        barPct = Math.max(0, Math.min(1, current / total));
         desc.textContent = achievement.desc + " · " + (achievement.id === "play_1h" ? formatPlayTime(current) + " / " + formatPlayTime(total) : fmt(current) + " / " + fmt(total));
       }
       left.appendChild(name);
       left.appendChild(desc);
+      if (!claimed) {
+        const bar = document.createElement("div");
+        bar.className = "paBar";
+        const fill = document.createElement("i");
+        fill.style.width = (barPct * 100).toFixed(0) + "%";
+        bar.appendChild(fill);
+        left.appendChild(bar);
+      }
       const reward = document.createElement("div");
-      reward.className = "profileAchReward";
-      reward.textContent = claimed ? "ПОЛУЧЕНО" : "+" + achievement.reward;
+      reward.className = "profileAchReward" + (claimed ? " done" : "");
+      reward.textContent = claimed ? "✓" : "+" + achievement.reward;
       row.appendChild(left);
       row.appendChild(reward);
       achEl.appendChild(row);
@@ -17818,6 +18087,8 @@ html, body, body * {
   function setupProfile() {
     const close = document.getElementById("profileClose");
     if (close) close.addEventListener("click", closeProfile);
+    const x = document.getElementById("profileX");
+    if (x) x.addEventListener("click", closeProfile);
     const ov = document.getElementById("profileOverlay");
     if (ov) ov.addEventListener("pointerdown", (event) => { if (event.target === ov) closeProfile(); });
   }
