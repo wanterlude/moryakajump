@@ -4,6 +4,7 @@ desktop/dist/
 desktop/index.html
 desktop/*.jpg
 desktop/build-out/
+desktop-lite/build-out/
 sim.html
 tools/sim/last-run.json
 tools/sim/last-run.md

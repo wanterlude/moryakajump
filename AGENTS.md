@@ -96,6 +96,26 @@ node tools/shot.js --tabs=hud --hud=2 --label=v2 --scale=2   # версия 1..4
 Кадр фиксирует счёт 1 919 и рекорд 83 747, чтобы версии сравнивались один к одному.
 Сами версии лежат в `tools/hud-variants.js` (только предпросмотр, игра их не видит).
 
+## Лёгкая сборка (без Chromium)
+
+```
+node desktop-lite/build.js          # лаунчер + файлы игры в zip
+node desktop-lite/build.js --keep   # оставить распакованную папку
+```
+
+`desktop-lite/Launcher.cs` компилируется штатным `csc` из .NET Framework (без NuGet
+и без WinForms) и открывает игру в отдельном окне Edge через `--app=`, с профилем
+в `%LOCALAPPDATA%\MoryakaJump\Profile` — localStorage с рекордами переживает
+перезапуск, основной профиль браузера не занимается.
+
+| Сборка | Что внутри | Размер |
+|---|---|---|
+| `desktop/` (Electron) | свой Chromium 22 | ~62 МБ exe |
+| `desktop-lite/` | лаунчер 371 КБ (364 КБ из них — иконка) + файлы игры | zip ~1,6 МБ |
+
+Лёгкая сборка требует установленного Edge (он есть в Windows 10/11). Electron
+не даёт опуститься ниже ~50 МБ: сам бинарь Chromium занимает 150 МБ в распаковке.
+
 ## Релиз
 
 1. Поднять `GAME_VERSION` в `index.html` (строка ~10196).
