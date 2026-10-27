@@ -11,12 +11,12 @@ using Microsoft.Web.WebView2.Core;
 namespace MoryakaJump
 {
     /// <summary>
-    /// Проверка и установка WebView2 Runtime. Компонент бесплатный, ставится один
-    /// раз на пользователя/машину; без него окно игры открыть нечем.
+    /// Проверка и установка WebView2 Runtime: отдельное окно с реальным прогрессом
+    /// скачивания, ожиданием установки и предложением запустить игру в конце.
     /// </summary>
     static class WebView2Runtime
     {
-        // Официальный бутстраппер Evergreen Runtime (≈2 МБ).
+        // Официальный бутстраппер Evergreen Runtime (≈1.9 МБ).
         const string BootstrapperUrl = "https://go.microsoft.com/fwlink/p/?LinkId=2124703";
 
         public static string Version
@@ -33,124 +33,313 @@ namespace MoryakaJump
             get { return !string.IsNullOrWhiteSpace(Version); }
         }
 
-        /// <summary>Возвращает true, если рантайм есть (или успешно установлен).</summary>
-        public static bool EnsureInstalled(IWin32Window owner)
+        /// <summary>Ждёт появления рантайма после установки (регистрация не мгновенная).</summary>
+        public static bool WaitUntilInstalled(int attempts, int delayMs)
+        {
+            for (int i = 0; i < attempts; i++)
+            {
+                if (IsInstalled) return true;
+                System.Threading.Thread.Sleep(delayMs);
+            }
+            return IsInstalled;
+        }
+
+        /// <summary>
+        /// true — рантайм есть или успешно установлен и игрок нажал «Запустить игру».
+        /// false — отказ, отмена или ошибка установки.
+        /// </summary>
+        public static bool EnsureInstalled(IWin32Window owner = null)
         {
             if (IsInstalled) return true;
-
-            DialogResult answer = MessageBox.Show(
-                owner,
-                "Для запуска игры нужен компонент Microsoft WebView2 Runtime.\n\n" +
-                "Он бесплатный, весит около 2 МБ и ставится один раз.\n" +
-                "Скачать и установить его сейчас?",
-                "Moryaka Jump",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (answer != DialogResult.Yes) return false;
-
-            using (InstallForm form = new InstallForm())
-            {
-                form.ShowDialog(owner);
-                return form.Success;
-            }
+            return ShowInstaller(owner);
         }
 
-        static void Download(string url, string target)
+        /// <summary>Показывает окно установки, не проверяя текущее состояние.</summary>
+        public static bool ShowInstaller(IWin32Window owner = null)
         {
-            using (WebClient client = new WebClient())
+            using (InstallerForm form = new InstallerForm())
             {
+                return form.ShowDialog(owner) == DialogResult.OK;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Окно установки: скачивание бутстраппера с процентом и объёмом, затем
+    /// «Устанавливаю…» без точного прогресса (установщик молчит), затем итог
+    /// с кнопкой «Запустить игру».
+    /// </summary>
+    sealed class InstallerForm : Form
+    {
+        enum Phase { Download, Install, Done, Failed }
+
+        const string BootstrapperUrl = "https://go.microsoft.com/fwlink/p/?LinkId=2124703";
+
+        readonly Label title;
+        readonly Label detail;
+        readonly ProgressBar bar;
+        readonly Button primary;
+        readonly Button secondary;
+
+        Phase phase = Phase.Download;
+        WebClient client;
+        Process installer;
+        bool cancelled;
+
+        public InstallerForm()
+        {
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            StartPosition = FormStartPosition.CenterScreen;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            ClientSize = new Size(470, 210);
+            BackColor = Color.FromArgb(236, 246, 252);
+            Font = new Font("Segoe UI", 9.5f);
+            Text = "Moryaka Jump — компонент WebView2";
+
+            title = new Label();
+            title.Font = new Font("Segoe UI Semibold", 12f);
+            title.ForeColor = Color.FromArgb(15, 61, 92);
+            title.Text = "Нужен компонент WebView2 Runtime";
+            title.SetBounds(20, 16, 430, 26);
+
+            detail = new Label();
+            detail.ForeColor = Color.FromArgb(46, 92, 122);
+            detail.Text = "Он бесплатный и ставится один раз.";
+            detail.SetBounds(20, 46, 430, 40);
+
+            bar = new ProgressBar();
+            bar.SetBounds(20, 92, 430, 20);
+            bar.Minimum = 0;
+            bar.Maximum = 100;
+            bar.Value = 0;
+            bar.Style = ProgressBarStyle.Continuous;
+
+            primary = new Button();
+            primary.Text = "Установить";
+            primary.SetBounds(262, 160, 188, 34);
+            primary.FlatStyle = FlatStyle.System;
+            primary.Click += delegate { OnPrimary(); };
+
+            secondary = new Button();
+            secondary.Text = "Отмена";
+            secondary.SetBounds(166, 160, 88, 34);
+            secondary.FlatStyle = FlatStyle.System;
+            secondary.Click += delegate { OnSecondary(); };
+
+            Controls.Add(title);
+            Controls.Add(detail);
+            Controls.Add(bar);
+            Controls.Add(primary);
+            Controls.Add(secondary);
+
+            Load += OnLoad;
+            FormClosing += OnClosing;
+        }
+
+        async void OnLoad(object sender, EventArgs e)
+        {
+            // Скачивание запускаем сразу: окно открылось — игрок видит прогресс.
+            await StartAsync();
+        }
+
+        async Task StartAsync()
+        {
+            SetPhase(Phase.Download);
+            title.Text = "Скачиваю WebView2 Runtime";
+            detail.Text = "Подготовка…";
+            bar.Style = ProgressBarStyle.Continuous;
+            bar.Value = 0;
+            primary.Visible = false;
+            secondary.Text = "Отмена";
+
+            string target = Path.Combine(Path.GetTempPath(), "MicrosoftEdgeWebview2Setup.exe");
+
+            try
+            {
+                client = new WebClient();
                 client.Headers.Add("User-Agent", "MoryakaJump");
-                client.DownloadFile(url, target);
+                client.DownloadProgressChanged += OnDownloadProgress;
+                await client.DownloadFileTaskAsync(new Uri(BootstrapperUrl), target);
+                client.Dispose();
+                client = null;
+            }
+            catch (Exception error)
+            {
+                if (client != null) { client.Dispose(); client = null; }
+                if (cancelled) return;
+                Fail("Не удалось скачать компонент.\n" + error.Message);
+                return;
+            }
+
+            if (cancelled) return;
+            bar.Value = 100;
+            await InstallAsync(target);
+        }
+
+        void OnDownloadProgress(object sender, DownloadProgressChangedEventArgs e)
+        {
+            if (cancelled) return;
+            bar.Value = Math.Max(0, Math.Min(100, e.ProgressPercentage));
+            if (e.TotalBytesToReceive > 0)
+            {
+                detail.Text = string.Format(
+                    "Скачано {0:0.0} из {1:0.0} МБ ({2}%)",
+                    e.BytesReceived / 1048576.0,
+                    e.TotalBytesToReceive / 1048576.0,
+                    e.ProgressPercentage);
+            }
+            else
+            {
+                detail.Text = string.Format("Скачано {0:0.0} МБ", e.BytesReceived / 1048576.0);
             }
         }
 
-        static void Install(string bootstrapper)
+        async Task InstallAsync(string bootstrapper)
         {
-            ProcessStartInfo info = new ProcessStartInfo(bootstrapper, "/silent /install");
-            info.UseShellExecute = true;
-            info.Verb = "runas"; // установка требует прав администратора
-            using (Process process = Process.Start(info))
+            SetPhase(Phase.Install);
+            title.Text = "Устанавливаю WebView2 Runtime";
+            detail.Text = "Подтвердите запрос Windows и подождите — установка идёт без прогресса.";
+            bar.Style = ProgressBarStyle.Marquee;
+            bar.MarqueeAnimationSpeed = 25;
+            DateTime startedAt = DateTime.UtcNow;
+            Timer ticker = new Timer();
+            ticker.Interval = 1000;
+            ticker.Tick += delegate
             {
-                if (process == null) throw new InvalidOperationException("Не удалось запустить установщик.");
-                process.WaitForExit();
+                if (phase != Phase.Install) { ticker.Stop(); ticker.Dispose(); return; }
+                detail.Text = string.Format(
+                    "Подтвердите запрос Windows и подождите — идёт {0:0} с (установка без прогресса).",
+                    (DateTime.UtcNow - startedAt).TotalSeconds);
+            };
+            ticker.Start();
+
+            bool ok = false;
+            string failure = null;
+
+            try
+            {
+                ok = await Task.Run(delegate
+                {
+                    ProcessStartInfo info = new ProcessStartInfo(bootstrapper, "/silent /install");
+                    info.UseShellExecute = true;
+                    info.Verb = "runas"; // установка требует прав администратора
+                    installer = Process.Start(info);
+                    if (installer == null) throw new InvalidOperationException("установщик не запустился");
+                    installer.WaitForExit();
+                    return installer.ExitCode == 0;
+                });
+            }
+            catch (Win32Exception error)
+            {
+                failure = error.NativeErrorCode == 1223
+                    ? "Установка отменена в запросе администратора."
+                    : "Не удалось запустить установщик: " + error.Message;
+            }
+            catch (Exception error)
+            {
+                failure = "Ошибка установки: " + error.Message;
+            }
+            finally
+            {
+                if (installer != null) { installer.Dispose(); installer = null; }
+            }
+
+            if (cancelled) return;
+
+            // Даже при нулевом коде выхода проверяем результат: установщик может
+            // вернуть 0, а рантайм зарегистрироваться с задержкой.
+            bool installed = await Task.Run(() => WebView2Runtime.WaitUntilInstalled(6, 700));
+
+            if (installed)
+            {
+                Done();
+                return;
+            }
+
+            Fail(failure ?? "Компонент не появился после установки. Попробуйте установить вручную с developer.microsoft.com/microsoft-edge/webview2/");
+        }
+
+        void SetPhase(Phase next)
+        {
+            phase = next;
+        }
+
+        void Done()
+        {
+            SetPhase(Phase.Done);
+            bar.Style = ProgressBarStyle.Continuous;
+            bar.Value = 100;
+            title.Text = "Готово";
+            detail.Text = "WebView2 Runtime установлен (" + (WebView2Runtime.Version ?? "версия неизвестна") + ").";
+            primary.Text = "Запустить игру";
+            primary.Visible = true;
+            primary.Enabled = true;
+            secondary.Text = "Закрыть";
+        }
+
+        void Fail(string message)
+        {
+            SetPhase(Phase.Failed);
+            bar.Style = ProgressBarStyle.Continuous;
+            bar.Value = 0;
+            title.Text = "Установить не удалось";
+            detail.Text = message;
+            primary.Text = "Повторить";
+            primary.Visible = true;
+            primary.Enabled = true;
+            secondary.Text = "Закрыть";
+        }
+
+        void OnPrimary()
+        {
+            switch (phase)
+            {
+                case Phase.Done:
+                    DialogResult = DialogResult.OK;
+                    Close();
+                    break;
+                case Phase.Failed:
+                    cancelled = false;
+                    primary.Visible = false;
+                    StartAsync();
+                    break;
+                default:
+                    break;
             }
         }
 
-        sealed class InstallForm : Form
+        void OnSecondary()
         {
-            readonly Label status;
-            readonly ProgressBar bar;
-
-            public bool Success { get; private set; }
-
-            public InstallForm()
+            if (phase == Phase.Download || phase == Phase.Install)
             {
-                Text = "Moryaka Jump — установка компонента";
-                FormBorderStyle = FormBorderStyle.FixedDialog;
-                StartPosition = FormStartPosition.CenterScreen;
-                MaximizeBox = false;
-                MinimizeBox = false;
-                ClientSize = new Size(420, 120);
-                BackColor = Color.FromArgb(236, 246, 252);
-
-                status = new Label();
-                status.Text = "Проверяю WebView2 Runtime…";
-                status.AutoSize = false;
-                status.SetBounds(16, 16, 388, 40);
-                status.Font = new Font("Segoe UI", 9.5f);
-
-                bar = new ProgressBar();
-                bar.SetBounds(16, 64, 388, 18);
-                bar.Style = ProgressBarStyle.Marquee;
-                bar.MarqueeAnimationSpeed = 30;
-
-                Controls.Add(status);
-                Controls.Add(bar);
-                Load += OnLoad;
+                Cancel();
+                DialogResult = DialogResult.Cancel;
+                Close();
+                return;
             }
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
 
-            async void OnLoad(object sender, EventArgs e)
+        void Cancel()
+        {
+            cancelled = true;
+            if (client != null)
             {
-                string bootstrapper = Path.Combine(Path.GetTempPath(), "MicrosoftEdgeWebview2Setup.exe");
-                try
-                {
-                    status.Text = "Скачиваю WebView2 Runtime…";
-                    await Task.Run(() => Download(BootstrapperUrl, bootstrapper));
-
-                    status.Text = "Устанавливаю… Подтвердите запрос Windows.";
-                    await Task.Run(() => Install(bootstrapper));
-
-                    if (WebView2Runtime.IsInstalled)
-                    {
-                        Success = true;
-                        DialogResult = DialogResult.OK;
-                        Close();
-                        return;
-                    }
-
-                    status.Text = "Установка не завершилась. Попробуйте установить вручную.";
-                }
-                catch (Win32Exception error)
-                {
-                    // 1223 — пользователь отменил запрос администратора.
-                    status.Text = error.NativeErrorCode == 1223
-                        ? "Установка отменена. Без WebView2 Runtime игра не запустится."
-                        : "Ошибка установки: " + error.Message;
-                }
-                catch (Exception error)
-                {
-                    status.Text = "Не удалось установить компонент: " + error.Message;
-                }
-
-                bar.Style = ProgressBarStyle.Continuous;
-                bar.Value = 0;
-                Button close = new Button();
-                close.Text = "Закрыть";
-                close.SetBounds(316, 88, 88, 24);
-                close.Click += delegate { DialogResult = DialogResult.Cancel; Close(); };
-                Controls.Add(close);
+                try { client.CancelAsync(); } catch (Exception) { }
+                client.Dispose();
+                client = null;
             }
+            if (installer != null)
+            {
+                try { installer.Kill(); } catch (Exception) { }
+            }
+        }
+
+        void OnClosing(object sender, FormClosingEventArgs e)
+        {
+            if (phase == Phase.Download || phase == Phase.Install) Cancel();
         }
     }
 }
