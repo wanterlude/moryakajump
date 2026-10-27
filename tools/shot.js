@@ -87,6 +87,7 @@ const HOOK = String.raw`
               makePlatform({ x: 240, y: 440, w: 130, h: 15, type: "static" }),
               makePlatform({ x: 90, y: 360, w: 140, h: 15, type: "static" })
             ];
+            platforms.forEach(function (p) { p.spring = true; });
             springs = platforms.map(function (p) {
               return { x: p.x + p.w / 2 - 10, y: p.y - 15, owner: p, offsetX: p.w / 2 - 10 };
             });
