@@ -105,6 +105,17 @@ const COMMON = String.raw`
     w += __res("jump", x + w, cy, s, ink);
     return w;
   }
+  function __resRowW(s, gap) {
+    var perLife = coinsPerLife();
+    var txt = (runCoins % perLife) + "/" + perLife;
+    setFont(s * 1.02, "bold");
+    var w1 = s * 1.08 + ctx.measureText(String(lives)).width;
+    setFont(s * 0.86, "bold");
+    var w2 = s * 1.08 + ctx.measureText(txt).width;
+    setFont(s * 0.9, "bold");
+    var w3 = s * 1.02 + ctx.measureText("\xD72").width;
+    return w1 + gap + w2 + gap + w3;
+  }
   function __scoreText(x, y, size, color, align) {
     var beating = Math.floor(player.score) > highScore && highScore > 0;
     __label(fmt(Math.floor(hudState.score)), x, y, size, color || "#ffffff", align || "left", size * 0.03);
@@ -434,7 +445,257 @@ const V10 = String.raw`
   }
 `;
 
-const VARIANTS = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10];
+
+// === Вторая десятка: другие принципы раскладки ===
+
+// 11. Круглая медаль: счёт в стеклянном круге.
+const V11 = String.raw`
+  function __hud11() {
+    var cx = 48, cy = 40, r = 28;
+    ctx.save();
+    ctx.shadowColor = "rgba(12,40,64,.24)";
+    ctx.shadowBlur = 12;
+    ctx.shadowOffsetY = 4;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255,255,255,.84)";
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.strokeStyle = "rgba(255,255,255,.95)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+    __label("СЧЁТ", cx, cy - 11, 5.6, "rgba(21,85,118,.6)", "center", 1.6);
+    __label(fmt(Math.floor(hudState.score)), cx, cy + 6, 17, HUD_COLORS.ink, "center");
+    __resRow(90, 34, 13, 14);
+    ctx.save();
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    __label("РЕКОРД " + fmt(highScore), 92, 50, 5.8, "rgba(21,85,118,.6)", "left", 0.9);
+    ctx.restore();
+    __hudTail();
+  }
+`;
+
+// 12. Центр, две строки: счёт и ресурсы отдельными центрированными капсулами.
+const V12 = String.raw`
+  function __hud12() {
+    __gcard(120, 8, 160, 28, 14, 0.82);
+    __label("СЧЁТ", 136, 22, 5.8, "rgba(21,85,118,.6)", "left", 1.6);
+    __label(fmt(Math.floor(hudState.score)), 266, 22, 16, HUD_COLORS.ink, "right");
+    __gcard(140, 40, 120, 24, 12, 0.78);
+    var w = __resRowW(12, 12);
+    __resRow(200 - w / 2, 52, 12, 12);
+    __label("РЕКОРД " + fmt(highScore), 200, 72, 5.8, "rgba(21,85,118,.55)", "center", 1);
+    __hudTail();
+  }
+`;
+
+// 13. Вертикальная панель: счёт и ресурсы столбиком вдоль левого края.
+const V13 = String.raw`
+  function __hud13() {
+    __gcard(10, 8, 62, 118, 16, 0.80);
+    __label("СЧЁТ", 41, 22, 5.6, "rgba(21,85,118,.6)", "center", 1.6);
+    __label(fmt(Math.floor(hudState.score)), 41, 38, 15, HUD_COLORS.ink, "center");
+    ctx.save();
+    ctx.strokeStyle = "rgba(21,85,118,.14)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(20, 50);
+    ctx.lineTo(62, 50);
+    ctx.stroke();
+    ctx.restore();
+    __res("heart", 22, 64, 11);
+    __res("coin", 22, 86, 11);
+    __res("jump", 22, 106, 11);
+    __hudTail();
+  }
+`;
+
+// 14. Две колонки по краям: ресурсы слева, счёт справа.
+const V14 = String.raw`
+  function __hud14() {
+    __res("heart", 16, 24, 13);
+    __res("coin", 16, 44, 13);
+    __res("jump", 16, 64, 13);
+    ctx.save();
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "right";
+    __label("СЧЁТ", 338, 18, 5.8, "rgba(21,85,118,.6)", "right", 1.8);
+    setFont(24, "bold");
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(2,14,26,.55)";
+    ctx.shadowBlur = 4;
+    trackedText(fmt(Math.floor(hudState.score)), 338, 38, 0.5, "right");
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    __label("РЕКОРД " + fmt(highScore), 338, 54, 5.8, "rgba(21,85,118,.6)", "right", 0.9);
+    ctx.restore();
+    __hudTail();
+  }
+`;
+
+// 15. Нижний статус-бар на всю ширину.
+const V15 = String.raw`
+  function __hud15() {
+    __gcard(8, 566, 384, 26, 13, 0.80);
+    var cy = 579;
+    var x = 20;
+    x += __res("heart", x, cy, 12) + 14;
+    x += __res("coin", x, cy, 12) + 14;
+    x += __res("jump", x, cy, 12);
+    __label("СЧЁТ", 382, 573, 5.4, "rgba(21,85,118,.55)", "right", 1.6);
+    __label(fmt(Math.floor(hudState.score)), 382, 584, 13, HUD_COLORS.ink, "right");
+    __hudTail();
+  }
+`;
+
+// 16. Счёт в правом нижнем углу, ресурсы сверху слева.
+const V16 = String.raw`
+  function __hud16() {
+    __resRow(16, 26, 13, 14);
+    ctx.save();
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "right";
+    setFont(34, "bold");
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(2,14,26,.5)";
+    ctx.shadowBlur = 5;
+    trackedText(fmt(Math.floor(hudState.score)), 384, 540, 0.6, "right");
+    ctx.shadowColor = "rgba(255,255,255,.9)";
+    ctx.shadowBlur = 6;
+    __label("РЕКОРД " + fmt(highScore), 384, 562, 6, "rgba(21,85,118,.6)", "right", 1);
+    ctx.restore();
+    __hudTail();
+  }
+`;
+
+// 17. Компактный чип: всё в одном маленьком блоке.
+const V17 = String.raw`
+  function __hud17() {
+    __gcard(12, 10, 196, 26, 13, 0.80);
+    var cy = 23, x = 24;
+    x += __res("heart", x, cy, 12) + 10;
+    x += __res("coin", x, cy, 12) + 10;
+    __res("jump", x, cy, 12);
+    __label(fmt(Math.floor(hudState.score)), 198, 23, 12, HUD_COLORS.ink, "right");
+    __label("РЕКОРД " + fmt(highScore), 16, 46, 5.6, "rgba(21,85,118,.55)", "left", 0.9);
+    __hudTail();
+  }
+`;
+
+// 18. Ледяная глыба: неровная плита с бликом.
+const V18 = String.raw`
+  function __hud18() {
+    var x = 10, y = 8, w = 168, h = 54;
+    ctx.save();
+    ctx.shadowColor = "rgba(20,70,110,.28)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 5;
+    ctx.beginPath();
+    ctx.moveTo(x + 16, y + 4);
+    ctx.lineTo(x + w - 22, y);
+    ctx.lineTo(x + w - 4, y + 16);
+    ctx.lineTo(x + w - 8, y + h - 10);
+    ctx.lineTo(x + w - 30, y + h);
+    ctx.lineTo(x + 12, y + h - 3);
+    ctx.lineTo(x, y + 22);
+    ctx.closePath();
+    var g = ctx.createLinearGradient(0, y, 0, y + h);
+    g.addColorStop(0, "rgba(226,246,255,.92)");
+    g.addColorStop(1, "rgba(186,222,240,.86)");
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.strokeStyle = "rgba(255,255,255,.9)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(x + 18, y + 8);
+    ctx.lineTo(x + w - 26, y + 5);
+    ctx.lineTo(x + w - 20, y + 13);
+    ctx.lineTo(x + 16, y + 16);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    __label("СЧЁТ", x + 18, y + 22, 5.6, "rgba(21,85,118,.62)", "left", 1.8);
+    __label(fmt(Math.floor(hudState.score)), x + 18, y + 36, 17, "#0f3d5c", "left");
+    __resRow(x + 96, y + 34, 11, 10);
+    __label("РЕКОРД " + fmt(highScore), x + 18, y + 48, 5.4, "rgba(21,85,118,.55)", "left", 0.8);
+    __hudTail();
+  }
+`;
+
+// 19. Текстовый минимал: одна строка по центру, без плашек.
+const V19 = String.raw`
+  function __hud19() {
+    var s = 12, sep = 7;
+    var perLife = coinsPerLife();
+    var coinTxt = (runCoins % perLife) + "/" + perLife;
+    setFont(s * 1.02, "bold");
+    var wHeart = s * 1.08 + ctx.measureText(String(lives)).width;
+    setFont(s * 0.86, "bold");
+    var wCoin = s * 1.08 + ctx.measureText(coinTxt).width;
+    setFont(s * 0.9, "bold");
+    var wJump = s * 1.02 + ctx.measureText("\xD72").width;
+    var scored = fmt(Math.floor(hudState.score));
+    setFont(13, "bold");
+    var wScore = ctx.measureText(scored).width + 6;
+    var total = wHeart + wCoin + wJump + wScore + sep * 3;
+    var x = 200 - total / 2, cy = 22;
+    ctx.save();
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    x += __res("heart", x, cy, s) + sep;
+    __label("·", x - 4, cy, 9, "rgba(21,85,118,.28)", "left");
+    x += __res("coin", x, cy, s) + sep;
+    __label("·", x - 4, cy, 9, "rgba(21,85,118,.28)", "left");
+    x += __res("jump", x, cy, s) + sep;
+    __label("·", x - 4, cy, 9, "rgba(21,85,118,.28)", "left");
+    __label(scored, x, cy, 13, HUD_COLORS.ink, "left");
+    __label("РЕКОРД " + fmt(highScore), 200, 40, 5.6, "rgba(21,85,118,.5)", "center", 1);
+    ctx.restore();
+    __hudTail();
+  }
+`;
+
+// 20. Спидометр: дуга прогресса до рекорда.
+const V20 = String.raw`
+  function __hud20() {
+    var cx = 56, cy = 44, r = 34;
+    var scoreNow = Math.floor(hudState.score);
+    var step = 5000;
+    var target = Math.max(step, Math.ceil((scoreNow + 1) / step) * step);
+    var frac = Math.max(0, Math.min(1, scoreNow / target));
+    ctx.save();
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(21,85,118,.14)";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, Math.PI * 0.75, Math.PI * 2.25);
+    ctx.stroke();
+    ctx.strokeStyle = frac >= 1 ? HUD_COLORS.gold : HUD_COLORS.green;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, Math.PI * 0.75, Math.PI * 0.75 + Math.PI * 1.5 * frac);
+    ctx.stroke();
+    ctx.restore();
+    __label("СЧЁТ", cx, cy - 11, 5.4, "rgba(21,85,118,.6)", "center", 1.6);
+    __label(fmt(scoreNow), cx, cy + 2, 14, HUD_COLORS.ink, "center");
+    __label("ДО " + fmt(target), cx, cy + 14, 4.8, "rgba(21,85,118,.5)", "center", 0.6);
+    __resRow(104, 30, 13, 14);
+    __label("РЕКОРД " + fmt(highScore), 106, 48, 5.8, "rgba(21,85,118,.6)", "left", 0.9);
+    __hudTail();
+  }
+`;
+const VARIANTS = [V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16, V17, V18, V19, V20];
 
 module.exports = {
   count: VARIANTS.length,
@@ -445,7 +706,7 @@ module.exports = {
   window.__hudVariant = ${idx};
   var __baseDrawHud = drawHud;
   drawHud = function () {
-    if (window.__hudVariant === 11) return;
+    if (window.__hudVariant === 99) return;
     var f = { ${table} }[window.__hudVariant];
     if (f) return f();
     return __baseDrawHud();
