@@ -72,6 +72,17 @@ const HOOK = String.raw`
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
       if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
+      if (shotHover === "quest") {
+        setTimeout(function () {
+          try {
+            questState.active = { label: "СОБЕРИ 24 МОНЕТЫ", target: 24, reward: 50 };
+            questState.progress = 11;
+            questState.done = false;
+            questState.failed = false;
+            hudRecordShift = 1;
+          } catch (e) {}
+        }, 500);
+      }
       if (shotTab === "hud") {
         // Кадр для сверки HUD: фиксированные счёт и рекорд, как на образце.
         setTimeout(function () {
