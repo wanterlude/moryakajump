@@ -1075,7 +1075,44 @@ var __srcWinter = (() => {
   return __toCommonJS(winter_exports);
 })();
   var WINTER = __srcWinter.WINTER;
+
+"use strict";
+var __srcHudColors = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/game/hud-colors.ts
+  var hud_colors_exports = {};
+  __export(hud_colors_exports, {
+    HUD_COLORS: () => HUD_COLORS
+  });
+  var HUD_COLORS = {
+    ink: "#0f3d5c",
+    inkSoft: "rgba(21,85,118,.60)",
+    gold: "#c28000",
+    green: "#0f8a76",
+    red: "#e63946"
+  };
+  return __toCommonJS(hud_colors_exports);
+})();
+  var HUD_COLORS = __srcHudColors.HUD_COLORS;
   // <<< src: конец вставки >>>
+
 
 
   // src/fx.ts
@@ -14044,13 +14081,8 @@ var __srcWinter = (() => {
     ctx.stroke();
     ctx.restore();
   }
-  var HUD_COLORS = {
-    ink: "#0f3d5c",
-    inkSoft: "rgba(21,85,118,.60)",
-    gold: "#c28000",
-    green: "#0f8a76",
-    red: "#e63946"
-  };
+  // Цвета HUD живут в src/game/hud-colors.ts.
+;
   var PAUSE_ZONE = { x: 348, y: 8, w: 40, h: 40 };
   var TILT_ZONE = { x: 346, y: 46, w: 32, h: 28 };
   var hudState = {

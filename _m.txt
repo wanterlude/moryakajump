@@ -1,9 +1,5 @@
-Move the winter palette into src/ and lift the src block to the top of the IIFE
+Move the HUD colours into src/
 
-src/game/winter.ts is now the single source for sky, peaks, ice and snow colours, with
-three tests: required keys present, every value parses as hex or rgba, no stray spaces.
-33 module tests in total.
-
-The injection point moved from just above drawPlatformMagnet to the very start of the
-IIFE, so modules that export constants (not only functions) are available before the
-first use. Golden frames unchanged.
+src/game/hud-colors.ts owns the ink, gold, red and green used by capsules, plates and
+buttons, with three tests (required keys, every value parses as a colour, ink is not
+pure black). 36 module tests in total, golden frames unchanged.

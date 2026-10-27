@@ -53,6 +53,11 @@ const MODULES = [
     global: "__srcWinter",
     exports: ["WINTER"],
   },
+  {
+    entry: path.join(root, "src/game/hud-colors.ts"),
+    global: "__srcHudColors",
+    exports: ["HUD_COLORS"],
+  },
 ];
 
 function buildBlock() {
