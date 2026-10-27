@@ -28,6 +28,7 @@ const source = path.resolve(root, arg("file", "index.html"));
 const label = arg("label", "");
 const hover = arg("hover", "");
 const hudVariant = arg("hud", "");
+const hazard = arg("hazard", "");
 
 const chromeCandidates = [
   path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
@@ -52,9 +53,11 @@ const HOOK = String.raw`
       var shotParts = shotHash.split("&");
       var shotTab = "avatars";
       var shotHover = "";
+      var shotHazard = "";
       for (var pi = 0; pi < shotParts.length; pi++) {
         if (shotParts[pi].indexOf("shot=") === 0) shotTab = shotParts[pi].slice(5);
         else if (shotParts[pi].indexOf("hover=") === 0) shotHover = decodeURIComponent(shotParts[pi].slice(6));
+        else if (shotParts[pi].indexOf("hazard=") === 0) shotHazard = shotParts[pi].slice(7);
       }
       bankCoins = 4321;
       var shotIdx = -1;
@@ -72,6 +75,35 @@ const HOOK = String.raw`
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
       if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
+      if (shotHazard === "hole" || shotHazard === "spikes" || shotHazard === "both") {
+        setTimeout(function () {
+          try {
+            startGame();
+            window.requestAnimationFrame = function () { return 0; };
+            player.x = 150; player.y = 452;
+            platforms = [
+              makePlatform({ x: 58, y: 600, w: 174, h: 15, type: "static" }),
+              makePlatform({ x: 252, y: 522, w: 142, h: 15, type: "static" }),
+              makePlatform({ x: 66, y: 442, w: 124, h: 15, type: "static" }),
+              makePlatform({ x: 232, y: 362, w: 152, h: 15, type: "static" })
+            ];
+            if (shotHazard === "hole" || shotHazard === "both") {
+              platforms[0].hole = true;
+              platforms[3].hole = true;
+            }
+            if (shotHazard === "spikes" || shotHazard === "both") {
+              activeEvents = [{ kind: "spikes", power: 1, total: 10000, left: 9991 }];
+              spikyBudget = 99;
+              for (var hi = 0; hi < platforms.length; hi++) {
+                var on = shotHazard === "both" ? hi % 2 === 1 : true;
+                spikyPlatforms.set(platforms[hi], on);
+                spikySerial.set(platforms[hi], spikeSerial);
+              }
+            }
+            draw(performance.now());
+          } catch (e) {}
+        }, 500);
+      }
       if (shotHover === "quest") {
         setTimeout(function () {
           try {
@@ -177,7 +209,7 @@ for (const tab of tabs) {
     "--virtual-time-budget=4000",
     "--user-data-dir=" + path.join(work, "profile"),
     "--screenshot=" + out,
-    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : ""),
+    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : ""),
   ]);
   if (!fs.existsSync(out)) {
     console.error("Не удалось снять " + tab + " (код " + res.status + ")");

@@ -96,6 +96,18 @@ node tools/shot.js --tabs=hud --hud=2 --label=v2 --scale=2   # версия 1..4
 Кадр фиксирует счёт 1 919 и рекорд 83 747, чтобы версии сравнивались один к одному.
 Сами версии лежат в `tools/hud-variants.js` (только предпросмотр, игра их не видит).
 
+### Полыньи и шипы
+
+```
+node tools/shot.js --tabs=play --hazard=hole   --label=hole
+node tools/shot.js --tabs=play --hazard=spikes --label=spikes
+node tools/shot.js --tabs=play --hazard=both   --label=both
+```
+
+`--hazard` собирает в копии игры сцену из четырёх платформ и включает опасность:
+полыньи (`p.hole`), шипы (`activeEvents` + `spikyPlatforms`) или обе. Кадр рисуется
+один раз, чтобы снимок был стабильным.
+
 ## Сборка приложения (WebView2)
 
 ```
