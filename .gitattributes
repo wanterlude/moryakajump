@@ -1,0 +1,8 @@
+﻿# Репозиторий в LF: без этого git отдаёт файлы с CRLF и ломает инструменты,
+# которые ищут якоря по "\n".
+* text=auto eol=lf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.ico binary
+*.exe binary
