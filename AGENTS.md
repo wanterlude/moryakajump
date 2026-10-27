@@ -62,7 +62,12 @@ node tools/build-variants.js --check  # проверить, что файлы н
 node tools/sim/make_sim.js                        # собрать sim.html из index.html
 node tools/sim/run-node.js --runs=500             # ~3,2 забега/с, 500 забегов ≈ 2,5 мин
 node tools/sim/run-node.js --runs=5000 --steps=600000   # ~26 мин
+node tools/sim/run-node.js --runs=300 --skill=0.7       # бот с человеческими ошибками
 ```
+
+`--skill` (0…1) включает модель ошибок: реже пересматривает решение, дрожание
+прицела, промахи по прыжку. На навыке 1.0 дуэли выглядят безобидно (97% без
+попаданий) — баланс дуэлей мерить на 0.6–0.8.
 
 `run-node.js` грузит игру в обычном Node через `tools/sim/dom-shim.js`
 (минимальные заглушки DOM/canvas, без единой зависимости) и пишет
@@ -70,6 +75,17 @@ node tools/sim/run-node.js --runs=5000 --steps=600000   # ~26 мин
 события, дуэли, последняя платформа. В песочнице GUI-процессы не стартуют,
 поэтому Electron здесь не используется — если нужен настоящий canvas, откройте
 `sim.html` в браузере и вызывайте `__simInit` / `__simChunk` из консоли.
+
+## Скриншоты интерфейса
+
+```
+node tools/shot.js --tabs=avatars,shop,platforms
+node tools/shot.js --tabs=profile,train --scale=1   # тяжёлые оверлеи только при scale=1
+```
+
+Снимает экраны в headless Chrome/Edge в `tools/shot-out/` (каталог в .gitignore).
+Работает на копии `index.html` во временной папке, игра не меняется. В песочнице
+DSH Chrome требует доступа к именованным каналам — без него падает на mojo.
 
 ## Релиз
 

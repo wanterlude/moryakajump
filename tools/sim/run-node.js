@@ -18,6 +18,7 @@ function flag(name, fallback) {
 const runs = Math.max(1, flag("--runs", 500));
 const steps = Math.max(1000, flag("--steps", 600000));
 const chunkMs = Math.max(200, flag("--chunk", 2000));
+const skill = Math.max(0, Math.min(1, flag("--skill", 1)));
 
 const simPath = path.join(__dirname, "..", "..", "sim.html");
 if (!fs.existsSync(simPath)) {
@@ -31,7 +32,7 @@ const game = loadSim(simPath);
 const version = (fs.readFileSync(simPath, "utf8").match(/var GAME_VERSION = "([^"]+)"/) || [])[1] || "?";
 console.log("sim.html загружен, версия " + version + ", забегов " + runs);
 
-game.__simInit(runs, steps);
+game.__simInit(runs, steps, { skill });
 
 const progressFile = path.join(__dirname, "last-run.log");
 const logProgress = (text) => {
@@ -88,7 +89,14 @@ const rows = raw.map((r) => ({
 }));
 
 const summary = summarize(rows);
-const meta = { version, steps, runs, stamp: new Date().toISOString() };
+const meta = {
+  version,
+  steps,
+  runs,
+  skill,
+  missedJumps: (game.__simCfg && game.__simCfg.missedJumps) || 0,
+  stamp: new Date().toISOString(),
+};
 const seconds = ((Date.now() - started) / 1000).toFixed(1);
 
 fs.writeFileSync(

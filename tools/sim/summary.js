@@ -117,6 +117,17 @@ function toMarkdown(s, meta) {
   lines.push(
     "Версия игры: " + meta.version + " · забегов: " + s.total + " · максимум шагов на забег: " + meta.steps
   );
+  if (meta.skill != null && meta.skill < 1) {
+    lines.push("");
+    lines.push(
+      "**Режим с ошибками:** навык бота " +
+        meta.skill.toFixed(2) +
+        " (реже пересматривает решение, дрожание прицела, промахи по прыжку). " +
+        "Пропущено прыжков: " +
+        (meta.missedJumps || 0) +
+        "."
+    );
+  }
   lines.push("");
   lines.push("## Высота (очки)");
   lines.push("");

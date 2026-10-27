@@ -102,11 +102,21 @@ const hook = String.raw`
     return risk;
   }
 
-  window.__simInit = function (runs, maxSteps) {
+  window.__simInit = function (runs, maxSteps, opts) {
     window.__sim.stopRender();
+    var o = opts || {};
+    var skill = Math.max(0, Math.min(1, o.skill == null ? 1 : o.skill));
     var m = {
       total: runs || 200,
       maxSteps: maxSteps || 200000,
+      // Модель «человеческих» ошибок: skill=1 — идеальный MPC-бот,
+      // меньше единицы — реже пересматривает решение, мажет прицелом
+      // и иногда промахивается мимо прыжка.
+      skill: skill,
+      decideEvery: Math.max(1, Math.round(1 + (1 - skill) * 12)),
+      aimJitter: (1 - skill) * 22,
+      skipJump: (1 - skill) * 0.3,
+      missedJumps: 0,
       finished: 0,
       done: false,
       runs: [],
@@ -117,6 +127,26 @@ const hook = String.raw`
       aimPrev: 200
     };
     var TYPES_PENALTY = { broken: 45, moving: 30, vanish: 34, ice: 14, sticky: 12, spring: -12 };
+
+    window.__simCfg = { aimJitter: m.aimJitter, skipJump: m.skipJump, missedJumps: 0 };
+    if (!window.__simWrapped) {
+      window.__simWrapped = true;
+      var rawMouse = window.__sim.mouse;
+      var rawJump = window.__sim.jump;
+      window.__sim.mouse = function (x) {
+        var c = window.__simCfg;
+        if (x != null && c && c.aimJitter) x += (Math.random() * 2 - 1) * c.aimJitter;
+        return rawMouse(x);
+      };
+      window.__sim.jump = function () {
+        var c = window.__simCfg;
+        if (c && c.skipJump && Math.random() < c.skipJump) {
+          c.missedJumps++;
+          return false;
+        }
+        return rawJump();
+      };
+    }
 
     m.newRun = function () {
       window.__sim.start();
@@ -491,7 +521,7 @@ const hook = String.raw`
     while (!m.done && performance.now() - t0 < (budgetMs || 20000)) {
       if (m.finished >= m.total) { m.done = true; break; }
       if (!m.run) m.newRun();
-      m.bot();
+      if (m.decideEvery <= 1 || m.steps % m.decideEvery === 0) m.bot();
       m.tick();
     }
     return { finished: m.finished, total: m.total, done: m.done };

@@ -114,6 +114,9 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .sheetActions button{flex:1;padding:11px 8px;border-radius:13px;border:1px solid rgba(15,61,92,.18);font:bold 11.5px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;background:rgba(255,255,255,.9);color:#0f3d5c;touch-action:manipulation}
 .sheetActions button.primary{background:linear-gradient(180deg,#23b6e2,#0a5fa0);border-color:transparent;color:#fff}
 .sheetActions button:active{transform:scale(.97)}
+.sheetWide{display:block;width:100%;margin:2px 0 12px;padding:11px 8px;border-radius:13px;border:1px solid rgba(15,61,92,.18);background:rgba(255,255,255,.9);color:#0f3d5c;font:bold 11.5px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;touch-action:manipulation}
+.sheetWide:hover{background:#fff}
+.sheetWide:active{transform:scale(.97)}
 .sheetRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid rgba(15,61,92,.08);font-size:12.5px;text-align:left}
 .sheetRow:last-of-type{border-bottom:0}
 .sheetRow input[type=range]{width:150px;accent-color:#12a08c}
@@ -297,6 +300,7 @@ html, body, body * {
         <input id="sideVolRange" class="sideRange" type="range" min="0" max="100" step="1" value="100">
         <label class="sideCheck"><input id="sideVibToggle" type="checkbox" checked> Вибрация</label>
         <label class="sideCheck"><input id="sideTiltToggle" type="checkbox"> Наклон</label>
+        <button id="sideSave" class="sideBtn" type="button">СОХРАНИТЬ ПРОГРЕСС</button>
         <button id="sideReset" class="sideBtn danger" type="button">СБРОСИТЬ ПРОГРЕСС</button>
     </div>
 </aside>
@@ -314,6 +318,7 @@ html, body, body * {
             <button id="settingsClose" type="button" class="primary">ГОТОВО</button>
         </div>
         <div class="sheetActions" style="margin-top:8px">
+            <button id="settingsSave" type="button">СОХРАНИТЬ</button>
             <button id="settingsReset" type="button">СБРОС ПРОГРЕССА</button>
         </div>
     </div>
@@ -351,6 +356,7 @@ html, body, body * {
         <div id="profileStats" class="profileStats"></div>
         <div class="profileSection">ЖУРНАЛ БОССОВ · ПОБЕДЫ / БОИ</div>
         <div id="profileBosses"></div>
+        <button id="profileTrain" class="sheetWide" type="button">ТРЕНИРОВКА БОССОВ</button>
         <div class="profileSection">ДОСТИЖЕНИЯ <span id="profileAchCount"></span></div>
         <div id="profileAch" class="profileAch"></div>
         <div class="sheetActions">
@@ -10193,7 +10199,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.33-ui";
+  var GAME_VERSION = "1.0.34-ui";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -10403,173 +10409,32 @@ html, body, body * {
     setMenuMessage("Аватар выбран", avatarName(i));
     sfx.click();
   }
-  function drawMenuGateIcon(cx, cy, s) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(s, s);
-    const g = ctx.createLinearGradient(-16, -16, 16, 16);
-    g.addColorStop(0, "#f4fdff");
-    g.addColorStop(0.45, "#bfe5f2");
-    g.addColorStop(1, "#5f9bb7");
-    ctx.fillStyle = g;
-    roundedRect(-15, -16, 6, 30, 3);
-    ctx.fill();
-    roundedRect(9, -16, 6, 30, 3);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-15, -8);
-    ctx.quadraticCurveTo(0, -30, 15, -8);
-    ctx.lineTo(15, -1);
-    ctx.quadraticCurveTo(0, -23, -15, -1);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "rgba(8,30,48,.8)";
-    ctx.beginPath();
-    ctx.moveTo(-8, 14);
-    ctx.lineTo(-8, -4);
-    ctx.quadraticCurveTo(0, -14, 8, -4);
-    ctx.lineTo(8, 14);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#ffc247";
-    ctx.beginPath();
-    ctx.arc(-3, -1, 1.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(3, -1, 1.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.ellipse(-11, -16, 5, 2.2, -0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(11, -16, 5, 2.2, 0.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  function drawMenuChestIcon(cx, cy, s) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(s, s);
-    const body = ctx.createLinearGradient(0, -10, 0, 14);
-    body.addColorStop(0, "#c98f58");
-    body.addColorStop(0.55, "#9a6039");
-    body.addColorStop(1, "#6a4128");
-    ctx.fillStyle = body;
-    roundedRect(-16, -6, 32, 20, 4);
-    ctx.fill();
-    const lid = ctx.createLinearGradient(0, -18, 0, -4);
-    lid.addColorStop(0, "#d8a06a");
-    lid.addColorStop(1, "#8f5834");
-    ctx.fillStyle = lid;
-    ctx.beginPath();
-    ctx.moveTo(-16, -6);
-    ctx.quadraticCurveTo(-16, -18, 0, -18);
-    ctx.quadraticCurveTo(16, -18, 16, -6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#e0b45c";
-    ctx.fillRect(-16, -7, 32, 2.4);
-    ctx.fillRect(-3, -18, 6, 32);
-    ctx.fillStyle = "#f2c14e";
-    roundedRect(-4, 1, 8, 8, 2);
-    ctx.fill();
-    ctx.fillStyle = "#6a4128";
-    ctx.beginPath();
-    ctx.arc(0, 4.5, 1.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.ellipse(0, -18, 12, 2.6, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  function drawMenuObjectButton(x, y, w, h, label, type) {
-    const hovered = pauseState.hover === "menu-btn-" + label;
-    uiPill(x, y, w, h, {
-      fill: hovered ? UI.surfaceSolid : "rgba(255,255,255,.62)",
-      radius: 13
-    });
-    const cx = x + w / 2;
-    if (type === "gate") drawMenuGateIcon(cx, y + 24, 0.78);
-    else drawMenuChestIcon(cx, y + 21, 0.78);
-    setFont(type === "chest" ? 6.0 : 6.4, "bold");
-    ctx.fillStyle = UI.ink;
-    trackedText(label, cx, y + h - 9, type === "chest" ? 0.2 : 0.4);
-  }
+  // Плоские тона кнопок: сплошная заливка, мягкая тень, светлая обводка.
+  // Раньше здесь была «казуальная» 3D-кнопка с рантом и бликом — она выбивалась
+  // из плоских карточек и капсул остального интерфейса.
   var CASUAL_BUTTON_TONES = {
-    blue: {
-      top: "#7fd9ff",
-      mid: "#2fa3e0",
-      bottom: "#116ea8",
-      rim: "#08486f",
-      glow: "rgba(42,160,225,.42)"
-    },
-    green: {
-      top: "#8bf5d6",
-      mid: "#23b79c",
-      bottom: "#0b7f70",
-      rim: "#075e54",
-      glow: "rgba(24,180,155,.42)"
-    },
-    gold: {
-      top: "#ffe9a6",
-      mid: "#f9b52c",
-      bottom: "#d47f06",
-      rim: "#965404",
-      glow: "rgba(244,171,28,.46)"
-    },
-    dim: {
-      top: "#c9dbe8",
-      mid: "#a3bdce",
-      bottom: "#7f9bb0",
-      rim: "#5f7c91",
-      glow: "rgba(18,52,76,.12)"
-    }
+    blue: { fill: "#1a78b0", hover: "#1d88c4", shadow: "rgba(26,120,176,.34)", ink: "#ffffff" },
+    green: { fill: "#0f7f6b", hover: "#119078", shadow: "rgba(15,127,107,.32)", ink: "#ffffff" },
+    gold: { fill: "#d99a1f", hover: "#e6a628", shadow: "rgba(217,154,31,.36)", ink: "#3d2600" },
+    dim: { fill: "rgba(255,255,255,.62)", hover: "rgba(255,255,255,.62)", shadow: "rgba(8,28,48,.12)", ink: "rgba(21,85,118,.5)" }
   };
   function drawCasualButtonBase(x, y, w, h, toneKey, hovered, glowBoost = 0) {
     const t = CASUAL_BUTTON_TONES[toneKey] || CASUAL_BUTTON_TONES.blue;
-    const rimH = Math.max(4, Math.min(8, h * 0.14));
-    const bodyH = h - rimH;
-    const r = Math.min(16, bodyH * 0.34);
+    const dim = toneKey === "dim";
+    const r = h / 2;
     ctx.save();
-    ctx.shadowColor = t.glow;
-    ctx.shadowBlur = (hovered ? 22 : 14) + glowBoost;
-    ctx.shadowOffsetY = hovered ? 5 : 4;
-    roundedRect(x, y + rimH, w, h - rimH, r);
-    ctx.fillStyle = t.rim;
+    ctx.shadowColor = t.shadow;
+    ctx.shadowBlur = (hovered ? 14 : 10) + glowBoost;
+    ctx.shadowOffsetY = hovered ? 4 : 3;
+    roundedRect(x, y, w, h, r);
+    ctx.fillStyle = hovered ? t.hover : t.fill;
     ctx.fill();
     ctx.shadowColor = "transparent";
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
-    const body = ctx.createLinearGradient(0, y, 0, y + bodyH);
-    body.addColorStop(0, t.top);
-    body.addColorStop(0.48, t.mid);
-    body.addColorStop(1, t.bottom);
-    roundedRect(x, y, w, bodyH, r);
-    ctx.fillStyle = body;
-    ctx.fill();
-    ctx.save();
-    roundedRect(x + 1, y + 1, w - 2, bodyH - 2, Math.max(2, r - 1));
-    ctx.clip();
-    const gloss = ctx.createLinearGradient(0, y, 0, y + bodyH * 0.72);
-    gloss.addColorStop(0, "rgba(255,255,255,.52)");
-    gloss.addColorStop(0.42, "rgba(255,255,255,.16)");
-    gloss.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = gloss;
-    roundedRect(x + 2, y + 1.5, w - 4, bodyH * 0.58, Math.max(2, r - 2));
-    ctx.fill();
-    if (hovered) {
-      ctx.fillStyle = "rgba(255,255,255,.12)";
-      ctx.fillRect(x, y, w, bodyH);
-    }
-    ctx.restore();
-    ctx.strokeStyle = "rgba(255,255,255,.55)";
+    roundedRect(x + 0.6, y + 0.6, w - 1.2, h - 1.2, r - 0.6);
+    ctx.strokeStyle = dim ? "rgba(15,61,92,.12)" : "rgba(255,255,255,.22)";
     ctx.lineWidth = 1.2;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(x + r + 2, y + 1.6);
-    ctx.lineTo(x + w - r - 2, y + 1.6);
     ctx.stroke();
     ctx.restore();
   }
@@ -10647,21 +10512,11 @@ html, body, body * {
   }
   function drawCasualIconMedallion(icon, cx, cy, r, fg) {
     ctx.save();
-    const g = ctx.createLinearGradient(0, cy - r, 0, cy + r);
-    g.addColorStop(0, "rgba(255,255,255,.22)");
-    g.addColorStop(0.5, "rgba(0,0,0,.10)");
-    g.addColorStop(1, "rgba(0,0,0,.22)");
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fillStyle = g;
+    ctx.fillStyle = "rgba(255,255,255,.16)";
     ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.34)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.shadowColor = "rgba(6,30,48,.4)";
-    ctx.shadowBlur = 2;
-    ctx.shadowOffsetY = 1;
-    drawCasualIcon(icon, cx, cy, r * 0.9, fg);
+    drawCasualIcon(icon, cx, cy, r * 0.86, fg);
     ctx.restore();
   }
   function drawCasualLabel(text, cx, cy, size, tracking, color) {
@@ -10669,9 +10524,6 @@ html, body, body * {
     ctx.textBaseline = "middle";
     setFont(size, "bold");
     ctx.fillStyle = color;
-    ctx.shadowColor = "rgba(6,28,44,.55)";
-    ctx.shadowBlur = 2.5;
-    ctx.shadowOffsetY = 1.4;
     trackedText(text, cx, cy, tracking);
     ctx.restore();
   }
@@ -10680,9 +10532,8 @@ html, body, body * {
     const hovered = pauseState.hover === (hoverKey || "menu-btn-" + label) && !dim;
     const key = dim ? "dim" : tone;
     drawCasualButtonBase(x, y, w, h, key, hovered);
-    const bodyH = h - Math.max(4, Math.min(8, h * 0.14));
-    const cy = y + bodyH / 2 + (sub ? -3 : 0);
-    const fg = "#ffffff";
+    const fg = (CASUAL_BUTTON_TONES[key] || CASUAL_BUTTON_TONES.blue).ink;
+    const cy = y + h / 2 + (sub ? -4 : 0);
     const medR = Math.min(12, h * 0.24);
     const gap = 8;
     setFont(size, "bold");
@@ -10699,11 +10550,8 @@ html, body, body * {
       ctx.save();
       ctx.textBaseline = "middle";
       setFont(6.6, "bold");
-      ctx.fillStyle = "rgba(255,255,255,.72)";
-      ctx.shadowColor = "rgba(6,28,44,.5)";
-      ctx.shadowBlur = 2;
-      ctx.shadowOffsetY = 1;
-      trackedText(sub, x + w / 2, cy + 11, 1.6);
+      ctx.fillStyle = dim ? "rgba(21,85,118,.45)" : "rgba(255,255,255,.72)";
+      trackedText(sub, x + w / 2, cy + 10, 1.6);
       ctx.restore();
     }
   }
@@ -10839,10 +10687,8 @@ html, body, body * {
   }
   function menuActionButtons() {
     return [
-      { id: "primary", x: MENU.padX, y: MENU.barY, w: 110, h: MENU.barH, label: menuPrimary().label },
-      { id: "play", x: 136, y: MENU.barY, w: 146, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" },
-      { id: "train", x: 286, y: MENU.barY, w: 44, h: MENU.barH, label: "БОССЫ" },
-      { id: "save", x: 334, y: MENU.barY, w: 54, h: MENU.barH, label: "СОХРАНИТЬ" }
+      { id: "primary", x: MENU.padX, y: MENU.barY, w: 228, h: MENU.barH, label: menuPrimary().label },
+      { id: "play", x: 260, y: MENU.barY, w: 120, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" }
     ];
   }
   function bossTrainRows() {
@@ -11276,46 +11122,43 @@ html, body, body * {
   }
   function drawMenuActions() {
     const primary = menuPrimary();
+    const back = menuActionButtons()[0];
+    const play = menuActionButtons()[1];
     if (primary.passive) {
-      uiPill(MENU.padX, MENU.barY, 110, MENU.barH, { fill: "rgba(255,255,255,.55)" });
+      uiPill(back.x, back.y, back.w, back.h, { fill: "rgba(255,255,255,.55)" });
       ctx.save();
       ctx.textBaseline = "middle";
-      const cy = MENU.barY + MENU.barH / 2;
+      setFont(11, "bold");
+      const label = "ВЫБРАН";
+      const tw = trackedWidth(label, 1.4);
+      const groupW = 22 + tw;
+      const gx = back.x + (back.w - groupW) / 2;
+      const cy = back.y + back.h / 2;
       ctx.strokeStyle = UI.accent;
-      ctx.lineWidth = 1.6;
+      ctx.lineWidth = 1.8;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
       ctx.beginPath();
-      ctx.moveTo(MENU.padX + 18, cy + 1);
-      ctx.lineTo(MENU.padX + 22, cy + 5);
-      ctx.lineTo(MENU.padX + 30, cy - 5);
+      ctx.moveTo(gx, cy + 1);
+      ctx.lineTo(gx + 4, cy + 5);
+      ctx.lineTo(gx + 12, cy - 6);
       ctx.stroke();
-      setFont(8.2, "bold");
       ctx.fillStyle = UI.inkSoft;
-      trackedText("ВЫБРАН", MENU.padX + 40, cy + 0.5, 1.1, "left");
+      trackedText(label, gx + groupW - tw / 2, cy + 0.5, 1.4);
       ctx.restore();
     } else {
-      drawMenuButton(
-        MENU.padX,
-        MENU.barY,
-        110,
-        MENU.barH,
-        primary.label,
-        primary.enabled ? "gold" : "green",
-        {
-          size: 10.5,
-          dim: !primary.enabled,
-          icon: primary.enabled ? "check" : "lock"
-        }
-      );
+      drawMenuButton(back.x, back.y, back.w, back.h, primary.label, primary.enabled ? "gold" : "green", {
+        size: 11,
+        tracking: 1.4,
+        dim: !primary.enabled,
+        icon: primary.enabled ? "check" : "lock"
+      });
     }
-    drawMenuButton(136, MENU.barY, 146, MENU.barH, "ИГРАТЬ", "blue", {
-      size: 12,
-      tracking: 1.2,
+    drawMenuButton(play.x, play.y, play.w, play.h, "ИГРАТЬ", "blue", {
+      size: 11,
+      tracking: 1.1,
       icon: "play"
     });
-    drawMenuObjectButton(286, MENU.barY, 44, MENU.barH, "БОССЫ", "gate");
-    drawMenuObjectButton(334, MENU.barY, 54, MENU.barH, "СОХРАНИТЬ", "chest");
     ctx.save();
     ctx.textBaseline = "middle";
     setFont(7.5, "bold");
@@ -15217,13 +15060,7 @@ html, body, body * {
         );
         if (hit) {
           if (hit.id === "play") startGame();
-          else if (hit.id === "train") {
-            bossTrainOpen = true;
-            sfx.click();
-          } else if (hit.id === "save") {
-            openSaveDialog();
-            sfx.click();
-          } else if (menuPrimary().enabled) runPrimary();
+          else if (menuPrimary().enabled) runPrimary();
           else {
             const i = menuCursor();
             if (menuState.tab === "avatars" && !menuItemUnlocked(i)) runPrimary();
@@ -16049,12 +15886,12 @@ html, body, body * {
     const hovered = hoverKey ? pauseState.hover === hoverKey : false;
     const pulse = !dim && !busy ? 0.5 + 0.5 * Math.sin(performance.now() / 460) : 0;
     drawCasualButtonBase(x, y, w, h, key, hovered && !dim && !busy, pulse * 8);
-    const bodyH = h - Math.max(4, Math.min(8, h * 0.14));
-    const cy = y + bodyH / 2;
+    const cy = y + h / 2;
     const medR = Math.min(12, h * 0.24);
     const gap = 8;
     const text = busy ? "ОТКРЫВАЕМ…" : dim ? "НЕ ХВАТАЕТ" : label;
-    const fg = "#ffffff";
+    const fg = (CASUAL_BUTTON_TONES[key] || CASUAL_BUTTON_TONES.blue).ink;
+    const onGold = key === "gold";
     setFont(11.5, "bold");
     const labelW = trackedWidth(text, 1.3);
     let badgeW = 0;
@@ -16073,9 +15910,9 @@ html, body, body * {
       const coinR = Math.min(6, bh * 0.3);
       ctx.save();
       roundedRect(bx, by, badgeW, bh, bh / 2);
-      ctx.fillStyle = "rgba(0,0,0,.22)";
+      ctx.fillStyle = onGold ? "rgba(61,38,0,.12)" : "rgba(0,0,0,.22)";
       ctx.fill();
-      ctx.strokeStyle = "rgba(255,255,255,.32)";
+      ctx.strokeStyle = onGold ? "rgba(61,38,0,.2)" : "rgba(255,255,255,.32)";
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.restore();
@@ -18006,6 +17843,8 @@ html, body, body * {
     }
     const rs = document.getElementById("settingsReset");
     if (rs) rs.addEventListener("click", () => { closeSettings(); openResetDialog(); });
+    const sv = document.getElementById("settingsSave");
+    if (sv) sv.addEventListener("click", () => { closeSettings(); openSaveDialog(); });
     const vol = document.getElementById("settingsVolume");
     if (vol) vol.addEventListener("input", () => applyVolume(vol.value));
     const vib = document.getElementById("settingsVibration");
@@ -18114,6 +17953,8 @@ html, body, body * {
     if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; syncSideSettings(); });
     const reset = document.getElementById("sideReset");
     if (reset) reset.addEventListener("click", () => openResetDialog());
+    const sideSave = document.getElementById("sideSave");
+    if (sideSave) sideSave.addEventListener("click", () => openSaveDialog());
     syncSideSettings();
     lbRenderSide();
     lbRefreshGlobal(true);
@@ -18244,6 +18085,11 @@ html, body, body * {
     if (close) close.addEventListener("click", closeProfile);
     const x = document.getElementById("profileX");
     if (x) x.addEventListener("click", closeProfile);
+    const train = document.getElementById("profileTrain");
+    if (train) train.addEventListener("click", () => {
+      closeProfile();
+      bossTrainOpen = true;
+    });
     const ov = document.getElementById("profileOverlay");
     if (ov) ov.addEventListener("pointerdown", (event) => { if (event.target === ov) closeProfile(); });
   }

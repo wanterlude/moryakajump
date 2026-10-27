@@ -8,5 +8,6 @@ sim.html
 tools/sim/last-run.json
 tools/sim/last-run.md
 tools/sim/last-run.log
+tools/shot-out/
 
 .dshwolf/
