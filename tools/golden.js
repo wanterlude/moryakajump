@@ -1,245 +1,151 @@
-// Golden-тесты кадра: снимаем детерминированный кадр игры и сравниваем хеш.
+// Golden-тесты отрисовки без браузера: грузим бандл в Node через заглушку DOM,
+// подменяем контекст канваса записывающим и сравниваем хеш списка вызовов.
 //
-//   node tools/golden.js            # проверить против сохранённых хешей
+//   node tools/golden.js            # проверить против эталонов
 //   node tools/golden.js --update   # перезаписать эталоны
-//   node tools/golden.js --only=run # один кадр
 //
-// Детерминизм: в копии игры замораживаются performance.now() и Math.random,
-// поэтому анимации и случайные элементы замирают в одном состоянии. Кадр
-// снимается через CDP (Page.captureScreenshot): canvas.toDataURL здесь не
-// годится — аватары из файлов помечают канвас как «испорченный».
+// Почему так, а не через headless Chrome: пиксели в headless зависят от шрифтов
+// и масштаба канваса, а передача большого списка вызовов через CDP оказалась
+// нестабильной. Здесь всё детерминировано (время и random заморожены), работает
+// за доли секунды и не грузит процессор.
 const fs = require("fs");
-const os = require("os");
 const path = require("path");
-const http = require("http");
 const crypto = require("crypto");
-const { spawn } = require("child_process");
+const vm = require("vm");
+const { createSandbox, extractScripts } = require("./sim/dom-shim");
 
 const root = path.resolve(__dirname, "..");
-const goldenDir = path.join(__dirname, "golden");
-const goldenFile = path.join(goldenDir, "frames.json");
+const goldenFile = path.join(__dirname, "golden", "calls.json");
 const ANCHOR = "  setTimeout(maybeShowTutorial, 500);\n";
-
-const CHROME = [
-  path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
-  path.join(process.env["ProgramFiles(x86)"] || "", "Google/Chrome/Application/chrome.exe"),
-  path.join(process.env["ProgramFiles(x86)"] || "", "Microsoft/Edge/Application/msedge.exe"),
-].find((p) => p && fs.existsSync(p));
+const FRAME_MS = 5000;
 
 const update = process.argv.includes("--update");
-const only = (process.argv.find((a) => a.startsWith("--only=")) || "").split("=")[1] || "";
 
 const SHOTS = [
-  { name: "run", hook: "startGame();" },
-  { name: "menu-avatars", hook: "menuState.tab = 'avatars';" },
-  { name: "menu-shop", hook: "menuState.tab = 'shop';" },
-  { name: "menu-platforms", hook: "menuState.tab = 'platforms';" },
-  { name: "settings", hook: "openSettings();" },
+  { name: "run", setup: (api) => api.startGame() },
+  { name: "menu-avatars", setup: (api) => { api.menuState.tab = "avatars"; } },
+  { name: "menu-shop", setup: (api) => { api.menuState.tab = "shop"; } },
+  { name: "menu-platforms", setup: (api) => { api.menuState.tab = "platforms"; } },
+  { name: "settings", setup: (api) => api.openSettings() },
 ];
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function hookFor(shot) {
-  return `
-  // --- golden-кадр: время и случайность заморожены ---
-  (function () {
-    var seed = 1337;
-    Math.random = function () {
-      seed = (seed * 1664525 + 1013904223) % 4294967296;
-      return seed / 4294967296;
-    };
-    performance.now = function () { return 5000; };
-    try {
-      localStorage.setItem("morjakaTutorialDone", "1");
-      var ov = document.getElementById("tutorialOverlay");
-      if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
-    } catch (e) {}
-    setTimeout(function () {
-      try {
-        ${shot.hook}
-        window.requestAnimationFrame = function () { return 0; };
-        draw(performance.now());
-      } catch (e) {}
-    }, 700);
-  })();
-`;
+function formatArg(value) {
+  if (typeof value === "number") return Math.round(value * 100) / 100;
+  if (value === null || value === undefined) return String(value);
+  if (typeof value === "object") return "[obj]";
+  return String(value).slice(0, 60);
 }
 
-function serve(directory) {
-  const server = http.createServer((req, res) => {
-    const rel = decodeURIComponent((req.url || "/").split("?")[0]);
-    const file = path.join(directory, rel);
-    if (!file.startsWith(directory) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-      res.writeHead(404);
-      res.end();
-      return;
-    }
-    const ext = path.extname(file).toLowerCase();
-    const type =
-      ext === ".html" ? "text/html; charset=utf-8" :
-      ext === ".jpg" || ext === ".jpeg" ? "image/jpeg" :
-      ext === ".png" ? "image/png" :
-      ext === ".ico" ? "image/x-icon" : "application/octet-stream";
-    res.writeHead(200, { "Content-Type": type });
-    fs.createReadStream(file).pipe(res);
-  });
-  return new Promise((resolve) => {
-    server.listen(0, "127.0.0.1", () => resolve({ server, port: server.address().port }));
-  });
-}
-
-async function capture(shot, port) {
-  const work = fs.mkdtempSync(path.join(os.tmpdir(), "mj-golden-"));
+function loadGame() {
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   if (html.split(ANCHOR).length !== 2) throw new Error("якорь не найден в index.html");
-  fs.writeFileSync(path.join(work, "golden.html"), html.replace(ANCHOR, ANCHOR + hookFor(shot)), "utf8");
-  for (const file of fs.readdirSync(root)) {
-    if (/\.(jpg|jpeg|png|ico)$/i.test(file)) {
-      fs.copyFileSync(path.join(root, file), path.join(work, file));
-    }
-  }
-
-  const { server, port: httpPort } = await serve(work);
-  const profile = path.join(work, "profile");
-  const chrome = spawn(
-    CHROME,
-    [
-      "--headless=new",
-      "--no-sandbox",
-      "--disable-dev-shm-usage",
-      "--hide-scrollbars",
-      "--window-size=900,1000",
-      "--remote-debugging-port=" + port,
-      "--user-data-dir=" + profile,
-      "http://127.0.0.1:" + httpPort + "/golden.html",
-    ],
-    { stdio: "ignore" }
+  const patched = html.replace(
+    ANCHOR,
+    ANCHOR + "  globalThis.__api = { draw, startGame, menuState, openSettings };\n"
   );
 
-  const cleanup = () => {
-    chrome.kill("SIGKILL");
-    server.close();
-  };
-
-  let target = null;
-  for (let i = 0; i < 60 && !target; i++) {
-    await sleep(200);
-    try {
-      const res = await fetch(`http://127.0.0.1:${port}/json/list`);
-      target = (await res.json()).find((t) => t.type === "page" && t.webSocketDebuggerUrl);
-    } catch {
-      /* порт ещё не поднялся */
-    }
-  }
-  if (!target) {
-    cleanup();
-    throw new Error("Chrome не поднял отладочный порт");
-  }
-
-  const ws = new WebSocket(target.webSocketDebuggerUrl);
-  await new Promise((resolve, reject) => {
-    ws.onopen = resolve;
-    ws.onerror = () => reject(new Error("не подключиться к CDP"));
-  });
-
-  let nextId = 1;
-  const send = (method, params = {}) =>
-    new Promise((resolve, reject) => {
-      const id = nextId++;
-      const onMessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.id !== id) return;
-        ws.removeEventListener("message", onMessage);
-        if (msg.error) reject(new Error(msg.error.message));
-        else resolve(msg.result);
-      };
-      ws.addEventListener("message", onMessage);
-      ws.send(JSON.stringify({ id, method, params }));
-    });
-
-  const evaluate = async (expression) => {
-    const result = await send("Runtime.evaluate", { expression, returnByValue: true });
-    return result?.result?.value;
-  };
-
-  await sleep(1800);
-
-  const rectJson = await evaluate(
-    "JSON.stringify((function(){var r=document.getElementById('game').getBoundingClientRect();" +
-      "return {x:r.x,y:r.y,width:r.width,height:r.height};})())"
+  const sandbox = createSandbox();
+  // Время и случайность заморожены: кадр воспроизводится один в один.
+  // Присваивать прямо в sandbox бесполезно — у контекста свои глобальные объекты,
+  // поэтому настройку делаем кодом внутри контекста.
+  vm.runInContext(
+    "var __seed = 1337;" +
+      "Math.random = function () { __seed = (__seed * 1664525 + 1013904223) % 4294967296; return __seed / 4294967296; };" +
+      "performance.now = function () { return " + FRAME_MS + "; };" +
+      "requestAnimationFrame = function () { return 0; };",
+    sandbox,
+    { filename: "golden-bootstrap" }
   );
-  if (!rectJson) {
-    ws.close();
-    cleanup();
-    throw new Error("не нашёл canvas#game");
+
+  for (const code of extractScripts(patched)) {
+    vm.runInContext(code, sandbox, { filename: "index.html#script", timeout: 60000 });
   }
-  const rect = JSON.parse(rectJson);
-
-  const shotResult = await send("Page.captureScreenshot", {
-    format: "png",
-    clip: { x: rect.x, y: rect.y, width: rect.width, height: rect.height, scale: 1 },
-    captureBeyondViewport: false,
-  });
-
-  ws.close();
-  cleanup();
-  await sleep(400);
-  try {
-    fs.rmSync(work, { recursive: true, force: true });
-  } catch {
-    /* подчистит система */
-  }
-
-  if (!shotResult || !shotResult.data) throw new Error("кадр не снят");
-  return shotResult.data;
+  if (!sandbox.__api) throw new Error("не удалось выставить __api (якорь не сработал)");
+  return sandbox;
 }
 
-async function main() {
-  if (!CHROME) throw new Error("не нашёл Chrome/Edge");
+/** Записывающий контекст: тот же объект, но методы складывают вызовы в массив. */
+function instrument(sandbox) {
+  const canvas = sandbox.document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+  const calls = [];
+  for (const key of Object.keys(ctx)) {
+    const original = ctx[key];
+    if (typeof original !== "function") continue;
+    ctx[key] = function (...args) {
+      if (calls.length < 300000) calls.push(key + "(" + args.map(formatArg).join(",") + ")");
+      return original.apply(ctx, args);
+    };
+  }
+  return calls;
+}
 
-  const selected = SHOTS.filter((s) => !only || s.name === only);
-  if (!selected.length) throw new Error("нет такого кадра: " + only);
+function hashCalls(calls) {
+  return crypto.createHash("sha256").update(calls.join("\n")).digest("hex").slice(0, 16);
+}
 
-  fs.mkdirSync(goldenDir, { recursive: true });
+function main() {
+  const sandbox = loadGame();
+  const calls = instrument(sandbox);
+  const api = sandbox.__api;
+
   const known = fs.existsSync(goldenFile) ? JSON.parse(fs.readFileSync(goldenFile, "utf8")) : {};
   const next = { ...known };
   let failed = 0;
 
-  for (let i = 0; i < selected.length; i++) {
-    const shot = selected[i];
-    const base64 = await capture(shot, 9360 + i);
-    const hash = crypto.createHash("sha256").update(base64).digest("hex").slice(0, 16);
+  for (const shot of SHOTS) {
+    calls.length = 0;
+    const errors = [];
+    try {
+      shot.setup(api);
+    } catch (error) {
+      errors.push(String(error.message || error));
+    }
+    try {
+      api.draw(FRAME_MS);
+    } catch (error) {
+      errors.push("draw: " + String(error.message || error));
+    }
+    if (errors.length) {
+      console.log("ОШИБКА " + shot.name.padEnd(16) + " " + errors.join("; "));
+      failed++;
+      continue;
+    }
+
+    const hash = hashCalls(calls);
     const expected = known[shot.name];
+    const info = " (" + calls.length + " вызовов)";
 
     if (update) {
       next[shot.name] = hash;
-      console.log("эталон " + shot.name.padEnd(16) + " " + hash);
-      continue;
-    }
-    if (!expected) {
+      console.log("эталон " + shot.name.padEnd(16) + " " + hash + info);
+    } else if (!expected) {
       failed++;
       console.log("НЕТ   " + shot.name.padEnd(16) + " (запустите --update)");
     } else if (expected !== hash) {
       failed++;
-      console.log("FAIL  " + shot.name.padEnd(16) + " было " + expected + ", стало " + hash);
+      console.log("FAIL  " + shot.name.padEnd(16) + " было " + expected + ", стало " + hash + info);
     } else {
-      console.log("ok    " + shot.name.padEnd(16) + " " + hash);
+      console.log("ok    " + shot.name.padEnd(16) + " " + hash + info);
     }
   }
 
   if (update) {
+    fs.mkdirSync(path.dirname(goldenFile), { recursive: true });
     fs.writeFileSync(goldenFile, JSON.stringify(next, null, 2) + "\n", "utf8");
-    console.log("\nэталоны обновлены: tools/golden/frames.json");
+    console.log("\nэталоны обновлены: tools/golden/calls.json");
     return;
   }
   if (failed) {
-    console.error("\nкадры разошлись: " + failed);
+    console.error("\nотрисовка разошлась: " + failed);
     process.exit(1);
   }
   console.log("\nвсе кадры совпали с эталонами");
 }
 
-main().catch((error) => {
-  console.error("FAIL: " + error.message);
+try {
+  main();
+} catch (error) {
+  console.error("FAIL: " + (error.message || error));
   process.exit(1);
-});
+}
