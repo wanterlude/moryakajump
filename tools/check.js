@@ -21,6 +21,16 @@ function fail(message) {
   console.log("FAIL  " + message);
 }
 
+// 0. Вставка из src/ совпадает с исходниками
+try {
+  execFileSync(process.execPath, [path.join(__dirname, "build-src.js"), "--check"], {
+    cwd: root,
+    stdio: "inherit",
+  });
+} catch (err) {
+  fail("вставка src устарела — запустите node tools/build-src.js");
+}
+
 // 1. Варианты
 try {
   execFileSync(process.execPath, [path.join(__dirname, "build-variants.js"), "--check"], {

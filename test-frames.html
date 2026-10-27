@@ -11696,56 +11696,125 @@ html, body, body * {
    * от перка ширины, поэтому число колец и искр считается от p.w, а не задано
    * константой.
    */
+  // <<< src: начало вставки — править в src/, не здесь >>>
+"use strict";
+var __srcFieldLayout = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/game/field-layout.ts
+  var field_layout_exports = {};
+  __export(field_layout_exports, {
+    fieldLayout: () => fieldLayout,
+    polePulse: () => polePulse,
+    ringPhase: () => ringPhase
+  });
+  var RING_PER_PIXELS = 26;
+  var RING_RX_SHARE = 0.34;
+  var SPARK_PER_PIXELS = 34;
+  function fieldLayout(platform) {
+    const { x, y, w, h } = platform;
+    const columns = Math.max(2, Math.round(w / RING_PER_PIXELS));
+    const columnWidth = w / columns;
+    const rx = columnWidth * RING_RX_SHARE;
+    const rings = [];
+    for (let column = 0; column < columns; column++) {
+      const ringX = x + columnWidth * (column + 0.5);
+      for (let band = 0; band < 2; band++) {
+        rings.push({ x: ringX, baseY: y + 3.1, rx, column, band });
+      }
+    }
+    const sparkCount = Math.max(3, Math.round(w / SPARK_PER_PIXELS));
+    const sparks = Array.from({ length: sparkCount }, (_, i) => ({
+      x: x + w * (i + 0.5) / sparkCount,
+      y: y + h / 2
+    }));
+    return {
+      columns,
+      rings,
+      poles: [
+        { x: x + 3.5, y: y + h / 2, side: 0 },
+        { x: x + w - 3.5, y: y + h / 2, side: 1 }
+      ],
+      glow: { x: x + w / 2, y: y + h / 2, rx: w * 0.62, ry: h * 3.1 },
+      sparks
+    };
+  }
+  function ringPhase(time, ring) {
+    return (time * 0.55 + ring.column * 0.17 + ring.band * 0.5) % 1;
+  }
+  function polePulse(time, side) {
+    return 0.55 + 0.45 * Math.sin(time * 2.2 + side * Math.PI);
+  }
+  return __toCommonJS(field_layout_exports);
+})();
+  var fieldLayout = __srcFieldLayout.fieldLayout;
+  var ringPhase = __srcFieldLayout.ringPhase;
+  var polePulse = __srcFieldLayout.polePulse;
+  // <<< src: конец вставки >>>
+
   function drawPlatformMagnet(p) {
     const now = frameNow();
     const w = p.w;
-    const cx = p.x + w / 2;
-    const top = p.y + 1.5;
-    const cy = p.y + p.h / 2;
+    // Геометрия приходит из src/game/field-layout.ts: число колец и искр
+    // считается от текущей ширины платформы.
+    const layout = fieldLayout(p);
+    const cx = layout.glow.x;
+    const cy = layout.glow.y;
     ctx.save();
 
     // Свечение вдоль всей платформы.
-    const field = ctx.createRadialGradient(cx, cy, 1, cx, cy, w * 0.62);
+    const field = ctx.createRadialGradient(cx, cy, 1, cx, cy, layout.glow.rx);
     field.addColorStop(0, "rgba(122,226,255,.26)");
     field.addColorStop(0.55, "rgba(122,226,255,.09)");
     field.addColorStop(1, "rgba(122,226,255,0)");
     ctx.fillStyle = field;
     ctx.beginPath();
-    ctx.ellipse(cx, cy, w * 0.62, p.h * 3.1, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy, layout.glow.rx, layout.glow.ry, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Кольца: по одному на каждые ~26 px ширины, уходят вверх и гаснут.
-    const columns = Math.max(2, Math.round(w / 26));
-    for (let c = 0; c < columns; c++) {
-      const colX = p.x + w * (c + 0.5) / columns;
-      for (let band = 0; band < 2; band++) {
-        const phase = (now * 0.55 + c * 0.17 + band * 0.5) % 1;
-        const alpha = (1 - phase) * 0.8;
-        if (alpha <= 0.03) continue;
-        ctx.globalAlpha = alpha;
-        ctx.strokeStyle = "rgba(150,240,255,1)";
-        ctx.lineWidth = 1.5 - phase * 0.7;
-        ctx.beginPath();
-        ctx.ellipse(colX, top + 1.6 - phase * 11, w / columns * 0.34, 2.2 + phase * 1.2, 0, 0, Math.PI * 2);
-        ctx.stroke();
-      }
+    // Кольца уходят вверх и гаснут.
+    for (const ring of layout.rings) {
+      const phase = ringPhase(now, ring);
+      const alpha = (1 - phase) * 0.8;
+      if (alpha <= 0.03) continue;
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "rgba(150,240,255,1)";
+      ctx.lineWidth = 1.5 - phase * 0.7;
+      ctx.beginPath();
+      ctx.ellipse(ring.x, ring.baseY - phase * 11, ring.rx, 2.2 + phase * 1.2, 0, 0, Math.PI * 2);
+      ctx.stroke();
     }
     ctx.globalAlpha = 1;
 
     // Полюса на самых концах.
-    for (let side = 0; side < 2; side++) {
-      const px = side === 0 ? p.x + 3.5 : p.x + w - 3.5;
-      const pulse = 0.55 + 0.45 * Math.sin(now * 2.2 + side * Math.PI);
-      const pole = ctx.createRadialGradient(px, cy, 0.5, px, cy, 9);
-      pole.addColorStop(0, "rgba(190,248,255," + (0.85 * pulse).toFixed(2) + ")");
-      pole.addColorStop(1, "rgba(120,226,255,0)");
-      ctx.fillStyle = pole;
+    for (const pole of layout.poles) {
+      const pulse = polePulse(now, pole.side);
+      const gradient = ctx.createRadialGradient(pole.x, pole.y, 0.5, pole.x, pole.y, 9);
+      gradient.addColorStop(0, "rgba(190,248,255," + (0.85 * pulse).toFixed(2) + ")");
+      gradient.addColorStop(1, "rgba(120,226,255,0)");
+      ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.arc(px, cy, 9, 0, Math.PI * 2);
+      ctx.arc(pole.x, pole.y, 9, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = "rgba(232,254,255," + (0.7 + 0.3 * pulse).toFixed(2) + ")";
       ctx.beginPath();
-      ctx.arc(px, cy, 1.5, 0, Math.PI * 2);
+      ctx.arc(pole.x, pole.y, 1.5, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -11755,10 +11824,10 @@ html, body, body * {
     ctx.fill();
 
     // Искры вдоль поля.
-    const sparks = Math.max(3, Math.round(w / 34));
-    for (let i = 0; i < sparks; i++) {
-      const angle = now * 1.1 + i * (Math.PI * 2 / sparks);
-      const baseX = p.x + w * (i + 0.5) / sparks;
+    const sparkCount = layout.sparks.length;
+    for (let i = 0; i < sparkCount; i++) {
+      const angle = now * 1.1 + i * (Math.PI * 2 / sparkCount);
+      const baseX = layout.sparks[i].x;
       const sx = baseX + Math.cos(angle) * 7;
       const sy = cy - 4 + Math.sin(angle * 1.3) * 8;
       const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(angle * 2.1 + i));
@@ -11771,8 +11840,6 @@ html, body, body * {
     ctx.globalAlpha = 1;
     ctx.restore();
   }
-
-
 
   // Пружинка-подбор: сердечник на поле платформы. Тела и штриховки нет —
   // поле рисует сама платформа, см. drawPlatformMagnet.
@@ -11826,8 +11893,6 @@ html, body, body * {
     ctx.globalAlpha = 1;
     ctx.restore();
   }
-
-
 
   function drawCoin(c) {
     const t = frameNow();

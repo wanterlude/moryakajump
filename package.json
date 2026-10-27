@@ -1,0 +1,16 @@
+{
+  "name": "moryaka-jump",
+  "private": true,
+  "version": "1.0.62",
+  "description": "Зимний эндлесс-платформер: один HTML-файл, Canvas 2D",
+  "scripts": {
+    "build:src": "node tools/build-src.js",
+    "check:src": "node tools/build-src.js --check",
+    "test": "node --test src"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.2"
+  }
+}
