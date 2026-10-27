@@ -73,7 +73,7 @@ for (const entry of fs.readdirSync(publishDir)) {
   fs.rmSync(path.join(publishDir, entry), { recursive: true, force: true });
 }
 
-const finalExe = path.join(outDir, "Moryaka-Jump.exe");
+const finalExe = path.join(outDir, "Moryaka-Jump-" + version + ".exe");
 fs.renameSync(exe, finalExe);
 fs.rmSync(publishDir, { recursive: true, force: true });
 fs.rmSync(stage, { recursive: true, force: true });

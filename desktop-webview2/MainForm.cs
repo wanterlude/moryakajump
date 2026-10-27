@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
@@ -15,6 +16,8 @@ namespace MoryakaJump
     sealed class MainForm : Form
     {
         const string VirtualHost = "game.local";
+        // С этого CSS-размера страница показывает боковые панели (рейтинг и настройки).
+        const int SidePanelsMinWidth = 1180;
         const string Origin = "https://" + VirtualHost + "/";
 
         readonly WebView2 view;
@@ -23,7 +26,8 @@ namespace MoryakaJump
         public MainForm()
         {
             Text = "Moryaka Jump";
-            ClientSize = new Size(1080, 900);
+            // Стартовый размер с запасом; после загрузки подгоняем по факту.
+            ClientSize = new Size(1260, 920);
             MinimumSize = new Size(560, 640);
             StartPosition = FormStartPosition.CenterScreen;
             BackColor = Color.FromArgb(16, 26, 53);
@@ -77,12 +81,36 @@ namespace MoryakaJump
                     "document.documentElement.style.overflow='hidden';" +
                     "document.body.style.overflow='hidden';});");
 
+                core.NavigationCompleted += async delegate
+                {
+                    try { await FitWidthForSidePanelsAsync(); }
+                    catch (Exception) { }
+                };
+
                 core.Navigate(Origin + "index.html");
             }
             catch (Exception failure)
             {
                 ShowError("Не удалось открыть игру:\n" + failure.Message);
             }
+        }
+
+        /// <summary>
+        /// Если окно уже страницы, где появляются боковые панели, расширяем его.
+        /// Считаем по фактическому масштабу DPI: CSS-пиксели не равны оконным.
+        /// </summary>
+        async Task FitWidthForSidePanelsAsync()
+        {
+            CoreWebView2 core = view.CoreWebView2;
+            if (core == null) return;
+            string json = await core.ExecuteScriptAsync("window.innerWidth");
+            int inner;
+            if (!int.TryParse(json, out inner) || inner <= 0) return;
+            if (inner >= SidePanelsMinWidth) return;
+
+            double scale = view.ClientSize.Width > 0 ? (double)view.ClientSize.Width / inner : 1.0;
+            int extra = (int)Math.Ceiling((SidePanelsMinWidth - inner) * scale) + 8;
+            ClientSize = new Size(ClientSize.Width + extra, ClientSize.Height);
         }
 
         void OnResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs args)

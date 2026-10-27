@@ -4,7 +4,7 @@
 //
 // 1. Производные сборки совпадают с index.html.
 // 2. JS-блок бандла парсится.
-// 3. Версия в index.html совпадает с README, desktop/package.json и Changelog.
+// 3. Версия в index.html совпадает с README, README и Changelog.
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
@@ -58,14 +58,11 @@ if (!version) {
   fail("GAME_VERSION не найдена в index.html");
 } else {
   const readmeBadge = (read("README.md").match(/version-v([0-9][^-\s]*)-/) || [])[1];
-  const pkgVersion = JSON.parse(read("desktop/package.json")).version;
   const changelogVersion = (read("Changelog").match(/^\[Версия ([^\]]+)\]$/m) || [])[1];
 
   const table = [
     ["index.html", version],
-    ["README.md", readmeBadge],
-    ["desktop/package.json", pkgVersion],
-    ["Changelog", changelogVersion],
+    ["README.md", readmeBadge],    ["Changelog", changelogVersion],
   ];
   const bad = table.filter(([, v]) => v !== version);
   if (bad.length) {

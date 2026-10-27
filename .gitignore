@@ -1,10 +1,4 @@
 graphify-out/
-desktop/node_modules/
-desktop/dist/
-desktop/index.html
-desktop/*.jpg
-desktop/build-out/
-desktop-lite/build-out/
 desktop-webview2/bin/
 desktop-webview2/obj/
 desktop-webview2/build-out/

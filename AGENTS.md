@@ -73,7 +73,7 @@ node tools/sim/run-node.js --runs=300 --skill=0.7       # бот с челове
 (минимальные заглушки DOM/canvas, без единой зависимости) и пишет
 `tools/sim/last-run.json` + `last-run.md` со сводкой: перцентили, причины смерти,
 события, дуэли, последняя платформа. В песочнице GUI-процессы не стартуют,
-поэтому Electron здесь не используется — если нужен настоящий canvas, откройте
+поэтому GUI здесь не запускается — если нужен настоящий canvas, откройте
 `sim.html` в браузере и вызывайте `__simInit` / `__simChunk` из консоли.
 
 ## Скриншоты интерфейса
@@ -96,27 +96,7 @@ node tools/shot.js --tabs=hud --hud=2 --label=v2 --scale=2   # версия 1..4
 Кадр фиксирует счёт 1 919 и рекорд 83 747, чтобы версии сравнивались один к одному.
 Сами версии лежат в `tools/hud-variants.js` (только предпросмотр, игра их не видит).
 
-## Лёгкая сборка (без Chromium)
-
-```
-node desktop-lite/build.js          # лаунчер + файлы игры в zip
-node desktop-lite/build.js --keep   # оставить распакованную папку
-```
-
-`desktop-lite/Launcher.cs` компилируется штатным `csc` из .NET Framework (без NuGet
-и без WinForms) и открывает игру в отдельном окне Edge через `--app=`, с профилем
-в `%LOCALAPPDATA%\MoryakaJump\Profile` — localStorage с рекордами переживает
-перезапуск, основной профиль браузера не занимается.
-
-| Сборка | Что внутри | Размер |
-|---|---|---|
-| `desktop/` (Electron) | свой Chromium 22 | ~62 МБ exe |
-| `desktop-lite/` | лаунчер 371 КБ (364 КБ из них — иконка) + файлы игры | zip ~1,6 МБ |
-
-Лёгкая сборка требует установленного Edge (он есть в Windows 10/11). Electron
-не даёт опуститься ниже ~50 МБ: сам бинарь Chromium занимает 150 МБ в распаковке.
-
-## Самостоятельная сборка на WebView2
+## Сборка приложения (WebView2)
 
 ```
 node desktop-webview2/build.js     # нужен .NET SDK 8+
@@ -143,17 +123,16 @@ WebView2 Runtime. Сборка даёт **один самодостаточны�
 
 ## Релиз
 
+Единственная сборка — `desktop-webview2`.
+
 1. Поднять `GAME_VERSION` в `index.html` (строка ~10196).
 2. Добавить запись в `Changelog` сверху: `[Версия X.Y.Z]` и строки `> пункт`.
 3. Обновить бейдж версии в `README.md`.
 4. `node tools/build-variants.js` — синхронизировать варианты.
-5. `cd desktop && npm install && npm run release` — соберёт exe и опубликует
-   релиз через `gh` (нужен авторизованный GitHub CLI). `prepare.js` сам
-   подставит версию в `desktop/package.json`, `release.js` возьмёт заметки
-   из `Changelog`.
-
-Ручное редактирование `desktop/index.html` бессмысленно: `prepare.js` копирует
-туда корневой `index.html`.
+5. `node tools/check.js` — версии и парсинг.
+6. `node desktop-webview2/build.js` — соберёт `desktop-webview2/build-out/Moryaka-Jump-<версия>.exe`.
+7. `gh release create v<версия> <exe> --title "Moryaka Jump <версия>" --notes-file <(sed -n '/^\[Версия <версия>\]/,/^\[Версия /p' Changelog)`
+   — заметки берутся из `Changelog`.
 
 ## Соглашения
 
@@ -164,8 +143,7 @@ WebView2 Runtime. Сборка даёт **один самодостаточны�
   `morjakaSchema`, `morjakaNick`, `morjakaSelectedFrame`, `morjakaTutorialDone`,
   `morjakaSideLbCollapsed`, `morjakaSideSetCollapsed`.
 - Глобальный рейтинг: `LB_CONFIG` в `index.html` (~строка 17722), Firebase
-  Realtime Database, ветка `/scores/moryaka-jump`. В Electron сеть ограничена
-  именно этим доменом (`desktop/main.js`).
+  Realtime Database, ветка `/scores/moryaka-jump`.
 - `1.jpg`–`27.jpg` — аватары, `fon.jpg` — фон. Они лежат рядом с игрой;
   `imageSource()` вернёт файл, а `share_avatar.jpg` вшит как data-URI.
 
@@ -176,12 +154,12 @@ node tools/check.js
 ```
 
 Проверяет три вещи: производные сборки совпадают с `index.html`, JS-блок парсится,
-версия одинакова в `index.html`, `README.md`, `desktop/package.json` и `Changelog`.
+версия одинакова в `index.html`, `README.md` и `Changelog`.
 Дальше — ручная проверка в браузере: меню, забег, дуэль, мобильная раскладка.
 При правках баланса — прогон симулятора и сравнение с `tools/sim/README.md`.
 
 ## Мусор, который не коммитим
 
 `sim.html`, `tools/sim/last-run.*`, `graphify-out/`, `.dshwolf/`,
-`desktop/node_modules/`, `desktop/dist/`, `desktop/build-out/`, `desktop/index.html`,
-`desktop/*.jpg`.
+`desktop-webview2/bin/`, `desktop-webview2/obj/`, `desktop-webview2/build-out/`,
+`desktop-webview2/staging/`.

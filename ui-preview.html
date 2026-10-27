@@ -9171,6 +9171,60 @@ html, body, body * {
     dailyAdd("platforms", 1);
   }
   var keys = {};
+  // Геймпад: опрос идёт каждый кадр, но флаги поднимаются только если он реально
+  // подключён — без пада управление ведёт себя ровно как раньше.
+  var padInput = { left: false, right: false, connected: false };
+  var padPrev = { jump: false, start: false };
+  var PAD_DEADZONE = 0.35;
+  function padJumpPressed() {
+    if (currentState === STATE.PLAYING) {
+      if (perkState.offering) return;
+      doDoubleJump();
+      return;
+    }
+    if (currentState === STATE.MENU) startGame();
+    else if (currentState === STATE.GAMEOVER) startGame();
+  }
+  function padStartPressed() {
+    if (currentState === STATE.PLAYING) pauseGame();
+    else if (currentState === STATE.PAUSE) resumeGame();
+    else if (currentState === STATE.MENU) startGame();
+    else if (currentState === STATE.GAMEOVER) startGame();
+  }
+  function pollGamepad() {
+    padInput.left = false;
+    padInput.right = false;
+    padInput.connected = false;
+    if (!navigator.getGamepads) return;
+    var pads = navigator.getGamepads();
+    var pad = null;
+    for (var i = 0; i < pads.length; i++) {
+      if (pads[i] && pads[i].connected) { pad = pads[i]; break; }
+    }
+    if (!pad) {
+      padPrev.jump = false;
+      padPrev.start = false;
+      return;
+    }
+    padInput.connected = true;
+    var axis = pad.axes && pad.axes.length ? pad.axes[0] : 0;
+    var dLeft = pad.buttons[14] && pad.buttons[14].pressed;
+    var dRight = pad.buttons[15] && pad.buttons[15].pressed;
+    padInput.left = axis < -PAD_DEADZONE || dLeft;
+    padInput.right = axis > PAD_DEADZONE || dRight;
+    // A, B и правый курок — прыжок; Start — пауза/продолжить.
+    var jump = !!(pad.buttons[0] && pad.buttons[0].pressed) ||
+      !!(pad.buttons[1] && pad.buttons[1].pressed) ||
+      !!(pad.buttons[7] && pad.buttons[7].value > 0.5);
+    var start = !!(pad.buttons[9] && pad.buttons[9].pressed);
+    if (jump && !padPrev.jump) padJumpPressed();
+    if (start && !padPrev.start) padStartPressed();
+    padPrev.jump = jump;
+    padPrev.start = start;
+  }
+  window.addEventListener("gamepadconnected", () => {
+    setMenuMessage("Геймпад подключён", "A — прыжок, START — пауза");
+  });
   function resetGame() {
     player = { x: 185, y: 500, vx: 0, dy: 0, score: 0 };
     platforms = [makePlatform({ x: 120, y: 550, w: 160, h: 15, type: "static" })];
@@ -10193,7 +10247,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.48-ui";
+  var GAME_VERSION = "1.0.49-ui";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -13218,8 +13272,8 @@ html, body, body * {
     }
     if (duelIsActive()) {
       const end = duelUpdate(dt, {
-        left: !!(keys.ArrowLeft || keys.KeyA || touchInput.left || tiltEnabled && tiltDirection < 0),
-        right: !!(keys.ArrowRight || keys.KeyD || touchInput.right || tiltEnabled && tiltDirection > 0),
+        left: !!(keys.ArrowLeft || keys.KeyA || touchInput.left || padInput.left || tiltEnabled && tiltDirection < 0),
+        right: !!(keys.ArrowRight || keys.KeyD || touchInput.right || padInput.right || tiltEnabled && tiltDirection > 0),
         targetX: mouseControl.inside ? mouseControl.targetX : null
       });
       for (const text of duelDrainEvents()) {
@@ -13232,8 +13286,8 @@ html, body, body * {
       tickEvents(SIM_STEP_MS);
       return;
     }
-    const keyboardOrTouchLeft = keys.ArrowLeft || keys.KeyA || touchInput.left;
-    const keyboardOrTouchRight = keys.ArrowRight || keys.KeyD || touchInput.right;
+    const keyboardOrTouchLeft = keys.ArrowLeft || keys.KeyA || touchInput.left || padInput.left;
+    const keyboardOrTouchRight = keys.ArrowRight || keys.KeyD || touchInput.right || padInput.right;
     const tiltLeft = tiltEnabled && tiltDirection < 0;
     const tiltRight = tiltEnabled && tiltDirection > 0;
     if (jumpCharges > maxAirJumps()) jumpCharges = maxAirJumps();
@@ -13644,6 +13698,8 @@ html, body, body * {
     hudState.pops.push({ x, y, text, color: color || HUD_COLORS.gold, life: 1 });
   }
   function updateHud(dt) {
+    // Геймпад опрашиваем каждый кадр: подключён — работает, отключён — молчит.
+    pollGamepad();
     if (player.score < hudState.score) hudState.score = player.score;
     else {
       hudState.score += (player.score - hudState.score) * Math.min(1, 0.22 * dt);
