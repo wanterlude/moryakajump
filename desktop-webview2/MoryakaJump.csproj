@@ -29,4 +29,17 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Всё, что раньше лежало рядом с exe, вшивается в него на сборке. -->
+    <EmbeddedResource Include="staging\lib\*.dll">
+      <LogicalName>lib/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="staging\native\*">
+      <LogicalName>native/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="staging\assets\*">
+      <LogicalName>assets/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

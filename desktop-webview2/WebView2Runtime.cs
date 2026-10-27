@@ -302,7 +302,8 @@ namespace MoryakaJump
                 case Phase.Failed:
                     cancelled = false;
                     primary.Visible = false;
-                    StartAsync();
+                    // Перезапуск установки: задачу не ждём, окно живёт своей жизнью.
+                    Task retry = StartAsync();
                     break;
                 default:
                     break;

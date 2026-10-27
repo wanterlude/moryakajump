@@ -126,11 +126,12 @@ node desktop-webview2/build.js     # нужен .NET SDK 8+
 (он уже в Windows, игроку ничего доставлять не нужно), движок — системный
 WebView2 Runtime. Сборка кладёт zip в `desktop-webview2/build-out/`.
 
-| Что | Размер |
-|---|---|
-| `Moryaka-Jump.exe` | ~77 КБ (иконка вшита) |
-| Вся папка | ~2.8 МБ |
-| zip | ~1.3 МБ |
+Сборка даёт **один самодостаточный exe** — рядом ничего не нужно:
+`Moryaka-Jump.exe` ~2.25 МБ. Внутри: код, иконка, сборки WebView2 (грузятся из
+памяти через `AssemblyResolve`), нативный `WebView2Loader.dll` (распаковывается
+в `%LOCALAPPDATA%\MoryakaJump\bin` и подключается `SetLoaderDllFolderPath`) и
+файлы игры (HTML в gzip, отдаются из памяти через `WebResourceRequested` на
+виртуальный хост `https://game.local`).
 
 При первом запуске `Program.Main` проверяет `CoreWebView2Environment.GetAvailableBrowserVersionString()`.
 Если рантайма нет, открывается окно установки: прогресс скачивания официального

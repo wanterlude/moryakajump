@@ -8,13 +8,14 @@ using Microsoft.Web.WebView2.WinForms;
 namespace MoryakaJump
 {
     /// <summary>
-    /// Окно игры: WebView2 на весь клиент, игра грузится с виртуального хоста
-    /// https://game.local — так localStorage с рекордами живёт как на обычном сайте
-    /// и переживает перезапуск (в отличие от file://, где origin считается непрозрачным).
+    /// Окно игры. Файлы игры лежат внутри exe, поэтому WebView2 отдаёт их из памяти
+    /// через виртуальный хост https://game.local — localStorage при этом ведёт себя
+    /// как на обычном сайте и рекорды переживают перезапуск.
     /// </summary>
     sealed class MainForm : Form
     {
         const string VirtualHost = "game.local";
+        const string Origin = "https://" + VirtualHost + "/";
 
         readonly WebView2 view;
         readonly Label error;
@@ -48,13 +49,6 @@ namespace MoryakaJump
 
         async void OnLoad(object sender, EventArgs e)
         {
-            string html = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "index.html");
-            if (!File.Exists(html))
-            {
-                ShowError("Рядом с программой нет index.html.\nПоложите файл игры в ту же папку.");
-                return;
-            }
-
             try
             {
                 string dataFolder = Path.Combine(
@@ -74,25 +68,50 @@ namespace MoryakaJump
                 core.Settings.IsPasswordAutosaveEnabled = false;
                 core.Settings.IsGeneralAutofillEnabled = false;
 
-                // Страница всегда переполняется на пару пикселей, и в окне появляется
-                // полоса прокрутки. В приложении она лишняя.
+                // Всё содержимое приходит из ресурсов сборки.
+                core.AddWebResourceRequestedFilter(Origin + "*", CoreWebView2WebResourceContext.All);
+                core.WebResourceRequested += OnResourceRequested;
+
                 await core.AddScriptToExecuteOnDocumentCreatedAsync(
                     "document.addEventListener('DOMContentLoaded',function(){" +
                     "document.documentElement.style.overflow='hidden';" +
                     "document.body.style.overflow='hidden';});");
 
-                // Отдаём папку с игрой как обычный https-хост.
-                core.SetVirtualHostNameToFolderMapping(
-                    VirtualHost,
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    CoreWebView2HostResourceAccessKind.Allow);
-
-                core.Navigate("https://" + VirtualHost + "/index.html");
+                core.Navigate(Origin + "index.html");
             }
             catch (Exception failure)
             {
                 ShowError("Не удалось открыть игру:\n" + failure.Message);
             }
+        }
+
+        void OnResourceRequested(object sender, CoreWebView2WebResourceRequestedEventArgs args)
+        {
+            CoreWebView2 core = view.CoreWebView2;
+            string requestUri = args.Request.Uri;
+            if (!requestUri.StartsWith(Origin, StringComparison.OrdinalIgnoreCase)) return;
+
+            string name = requestUri.Substring(Origin.Length);
+            int cut = name.IndexOfAny(new[] { '?', '#' });
+            if (cut >= 0) name = name.Substring(0, cut);
+            name = Uri.UnescapeDataString(name);
+            if (string.IsNullOrEmpty(name)) name = "index.html";
+
+            bool compressed;
+            byte[] payload = Embedded.GetAsset(name, out compressed);
+            if (payload == null)
+            {
+                args.Response = core.Environment.CreateWebResourceResponse(
+                    null, 404, "Not Found", "Content-Type: text/plain; charset=utf-8");
+                return;
+            }
+
+            MemoryStream body = new MemoryStream(payload, false);
+            args.Response = core.Environment.CreateWebResourceResponse(
+                body,
+                200,
+                "OK",
+                "Content-Type: " + Embedded.ContentType(name) + "\r\nCache-Control: no-store");
         }
 
         void ShowError(string message)
