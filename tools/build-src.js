@@ -43,6 +43,11 @@ const MODULES = [
     global: "__srcDaily",
     exports: ["localDateKey", "yesterdayDateKey", "dailyHash"],
   },
+  {
+    entry: path.join(root, "src/game/perk-icons.ts"),
+    global: "__srcPerkIcons",
+    exports: ["drawPerkIconShape", "shieldGlyph"],
+  },
 ];
 
 function buildBlock() {

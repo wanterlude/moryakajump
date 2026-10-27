@@ -1,0 +1,361 @@
+  function drawPerkIconShape(kind, cx, cy, color, deps) {
+    const { ctx: ctx2, coinBadge, heart } = deps;
+    ctx2.save();
+    ctx2.strokeStyle = color;
+    ctx2.fillStyle = color;
+    ctx2.lineCap = "round";
+    ctx2.lineJoin = "round";
+    switch (kind) {
+      case "coin":
+        coinBadge(cx, cy, 11);
+        break;
+      case "triple":
+        coinBadge(cx - 8, cy + 2, 7);
+        coinBadge(cx + 8, cy + 2, 7);
+        coinBadge(cx, cy - 6, 7.5);
+        break;
+      case "star":
+        ctx2.lineWidth = 1.8;
+        ctx2.beginPath();
+        for (let k = 0; k < 10; k++) {
+          const ang = -Math.PI / 2 + k * Math.PI / 5;
+          const rad = k % 2 === 0 ? 11 : 4.6;
+          const px = cx + Math.cos(ang) * rad;
+          const py = cy + Math.sin(ang) * rad;
+          if (k === 0) ctx2.moveTo(px, py);
+          else ctx2.lineTo(px, py);
+        }
+        ctx2.closePath();
+        ctx2.stroke();
+        ctx2.save();
+        ctx2.globalAlpha = 0.3;
+        ctx2.fill();
+        ctx2.restore();
+        break;
+      case "magnet":
+        ctx2.lineWidth = 5;
+        ctx2.beginPath();
+        ctx2.arc(cx, cy + 1, 8, Math.PI, 0, false);
+        ctx2.stroke();
+        ctx2.lineWidth = 6;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 8, cy + 1);
+        ctx2.lineTo(cx - 8, cy + 9);
+        ctx2.moveTo(cx + 8, cy + 1);
+        ctx2.lineTo(cx + 8, cy + 9);
+        ctx2.stroke();
+        ctx2.fillStyle = "#e63946";
+        ctx2.beginPath();
+        ctx2.arc(cx - 8, cy + 10, 3, 0, Math.PI * 2);
+        ctx2.arc(cx + 8, cy + 10, 3, 0, Math.PI * 2);
+        ctx2.fill();
+        break;
+      case "heart":
+        heart(cx, cy + 1, 8.5, color);
+        break;
+      case "heartPlus":
+        heart(cx - 1, cy + 1, 7.5, color);
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx + 7, cy - 6);
+        ctx2.lineTo(cx + 7, cy + 2);
+        ctx2.moveTo(cx + 3, cy - 2);
+        ctx2.lineTo(cx + 11, cy - 2);
+        ctx2.stroke();
+        break;
+      case "heartClock":
+        heart(cx - 2, cy + 1, 7, color);
+        ctx2.save();
+        ctx2.lineWidth = 1.7;
+        ctx2.beginPath();
+        ctx2.arc(cx + 7, cy - 5, 5, 0, Math.PI * 2);
+        ctx2.stroke();
+        ctx2.beginPath();
+        ctx2.moveTo(cx + 7, cy - 8);
+        ctx2.lineTo(cx + 7, cy - 5);
+        ctx2.lineTo(cx + 9.5, cy - 3.5);
+        ctx2.stroke();
+        ctx2.restore();
+        break;
+      case "heartCoin":
+        heart(cx - 5, cy + 1, 6.5, color);
+        coinBadge(cx + 7, cy + 1, 6);
+        break;
+      case "feather":
+        ctx2.lineWidth = 1.8;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 8, cy + 10);
+        ctx2.quadraticCurveTo(cx + 2, cy - 2, cx + 9, cy - 10);
+        ctx2.stroke();
+        ctx2.lineWidth = 1.4;
+        for (let k = 0; k < 4; k++) {
+          const t = k / 4;
+          const px = cx - 8 + 16 * t;
+          const py = cy + 10 - 20 * t;
+          ctx2.beginPath();
+          ctx2.moveTo(px, py);
+          ctx2.lineTo(px + 5 + t * 2, py - 1);
+          ctx2.stroke();
+        }
+        break;
+      case "jump":
+        ctx2.lineWidth = 2.4;
+        for (let k = 0; k < 2; k++) {
+          const oy = cy - 6 + k * 10;
+          ctx2.beginPath();
+          ctx2.moveTo(cx - 7, oy + 5);
+          ctx2.lineTo(cx, oy - 2);
+          ctx2.lineTo(cx + 7, oy + 5);
+          ctx2.stroke();
+        }
+        break;
+      case "wind":
+        ctx2.lineWidth = 2.4;
+        {
+          const widths = [16, 12, 8];
+          for (let k = 0; k < 3; k++) {
+            ctx2.beginPath();
+            ctx2.moveTo(cx - widths[k] / 2, cy - 7 + k * 7);
+            ctx2.lineTo(cx + widths[k] / 2, cy - 7 + k * 7);
+            ctx2.stroke();
+          }
+        }
+        break;
+      case "windOff":
+        ctx2.lineWidth = 2.2;
+        {
+          const widths = [16, 12, 9];
+          for (let k = 0; k < 3; k++) {
+            ctx2.beginPath();
+            ctx2.moveTo(cx - widths[k] / 2, cy - 7 + k * 7);
+            ctx2.lineTo(cx + widths[k] / 2, cy - 7 + k * 7);
+            ctx2.stroke();
+          }
+        }
+        ctx2.save();
+        ctx2.strokeStyle = "#e63946";
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 9, cy + 10);
+        ctx2.lineTo(cx + 9, cy - 10);
+        ctx2.stroke();
+        ctx2.restore();
+        break;
+      case "snow":
+        ctx2.lineWidth = 1.8;
+        for (let k = 0; k < 3; k++) {
+          const ang = k * Math.PI / 3;
+          ctx2.beginPath();
+          ctx2.moveTo(cx - Math.cos(ang) * 10, cy - Math.sin(ang) * 10);
+          ctx2.lineTo(cx + Math.cos(ang) * 10, cy + Math.sin(ang) * 10);
+          ctx2.stroke();
+        }
+        break;
+      case "bolt":
+        ctx2.lineWidth = 1.8;
+        ctx2.beginPath();
+        ctx2.moveTo(cx + 3, cy - 11);
+        ctx2.lineTo(cx - 6, cy + 1);
+        ctx2.lineTo(cx - 1, cy + 1);
+        ctx2.lineTo(cx - 3, cy + 11);
+        ctx2.lineTo(cx + 6, cy - 1);
+        ctx2.lineTo(cx + 1, cy - 1);
+        ctx2.closePath();
+        ctx2.stroke();
+        ctx2.save();
+        ctx2.globalAlpha = 0.35;
+        ctx2.fill();
+        ctx2.restore();
+        break;
+      case "brake":
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.arc(cx, cy, 9.5, 0, Math.PI * 2);
+        ctx2.stroke();
+        ctx2.lineWidth = 2;
+        ctx2.beginPath();
+        for (let k = 0; k < 6; k++) {
+          const ang = k * Math.PI / 3;
+          ctx2.moveTo(cx + Math.cos(ang) * 5, cy + Math.sin(ang) * 5);
+          ctx2.lineTo(cx + Math.cos(ang) * 9.5, cy + Math.sin(ang) * 9.5);
+        }
+        ctx2.stroke();
+        break;
+      case "bounce":
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 9, cy + 8);
+        ctx2.quadraticCurveTo(cx, cy - 4, cx + 9, cy + 8);
+        ctx2.stroke();
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy + 10);
+        ctx2.lineTo(cx, cy - 9);
+        ctx2.moveTo(cx - 5, cy - 4);
+        ctx2.lineTo(cx, cy - 10);
+        ctx2.lineTo(cx + 5, cy - 4);
+        ctx2.stroke();
+        break;
+      case "spring":
+        ctx2.lineWidth = 2;
+        ctx2.beginPath();
+        for (let k = 0; k <= 26; k++) {
+          const t = k / 26;
+          const px = cx + Math.sin(t * Math.PI * 4) * 7;
+          const py = cy - 10 + t * 20;
+          if (k === 0) ctx2.moveTo(px, py);
+          else ctx2.lineTo(px, py);
+        }
+        ctx2.stroke();
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 8, cy - 10);
+        ctx2.lineTo(cx + 8, cy - 10);
+        ctx2.moveTo(cx - 8, cy + 10);
+        ctx2.lineTo(cx + 8, cy + 10);
+        ctx2.stroke();
+        break;
+      case "ladder":
+        ctx2.lineWidth = 2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 7, cy - 10);
+        ctx2.lineTo(cx - 7, cy + 10);
+        ctx2.moveTo(cx + 7, cy - 10);
+        ctx2.lineTo(cx + 7, cy + 10);
+        for (let k = 0; k < 4; k++) {
+          const py = cy - 7 + k * 5;
+          ctx2.moveTo(cx - 7, py);
+          ctx2.lineTo(cx + 7, py);
+        }
+        ctx2.stroke();
+        break;
+      case "clock":
+        ctx2.lineWidth = 2;
+        ctx2.beginPath();
+        ctx2.arc(cx, cy, 10, 0, Math.PI * 2);
+        ctx2.stroke();
+        ctx2.lineWidth = 1.8;
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy - 5.5);
+        ctx2.lineTo(cx, cy);
+        ctx2.lineTo(cx + 5, cy + 2.5);
+        ctx2.stroke();
+        break;
+      case "shield":
+        shieldGlyph(ctx2, cx, cy, 12, color);
+        ctx2.save();
+        ctx2.globalAlpha = 0.5;
+        shieldGlyph(ctx2, cx + 5, cy + 3, 9, color);
+        ctx2.restore();
+        break;
+      case "halo":
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.arc(cx, cy, 10, 0, Math.PI * 2);
+        ctx2.stroke();
+        ctx2.lineWidth = 2.6;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 4.5, cy);
+        ctx2.lineTo(cx + 4.5, cy);
+        ctx2.moveTo(cx, cy - 4.5);
+        ctx2.lineTo(cx, cy + 4.5);
+        ctx2.stroke();
+        break;
+      case "phoenix":
+        ctx2.lineWidth = 1.6;
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy - 11);
+        ctx2.bezierCurveTo(cx + 10, cy - 2, cx + 6, cy + 10, cx, cy + 10);
+        ctx2.bezierCurveTo(cx - 6, cy + 10, cx - 10, cy - 2, cx, cy - 11);
+        ctx2.stroke();
+        ctx2.save();
+        ctx2.globalAlpha = 0.6;
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy - 2);
+        ctx2.bezierCurveTo(cx + 4, cy + 2, cx + 3, cy + 8, cx, cy + 8);
+        ctx2.bezierCurveTo(cx - 3, cy + 8, cx - 4, cy + 2, cx, cy - 2);
+        ctx2.fill();
+        ctx2.restore();
+        break;
+      case "birdOff":
+        ctx2.lineWidth = 2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 10, cy + 2);
+        ctx2.quadraticCurveTo(cx - 4, cy - 6, cx, cy + 1);
+        ctx2.quadraticCurveTo(cx + 4, cy - 6, cx + 10, cy + 2);
+        ctx2.stroke();
+        ctx2.save();
+        ctx2.strokeStyle = "#e63946";
+        ctx2.lineWidth = 2.2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 9, cy + 10);
+        ctx2.lineTo(cx + 9, cy - 10);
+        ctx2.stroke();
+        ctx2.restore();
+        break;
+      case "rocket":
+        ctx2.lineWidth = 1.8;
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy - 11);
+        ctx2.quadraticCurveTo(cx + 6, cy - 2, cx + 5, cy + 6);
+        ctx2.lineTo(cx - 5, cy + 6);
+        ctx2.quadraticCurveTo(cx - 6, cy - 2, cx, cy - 11);
+        ctx2.stroke();
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 5, cy + 6);
+        ctx2.lineTo(cx - 8, cy + 10);
+        ctx2.moveTo(cx + 5, cy + 6);
+        ctx2.lineTo(cx + 8, cy + 10);
+        ctx2.moveTo(cx, cy + 7);
+        ctx2.lineTo(cx, cy + 11);
+        ctx2.stroke();
+        break;
+      case "gem":
+        ctx2.lineWidth = 1.8;
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy - 10);
+        ctx2.lineTo(cx + 9, cy - 2);
+        ctx2.lineTo(cx + 5, cy + 10);
+        ctx2.lineTo(cx - 5, cy + 10);
+        ctx2.lineTo(cx - 9, cy - 2);
+        ctx2.closePath();
+        ctx2.stroke();
+        ctx2.save();
+        ctx2.globalAlpha = 0.45;
+        ctx2.beginPath();
+        ctx2.moveTo(cx, cy - 10);
+        ctx2.lineTo(cx + 9, cy - 2);
+        ctx2.lineTo(cx, cy + 2);
+        ctx2.lineTo(cx - 9, cy - 2);
+        ctx2.closePath();
+        ctx2.fill();
+        ctx2.restore();
+        break;
+      case "coinStack":
+        for (let k = 0; k < 3; k++) coinBadge(cx, cy + 7 - k * 7, 6.5);
+        break;
+      case "coinsArc":
+        coinBadge(cx - 9, cy + 5, 5.5);
+        coinBadge(cx, cy - 5, 6);
+        coinBadge(cx + 9, cy + 5, 5.5);
+        break;
+      case "crown":
+      default:
+        ctx2.lineWidth = 2;
+        ctx2.beginPath();
+        ctx2.moveTo(cx - 10, cy + 7);
+        ctx2.lineTo(cx - 10, cy - 5);
+        ctx2.lineTo(cx - 4, cy + 1);
+        ctx2.lineTo(cx, cy - 9);
+        ctx2.lineTo(cx + 4, cy + 1);
+        ctx2.lineTo(cx + 10, cy - 5);
+        ctx2.lineTo(cx + 10, cy + 7);
+        ctx2.closePath();
+        ctx2.stroke();
+        ctx2.save();
+        ctx2.globalAlpha = 0.35;
+        ctx2.fill();
+        ctx2.restore();
+        break;
+    }
+    ctx2.restore();
+  }

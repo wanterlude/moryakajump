@@ -1,9 +1,11 @@
-Move fmt and the daily-date helpers into src/
+Move the perk icons into src/ with coverage for every kind
 
-src/game/format.ts keeps the thin-space grouping and floor exactly as before.
-src/game/daily-date.ts owns localDateKey, yesterdayDateKey and the FNV-1a dailyHash
-used to pick the daily quest.
+src/game/perk-icons.ts now owns drawPerkIconShape and shieldGlyph, typed against a
+narrow IconDeps (ctx, coinBadge, heart), so the module does not reach into the bundle.
 
-Tests grew to 25: formatting edge cases (fractions, negatives), local date without UTC
-drift, hash determinism and a check that 200 consecutive days reach all six daily quest
-variants. Golden frames unchanged, so the bundle output is identical.
+The tests read the kind list straight from the module source and call every one with a
+recording canvas, which is the first coverage these icons have ever had: all kinds draw
+something, unknown kinds do not throw, and save/restore stay balanced.
+
+tsconfig gains the DOM lib for CanvasRenderingContext2D. 30 tests, tsc clean, check.js
+green, golden frames unchanged.
