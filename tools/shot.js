@@ -27,6 +27,7 @@ const scale = Number(arg("scale", 2));
 const source = path.resolve(root, arg("file", "index.html"));
 const label = arg("label", "");
 const hover = arg("hover", "");
+const hudVariant = arg("hud", "");
 
 const chromeCandidates = [
   path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
@@ -107,7 +108,7 @@ const HOOK = String.raw`
       if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
     } catch (e) {}
   }, 700);
-`;
+` + (hudVariant ? require("./hud-variants.js").block(hudVariant) : "");
 
 const work = fs.mkdtempSync(path.join(os.tmpdir(), "mj-shot-"));
 const html = fs.readFileSync(source, "utf8");
