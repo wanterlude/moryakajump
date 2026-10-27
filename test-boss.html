@@ -8261,21 +8261,21 @@ html, body, body * {
     return s + " с";
   }
   var ACHIEVEMENT_DEFS = [
-    { id: "first_run", name: "ПЕРВЫЙ ШАГ", desc: "Заверши первый забег", reward: 7, check: () => stats.runs >= 1, progress: () => [Math.min(stats.runs, 1), 1] },
-    { id: "score_500", name: "РАЗБЕГ", desc: "Набери 500 очков", reward: 8, check: () => highScore >= 500, progress: () => [Math.min(highScore, 500), 500] },
-    { id: "score_5000", name: "ВЫСОТА", desc: "Набери 5 000 очков", reward: 20, check: () => highScore >= 5000, progress: () => [Math.min(highScore, 5000), 5000] },
-    { id: "score_25000", name: "К НЕБУ", desc: "Набери 25 000 очков", reward: 50, check: () => highScore >= 25000, progress: () => [Math.min(highScore, 25000), 25000] },
-    { id: "coins_100", name: "КЛАДОВАЯ", desc: "Собери 100 монет", reward: 13, check: () => stats.coins >= 100, progress: () => [Math.min(stats.coins, 100), 100] },
-    { id: "coins_1000", name: "ЗОЛОТО", desc: "Собери 1 000 монет", reward: 47, check: () => stats.coins >= 1000, progress: () => [Math.min(stats.coins, 1000), 1000] },
-    { id: "platforms_100", name: "ПЕРВЫЕ СТУПЕНИ", desc: "Приземлись на 100 платформ", reward: 15, check: () => stats.platforms >= 100, progress: () => [Math.min(stats.platforms, 100), 100] },
-    { id: "platforms_1000", name: "ЛЕДЯНАЯ ЛЕСТНИЦА", desc: "Приземлись на 1 000 платформ", reward: 53, check: () => stats.platforms >= 1000, progress: () => [Math.min(stats.platforms, 1000), 1000] },
-    { id: "first_boss", name: "ПОБЕДИТЕЛЬ", desc: "Победи первого босса", reward: 33, check: () => stats.bossWins.some((n) => n > 0), progress: () => [stats.bossWins.some((n) => n > 0) ? 1 : 0, 1] },
-    { id: "all_bosses", name: "ЦАРЬ СТУЖИ", desc: "Победи всех пятерых боссов", reward: 100, check: () => stats.bossWins.every((n) => n > 0), progress: () => [stats.bossWins.filter((n) => n > 0).length, 5] },
-    { id: "daily_7", name: "ПРИВЫЧКА", desc: "7 дней ежедневной серии", reward: 40, check: () => dailyState.streak >= 7, progress: () => [Math.min(dailyState.streak, 7), 7] },
-    { id: "frames_10", name: "КОЛЛЕКЦИОНЕР", desc: "Открой 10 рамок", reward: 27, check: () => ownedFrames.filter((id) => id !== 0).length >= 10, progress: () => [Math.min(ownedFrames.filter((id) => id !== 0).length, 10), 10] },
-    { id: "characters_10", name: "ДРУЖНАЯ КОМАНДА", desc: "Открой 10 персонажей", reward: 33, check: () => unlockedAvatars.length >= 10, progress: () => [Math.min(unlockedAvatars.length, 10), 10] },
-    { id: "play_1h", name: "СТАРЫЙ МОРЯКА", desc: "Проведи в игре час", reward: 50, check: () => stats.playMs >= 3600000, progress: () => [Math.min(stats.playMs, 3600000), 3600000] },
-    { id: "runs_25", name: "НЕ СДАВАЙСЯ", desc: "Заверши 25 забегов", reward: 30, check: () => stats.runs >= 25, progress: () => [Math.min(stats.runs, 25), 25] }
+    { id: "first_run", name: "ПЕРВЫЙ ШАГ", desc: "Заверши первый забег", reward: 5, check: () => stats.runs >= 1, progress: () => [Math.min(stats.runs, 1), 1] },
+    { id: "score_500", name: "РАЗБЕГ", desc: "Набери 500 очков", reward: 5, check: () => highScore >= 500, progress: () => [Math.min(highScore, 500), 500] },
+    { id: "score_5000", name: "ВЫСОТА", desc: "Набери 5 000 очков", reward: 10, check: () => highScore >= 5000, progress: () => [Math.min(highScore, 5000), 5000] },
+    { id: "score_25000", name: "К НЕБУ", desc: "Набери 25 000 очков", reward: 20, check: () => highScore >= 25000, progress: () => [Math.min(highScore, 25000), 25000] },
+    { id: "coins_100", name: "КЛАДОВАЯ", desc: "Собери 100 монет", reward: 10, check: () => stats.coins >= 100, progress: () => [Math.min(stats.coins, 100), 100] },
+    { id: "coins_1000", name: "ЗОЛОТО", desc: "Собери 1 000 монет", reward: 20, check: () => stats.coins >= 1000, progress: () => [Math.min(stats.coins, 1000), 1000] },
+    { id: "platforms_100", name: "ПЕРВЫЕ СТУПЕНИ", desc: "Приземлись на 100 платформ", reward: 10, check: () => stats.platforms >= 100, progress: () => [Math.min(stats.platforms, 100), 100] },
+    { id: "platforms_1000", name: "ЛЕДЯНАЯ ЛЕСТНИЦА", desc: "Приземлись на 1 000 платформ", reward: 20, check: () => stats.platforms >= 1000, progress: () => [Math.min(stats.platforms, 1000), 1000] },
+    { id: "first_boss", name: "ПОБЕДИТЕЛЬ", desc: "Победи первого босса", reward: 15, check: () => stats.bossWins.some((n) => n > 0), progress: () => [stats.bossWins.some((n) => n > 0) ? 1 : 0, 1] },
+    { id: "all_bosses", name: "ЦАРЬ СТУЖИ", desc: "Победи всех пятерых боссов", reward: 30, check: () => stats.bossWins.every((n) => n > 0), progress: () => [stats.bossWins.filter((n) => n > 0).length, 5] },
+    { id: "daily_7", name: "ПРИВЫЧКА", desc: "7 дней ежедневной серии", reward: 20, check: () => dailyState.streak >= 7, progress: () => [Math.min(dailyState.streak, 7), 7] },
+    { id: "frames_10", name: "КОЛЛЕКЦИОНЕР", desc: "Открой 10 рамок", reward: 10, check: () => ownedFrames.filter((id) => id !== 0).length >= 10, progress: () => [Math.min(ownedFrames.filter((id) => id !== 0).length, 10), 10] },
+    { id: "characters_10", name: "ДРУЖНАЯ КОМАНДА", desc: "Открой 10 персонажей", reward: 15, check: () => unlockedAvatars.length >= 10, progress: () => [Math.min(unlockedAvatars.length, 10), 10] },
+    { id: "play_1h", name: "СТАРЫЙ МОРЯКА", desc: "Проведи в игре час", reward: 20, check: () => stats.playMs >= 3600000, progress: () => [Math.min(stats.playMs, 3600000), 3600000] },
+    { id: "runs_25", name: "НЕ СДАВАЙСЯ", desc: "Заверши 25 забегов", reward: 15, check: () => stats.runs >= 25, progress: () => [Math.min(stats.runs, 25), 25] }
   ];
   function checkAchievements(announce) {
     let gained = 0;
@@ -10232,7 +10232,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.56";
+  var GAME_VERSION = "1.0.57";
   var MENU = {
     padX: 20,
     titleY: 20,
