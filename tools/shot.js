@@ -71,6 +71,21 @@ const HOOK = String.raw`
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
       if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
+      if (shotTab === "hud") {
+        // Кадр для сверки HUD: фиксированные счёт и рекорд, как на образце.
+        setTimeout(function () {
+          try {
+            startGame();
+            setTimeout(function () {
+              try {
+                hudState.score = 1919; player.score = 1919; highScore = 83747;
+                window.requestAnimationFrame = function () { return 0; };
+                draw(performance.now());
+              } catch (e) {}
+            }, 700);
+          } catch (e) {}
+        }, 400);
+      }
       if (shotHover) {
         // Наведение задаём напрямую: ховер в меню читается из pauseState.
         pauseState.hover = shotHover;
