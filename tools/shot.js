@@ -70,6 +70,7 @@ const HOOK = String.raw`
       if (shotTab === "profile") openProfile();
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
+      if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
       if (shotHover) {
         // Наведение задаём напрямую: ховер в меню читается из pauseState.
         pauseState.hover = shotHover;
