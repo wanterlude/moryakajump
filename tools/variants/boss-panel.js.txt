@@ -1,0 +1,65 @@
+  window.__TEST_BUILD = true;
+  window.__testBoss = (index, livesCount) => {
+    startGame();
+    lives = Math.max(1, livesCount || 5);
+    const target = BOSS_STEP_SCORE * (index + 1);
+    player.score = target;
+    // Не показывать экран усилений: тест должен сразу вести к боссу.
+    perkState.lastOfferScore = Math.floor(target / PERK_SCORE_STEP) * PERK_SCORE_STEP;
+    perkState.offering = false;
+    perkState.offerCards = [];
+    perkState.pickedIndex = -1;
+    bossState.nextScore = target;
+    bossState.phase = "idle";
+    bossState.timer = 0;
+    return { index, lives, target };
+  };
+  window.__testInfo = () => ({ state: currentState, duel: duelIsActive(), phase: bossState.phase, lives, score: player.score });
+
+  (() => {
+    const ui = document.createElement("div");
+    ui.id = "testBossPanel";
+    ui.style.cssText = "position:fixed;left:12px;top:12px;z-index:2147483000;display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px;border-radius:14px;background:rgba(8,34,52,.92);border:1px solid rgba(160,225,255,.28);box-shadow:0 10px 30px rgba(0,0,0,.38);color:#eaf7ff;font:600 12px 'Trebuchet MS','Segoe UI',Arial,sans-serif;letter-spacing:.6px;pointer-events:auto";
+    const title = document.createElement("div");
+    title.textContent = "ТЕСТ БОССА";
+    title.style.cssText = "letter-spacing:1.6px;opacity:.85;font-size:11px";
+    ui.appendChild(title);
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:6px";
+    for (let i = 0; i < 5; i++) {
+      const b = document.createElement("button");
+      b.textContent = String(i + 1);
+      b.style.cssText = "width:30px;height:28px;border-radius:9px;border:1px solid rgba(160,225,255,.35);background:rgba(126,247,255,.12);color:#eaf7ff;font:700 12px 'Trebuchet MS',sans-serif;cursor:pointer";
+      b.onmouseenter = () => { b.style.background = "rgba(126,247,255,.3)"; };
+      b.onmouseleave = () => { b.style.background = "rgba(126,247,255,.12)"; };
+      b.onclick = () => { __testBoss(i, Number(livesSel.value)); };
+      row.appendChild(b);
+    }
+    ui.appendChild(row);
+    const lifeRow = document.createElement("div");
+    lifeRow.style.cssText = "display:flex;align-items:center;gap:8px;font-size:11px;opacity:.9";
+    const lifeLabel = document.createElement("span");
+    lifeLabel.textContent = "ЖИЗНИ";
+    const livesSel = document.createElement("select");
+    livesSel.style.cssText = "border-radius:8px;border:1px solid rgba(160,225,255,.35);background:#0b2a3e;color:#eaf7ff;font:700 12px 'Trebuchet MS',sans-serif;padding:3px 6px;outline:none";
+    for (const n of [1, 2, 3, 5, 9]) {
+      const o = document.createElement("option");
+      o.value = String(n);
+      o.textContent = String(n);
+      if (n === 5) o.selected = true;
+      livesSel.appendChild(o);
+    }
+    lifeRow.appendChild(lifeLabel);
+    lifeRow.appendChild(livesSel);
+    ui.appendChild(lifeRow);
+    const hint = document.createElement("div");
+    hint.textContent = "Esc → меню, чтобы вернуться сюда";
+    hint.style.cssText = "font-size:10px;font-weight:400;opacity:.55;letter-spacing:.3px";
+    ui.appendChild(hint);
+    document.body.appendChild(ui);
+    setInterval(() => {
+      const info = __testInfo();
+      ui.style.display = info.state === 0 || info.state === 3 ? "flex" : "none";
+    }, 200);
+  })();
+

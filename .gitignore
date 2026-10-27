@@ -5,5 +5,8 @@ desktop/index.html
 desktop/*.jpg
 desktop/build-out/
 sim.html
+tools/sim/last-run.json
+tools/sim/last-run.md
+tools/sim/last-run.log
 
 .dshwolf/

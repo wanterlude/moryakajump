@@ -71,13 +71,32 @@
 
 ## 📁 Структура
 
-- `index.html` — вся игра: HTML, CSS и JavaScript в одном файле.
-- `test-boss.html` — тестовая сборка для проверки боссов.
-- `test-frames.html` — галерея всех рамок и их эффектов.
+- `index.html` — вся игра: HTML, CSS и JavaScript в одном файле. **Единственный источник правды.**
+- `test-boss.html` — тестовая сборка для проверки боссов (собирается из `index.html`).
+- `test-frames.html` — галерея всех 211 рамок (собирается из `index.html`).
 - `desktop/` — оболочка Electron и скрипты сборки Windows-exe.
-- `tools/sim/` — симулятор забегов с ботом для тестов высоты и сложности.
+- `tools/build-variants.js` — собирает тестовые сборки и `ui-preview.html`.
+- `tools/sim/` — симулятор забегов с ботом: сборка `sim.html`, прогоны, замеры сложности.
+- `AGENTS.md` — правила разработки: карта файла, релиз, проверки.
 - `Changelog` — история изменений, новые версии сверху.
-- `1.jpg`–`27.jpg`, `fon.jpg` — локальные материалы игры.
+- `1.jpg`–`27.jpg`, `fon.jpg` — аватары и фон игры.
+
+## 🛠️ Разработка
+
+Все правки делаются в `index.html`; тестовые сборки и симулятор — производные от него.
+
+```bash
+node tools/check.js                   # сборки, синтаксис и версии — перед коммитом
+
+node tools/build-variants.js          # пересобрать test-boss, test-frames, ui-preview
+node tools/build-variants.js --check  # проверить, что варианты не разъехались
+
+node tools/sim/make_sim.js            # собрать sim.html с хуками для бота
+node tools/sim/run-node.js --runs=500 # прогон бота, сводка в tools/sim/last-run.md
+```
+
+Подробности, карта бандла и порядок релиза — в [AGENTS.md](AGENTS.md).
+
 
 ## 💾 Прогресс
 

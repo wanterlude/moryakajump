@@ -1,0 +1,120 @@
+// Тестовая галерея всех рамок. Вставляется в копию index.html.
+window.__TEST_BUILD = true;
+(() => {
+  if (window.__framesGalleryReady) return;
+  window.__framesGalleryReady = true;
+  try { cancelAnimationFrame(drawRafHandle); } catch (e) {}
+  drawRafHandle = null;
+  document.title = "Все рамки — Moryaka Jump";
+
+  const stageWrap = document.getElementById("stageWrap");
+  if (stageWrap) stageWrap.style.display = "none";
+  ["resetOverlay", "saveOverlay", "nickOverlay", "settingsOverlay", "soundOverlay", "leaderboardOverlay", "tutorialOverlay"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove("open"); el.style.display = "none"; }
+  });
+  setTimeout(() => {
+    const tut = document.getElementById("tutorialOverlay");
+    if (tut) { tut.classList.remove("open"); tut.style.display = "none"; }
+  }, 700);
+
+  document.documentElement.style.background = "#eaf6ff";
+  document.body.style.cssText = "margin:0;padding:0;display:block;min-height:100vh;overflow:auto;touch-action:auto;background:linear-gradient(180deg,#f2fbff 0%,#dceffb 48%,#c9e6f7 100%);";
+
+  const style = document.createElement("style");
+  style.textContent = `
+    #framesPage{max-width:1500px;margin:0 auto;padding:26px 24px 64px}
+    #fpHead{text-align:center;margin:6px 0 22px}
+    #fpTitle{font:bold 25px 'Trebuchet MS','Segoe UI',Arial,sans-serif;letter-spacing:2.4px;color:#0f3d5c}
+    #fpSub{margin-top:7px;font:12px Arial,sans-serif;color:rgba(15,61,92,.6);letter-spacing:.4px}
+    #fpGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+    .fpCard{background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(235,248,255,.82));border:1px solid rgba(255,255,255,.96);border-radius:18px;padding:12px 10px 10px;box-shadow:0 10px 26px rgba(20,60,95,.14);text-align:center;overflow:hidden}
+    .fpCard canvas{display:block;margin:0 auto}
+    .fpName{font:bold 11px 'Trebuchet MS',Arial,sans-serif;color:#0f3d5c;margin-top:4px;min-height:27px;line-height:1.25}
+    .fpMeta{font:9px Arial,sans-serif;color:rgba(15,61,92,.52);line-height:1.35;min-height:24px}
+    @media (max-width:520px){#framesPage{padding:18px 12px 50px}#fpGrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.fpCard{padding:8px 6px}.fpName{font-size:10px}}
+  `;
+  document.head.appendChild(style);
+
+  const page = document.createElement("div");
+  page.id = "framesPage";
+  page.innerHTML = '<div id="fpHead"><div id="fpTitle">ВСЕ ЭФФЕКТЫ РАМОК</div><div id="fpSub"></div></div><div id="fpGrid"></div>';
+  document.body.appendChild(page);
+  const grid = document.getElementById("fpGrid");
+  const sub = document.getElementById("fpSub");
+  const AVATAR = 0;
+  const SIZE = 180;
+  const R = 42;
+  const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+  const items = [];
+  const io = ("IntersectionObserver" in window) ? new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const item = entry.target.__fpItem;
+      if (item) {
+        item.visible = entry.isIntersecting;
+        if (item.visible) draw(item);
+      }
+    });
+  }, { rootMargin: "220px" }) : null;
+
+  FRAMES.forEach((frame, frameIndex) => {
+    const card = document.createElement("div");
+    card.className = "fpCard";
+    const cv = document.createElement("canvas");
+    cv.width = Math.round(SIZE * dpr);
+    cv.height = Math.round(SIZE * dpr);
+    cv.style.width = SIZE + "px";
+    cv.style.height = SIZE + "px";
+    const c = cv.getContext("2d");
+    const name = document.createElement("div");
+    name.className = "fpName";
+    name.textContent = frame.name;
+    const extras = (frame.look && frame.look.extras) || [];
+    const labels = extras.slice(0, 4).map((entry) => ALL_EXTRA_LABELS[entry]).filter(Boolean).join(" · ");
+    const meta = document.createElement("div");
+    meta.className = "fpMeta";
+    meta.textContent = "№ " + (frameIndex + 1) + " · " + FRAME_RARITY(frame) + (labels ? " · " + labels : "");
+    card.appendChild(cv);
+    card.appendChild(name);
+    card.appendChild(meta);
+    grid.appendChild(card);
+    const item = { frame, c, visible: false };
+    card.__fpItem = item;
+    items.push(item);
+    if (io) io.observe(card); else item.visible = true;
+  });
+
+  sub.textContent = "Рамок: " + FRAMES.length + " · номера по редкости · эффекты анимируются, прокрути страницу вниз";
+
+  function draw(item) {
+    const c = item.c;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, SIZE, SIZE);
+    c.globalAlpha = 1;
+    c.shadowBlur = 0;
+    c.fillStyle = "rgba(255,255,255,.92)";
+    c.beginPath();
+    c.arc(SIZE / 2, SIZE / 2, R + 4, 0, Math.PI * 2);
+    c.fill();
+    const prev = ctx;
+    ctx = c;
+    try {
+      drawAvatarCircle(SIZE / 2, SIZE / 2, R, AVATAR);
+      drawFrame(SIZE / 2, SIZE / 2, R, item.frame.id);
+    } finally {
+      ctx = prev;
+    }
+  }
+
+  let last = 0;
+  function tick(ts) {
+    requestAnimationFrame(tick);
+    if (ts - last < 33) return;
+    last = ts;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].visible) draw(items[i]);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+
