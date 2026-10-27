@@ -3,6 +3,8 @@ desktop-webview2/bin/
 desktop-webview2/obj/
 desktop-webview2/build-out/
 desktop-webview2/staging/
+pixi-spike/node_modules/
+pixi-spike/dist/
 sim.html
 tools/sim/last-run.json
 tools/sim/last-run.md

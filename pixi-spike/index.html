@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Moryaka — Pixi spike</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        background: #0b1730;
+        color: #cfe6f5;
+        font: 13px/1.45 "Segoe UI", system-ui, sans-serif;
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        padding: 18px;
+      }
+      .pane { position: relative; }
+      .pane canvas, .pane .stage {
+        display: block;
+        width: 400px;
+        height: 600px;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      }
+      .label {
+        position: absolute;
+        left: 10px;
+        top: 8px;
+        font: 700 11px/1 "Segoe UI", sans-serif;
+        letter-spacing: 1.2px;
+        color: rgba(10, 40, 60, 0.55);
+        background: rgba(255, 255, 255, 0.75);
+        padding: 4px 8px;
+        border-radius: 8px;
+      }
+      #out {
+        margin: 0;
+        padding: 14px 16px;
+        background: #101f39;
+        border-radius: 14px;
+        font: 12px/1.6 ui-monospace, Consolas, monospace;
+        white-space: pre;
+        color: #d9ecfa;
+        min-width: 340px;
+      }
+      b { color: #7fe3c8; }
+      .bad { color: #ff8a9a; }
+    </style>
+  </head>
+  <body>
+    <div class="pane">
+      <canvas id="cv" width="400" height="600"></canvas>
+      <div class="label">CANVAS 2D</div>
+    </div>
+    <div class="pane">
+      <div id="pixi" class="stage"></div>
+      <div class="label">PIXIJS</div>
+    </div>
+    <pre id="out">инициализация…</pre>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
