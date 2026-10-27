@@ -96,17 +96,18 @@ node tools/shot.js --tabs=hud --hud=2 --label=v2 --scale=2   # версия 1..4
 Кадр фиксирует счёт 1 919 и рекорд 83 747, чтобы версии сравнивались один к одному.
 Сами версии лежат в `tools/hud-variants.js` (только предпросмотр, игра их не видит).
 
-### Полыньи и шипы
+### Опасности и превью пружин
 
 ```
-node tools/shot.js --tabs=play --hazard=hole   --label=hole
 node tools/shot.js --tabs=play --hazard=spikes --label=spikes
-node tools/shot.js --tabs=play --hazard=both   --label=both
+node tools/shot.js --tabs=play --springs=1 --width=760 --height=1140 --scale=2
 ```
 
-`--hazard` собирает в копии игры сцену из четырёх платформ и включает опасность:
-полыньи (`p.hole`), шипы (`activeEvents` + `spikyPlatforms`) или обе. Кадр рисуется
-один раз, чтобы снимок был стабильным.
+`--hazard=spikes` собирает сцену из четырёх платформ и включает шипы.
+
+`--springs=1` рисует лист из десяти вариантов внешнего вида пружинных платформ
+(`tools/spring-variants.js`) на отдельном canvas поверх страницы: игровой цикл его
+не затирает. Сам лист в игру не попадает — это только превью для выбора.
 
 ## Сборка приложения (WebView2)
 

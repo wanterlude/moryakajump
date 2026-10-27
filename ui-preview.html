@@ -8904,12 +8904,11 @@ html, body, body * {
     platformTimer: "\u041D\u0415 \u0421\u0422\u041E\u0419 \u041D\u0410 \u041C\u0415\u0421\u0422\u0415",
     walls: "\u0421\u0422\u0415\u041D\u042B",
     spikes: "\u0428\u0418\u041F\u042B",
-    blizzard: "\u041C\u0415\u0422\u0415\u041B\u042C",
-    iceholes: "\u041F\u041E\u041B\u042B\u041D\u042C\u0418"
+    blizzard: "\u041C\u0415\u0422\u0415\u041B\u042C"
   };
   var PLATFORM_TIMER_ENABLED = false;
   var EVENT_FIRST_SCORE = 15e3;
-  var EVENT_POOL = ["darkness", "slide", "avalanche", "walls", "spikes", "blizzard", "iceholes"];
+  var EVENT_POOL = ["darkness", "slide", "avalanche", "walls", "spikes", "blizzard"];
   var spikyPlatforms = /* @__PURE__ */ new WeakMap();
   var SPIKY_CHANCE = 0.15;
   var SPIKY_MAX_PER_EVENT = 3;
@@ -8936,8 +8935,7 @@ html, body, body * {
     avalanche: { title: "\u041B\u0410\u0412\u0418\u041D\u0410", text: "\u0421\u0432\u0435\u0440\u0445\u0443 \u043F\u0430\u0434\u0430\u044E\u0442 \u043A\u0430\u043C\u043D\u0438. \u041E\u043D\u0438 \u0442\u043E\u043B\u043A\u0430\u044E\u0442 \u0438\u0433\u0440\u043E\u043A\u0430, \u043D\u043E \u0436\u0438\u0437\u043D\u044C \u043D\u0435 \u043E\u0442\u043D\u0438\u043C\u0430\u044E\u0442." },
     walls: { title: "\u0421\u0422\u0415\u041D\u042B", text: "\u041F\u043E \u043A\u0440\u0430\u044F\u043C \u0432\u044B\u0440\u0430\u0441\u0442\u0430\u044E\u0442 \u043B\u0435\u0434\u044F\u043D\u044B\u0435 \u0441\u0442\u0435\u043D\u044B. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0431\u043B\u0438\u0436\u0435 \u043A \u0446\u0435\u043D\u0442\u0440\u0443." },
     spikes: { title: "\u0428\u0418\u041F\u042B", text: "\u0427\u0430\u0441\u0442\u044C \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C \u043F\u043E\u043A\u0440\u044B\u0442\u0430 \u0448\u0438\u043F\u0430\u043C\u0438. \u041A\u0430\u0441\u0430\u043D\u0438\u0435 \u0448\u0438\u043F\u0430 \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043A\u0430\u043A \u043F\u0430\u0434\u0435\u043D\u0438\u0435." },
-    blizzard: { title: "\u041C\u0415\u0422\u0415\u041B\u042C", text: "\u0421\u043D\u0435\u0433 \u0437\u0430\u0441\u0442\u0438\u043B\u0430\u0435\u0442 \u044D\u043A\u0440\u0430\u043D, \u0430 \u0432\u0435\u0442\u0435\u0440 \u0441\u0431\u0438\u0432\u0430\u0435\u0442 \u0441 \u043A\u0443\u0440\u0441\u0430. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0446\u0435\u043D\u0442\u0440\u0430." },
-    iceholes: { title: "\u041F\u041E\u041B\u042B\u041D\u042C\u0418", text: "\u0412\u043E \u043B\u044C\u0434\u0443 \u043F\u043E\u044F\u0432\u043B\u044F\u044E\u0442\u0441\u044F \u043F\u043E\u043B\u044B\u043D\u044C\u0438. \u0421\u0442\u0443\u043F\u0438\u0448\u044C \u0432 \u0442\u0451\u043C\u043D\u0443\u044E \u0432\u043E\u0434\u0443 \u2014 \u0443\u043F\u0430\u0434\u0451\u0448\u044C." }
+    blizzard: { title: "\u041C\u0415\u0422\u0415\u041B\u042C", text: "\u0421\u043D\u0435\u0433 \u0437\u0430\u0441\u0442\u0438\u043B\u0430\u0435\u0442 \u044D\u043A\u0440\u0430\u043D, \u0430 \u0432\u0435\u0442\u0435\u0440 \u0441\u0431\u0438\u0432\u0430\u0435\u0442 \u0441 \u043A\u0443\u0440\u0441\u0430. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0446\u0435\u043D\u0442\u0440\u0430." }
   };
   var EVENT_ACCENTS = {
     darkness: "#3f6fa8",
@@ -8945,8 +8943,7 @@ html, body, body * {
     avalanche: "#6b8fa8",
     walls: "#4b8fd1",
     spikes: "#e0575f",
-    blizzard: "#8fc9e8",
-    iceholes: "#2f6f9d"
+    blizzard: "#8fc9e8"
   };
   var EVENT_DURATION_MS = 1e4;
   var EVENT_DURATION_GROWTH_MS = 5e3;
@@ -8971,8 +8968,6 @@ html, body, body * {
   var EVENT_BOUNCE_LIMIT = 4;
   var activeEvents = [];
   var nextEventScore = EVENT_FIRST_SCORE;
-  var iceHolesActive = false;
-  var holeBudget = 0;
   var introKind = "";
   var lastLandedPlatform = null;
   var frameSinceLanding = 0;
@@ -8985,9 +8980,6 @@ html, body, body * {
     nextEventScore = EVENT_FIRST_SCORE;
     introKind = "";
     spikyBudget = 0;
-    iceHolesActive = false;
-    holeBudget = 0;
-    for (const p of platforms) p.hole = false;
     lastLandedPlatform = null;
     frameSinceLanding = 0;
   }
@@ -9019,21 +9011,6 @@ html, body, body * {
     return Math.min(max, (w.total - w.left) / WALLS_GROW_MS * max);
   }
   function updateEventWorld(dt) {
-    if (eventActive("iceholes")) {
-      if (holeBudget > 0) {
-        for (const p of platforms) {
-          if (holeBudget <= 0) break;
-          if (p.hole || p.type === "moving" || p.type === "vanish" || p.y > 560) continue;
-          if (Math.random() < 0.015) {
-            p.hole = true;
-            holeBudget--;
-          }
-        }
-      }
-    } else if (iceHolesActive) {
-      iceHolesActive = false;
-      for (const p of platforms) p.hole = false;
-    }
     if (eventActive("slide")) {
       const power = eventPowerOf("slide");
       for (const [p, dir] of slidingPlatforms) {
@@ -9106,11 +9083,6 @@ html, body, body * {
     if (kind === "spikes") {
       spikeSerial++;
       spikyBudget = SPIKY_MAX_PER_EVENT;
-    }
-    if (kind === "iceholes") {
-      iceHolesActive = true;
-      holeBudget = 3;
-      for (const p of platforms) p.hole = false;
     }
     introKind = kind;
     eventIntroMs = 0;
@@ -10260,7 +10232,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.52-ui";
+  var GAME_VERSION = "1.0.53-ui";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -12171,120 +12143,6 @@ html, body, body * {
     const skin = PLATFORM_SKIN_BY_ID[equippedPlatformSkinId(p.type)];
     if (!skin || skin.tier === "base") drawPlatformBase(p);
     else drawThemedPlatform(p, skin);
-    if (p.hole) drawIceHole(p);
-  }
-  function drawIceHole(p) {
-    const cx = p.x + p.w / 2;
-    const now = frameNow();
-    // Прорубь-провал: уже платформы, с сужением книзу — читается как дыра во льду.
-    const gapW = Math.max(26, Math.min(38, p.w * 0.32));
-    const x0 = cx - gapW / 2;
-    const x1 = cx + gapW / 2;
-    const top = p.y - 1.2;
-    const bottom = p.y + p.h + 1.2;
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.moveTo(x0, top);
-    ctx.lineTo(x1, top);
-    ctx.quadraticCurveTo(x1 - 2, bottom - 2.4, cx + gapW * 0.29, bottom);
-    ctx.lineTo(cx - gapW * 0.29, bottom);
-    ctx.quadraticCurveTo(x0 + 2, bottom - 2.4, x0, top);
-    ctx.closePath();
-    const deep = ctx.createLinearGradient(0, top, 0, bottom);
-    deep.addColorStop(0, "#0e3552");
-    deep.addColorStop(0.38, "#0a2540");
-    deep.addColorStop(1, "#030d17");
-    ctx.fillStyle = deep;
-    ctx.fill();
-
-    ctx.save();
-    ctx.clip();
-
-    // Гладь: светлая полоса воды сразу под кромкой.
-    const surfY = top + 4.6;
-    const surf = ctx.createLinearGradient(0, surfY - 3, 0, surfY + 7);
-    surf.addColorStop(0, "rgba(168,232,255,.78)");
-    surf.addColorStop(0.4, "rgba(96,180,214,.42)");
-    surf.addColorStop(1, "rgba(26,74,108,0)");
-    ctx.fillStyle = surf;
-    ctx.fillRect(x0, surfY - 3, gapW, 11);
-
-    // Блик на самой глади.
-    const pool = ctx.createLinearGradient(x0 + 2, surfY, x1 - 2, surfY);
-    pool.addColorStop(0, "rgba(190,240,255,.10)");
-    pool.addColorStop(0.5, "rgba(226,252,255,.62)");
-    pool.addColorStop(1, "rgba(190,240,255,.10)");
-    ctx.fillStyle = pool;
-    ctx.beginPath();
-    ctx.ellipse(cx, surfY + 0.6, gapW * 0.42, 2.1, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Кромка воды.
-    ctx.strokeStyle = "rgba(224,252,255,.85)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(cx, surfY + 0.4, gapW * 0.43, 2.6, 0, Math.PI, Math.PI * 2);
-    ctx.stroke();
-
-    // Блики бегут по воде.
-    for (let i = 0; i < 3; i++) {
-      const phase = now * 1.1 + i * 2.0;
-      const t = 0.5 + 0.5 * Math.sin(phase);
-      const xx = x0 + 4 + (gapW - 9) * ((i * 0.37 + t * 0.22) % 1);
-      const ww = 5 + t * 5;
-      const a = 0.22 + t * 0.26;
-      ctx.fillStyle = "rgba(214,248,255," + a.toFixed(3) + ")";
-      ctx.beginPath();
-      ctx.ellipse(xx, surfY + 1.4 + i * 1.1, ww * 0.5, 0.85, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Глубина: тонкая световая кромка у стенок колодца.
-    ctx.strokeStyle = "rgba(90,170,205,.18)";
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    ctx.moveTo(x0 + 1.2, top + 5);
-    ctx.quadraticCurveTo(x0 + 2.4, bottom - 5, cx - gapW * 0.29, bottom - 1);
-    ctx.moveTo(x1 - 1.2, top + 5);
-    ctx.quadraticCurveTo(x1 - 2.4, bottom - 5, cx + gapW * 0.29, bottom - 1);
-    ctx.stroke();
-    ctx.restore();
-
-    // Кромка льда внизу отверстия: видно, что прорубь идёт насквозь.
-    ctx.strokeStyle = "rgba(214,246,255,.55)";
-    ctx.lineWidth = 1.1;
-    ctx.beginPath();
-    ctx.moveTo(cx - gapW * 0.31, bottom - 0.6);
-    ctx.quadraticCurveTo(cx, bottom + 1.6, cx + gapW * 0.31, bottom - 0.6);
-    ctx.stroke();
-
-    // Снежные губы по краям проруби.
-    ctx.fillStyle = "rgba(247,254,255,.97)";
-    ctx.beginPath();
-    ctx.moveTo(x0 - 7, top + 0.2);
-    ctx.quadraticCurveTo(x0 + 2.2, top - 1.6, x0 + 3, top + 4.4);
-    ctx.quadraticCurveTo(x0 - 2, top + 3.6, x0 - 7, top + 0.8);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(x1 + 7, top + 0.2);
-    ctx.quadraticCurveTo(x1 - 2.2, top - 1.6, x1 - 3, top + 4.4);
-    ctx.quadraticCurveTo(x1 + 2, top + 3.6, x1 + 7, top + 0.8);
-    ctx.closePath();
-    ctx.fill();
-
-    // Сколы: две трещинки от краёв, чтобы лёд не выглядел гладким.
-    ctx.strokeStyle = "rgba(255,255,255,.7)";
-    ctx.lineWidth = 0.9;
-    ctx.beginPath();
-    ctx.moveTo(x0 - 4, top + 1);
-    ctx.lineTo(x0 - 9, top + 3.4);
-    ctx.moveTo(x1 + 4, top + 1.4);
-    ctx.lineTo(x1 + 8.5, top + 4);
-    ctx.stroke();
-
-    ctx.restore();
   }
   function darkenSkinHex(hex, k) {
     const n = parseInt(hex.slice(1), 16);
@@ -13556,13 +13414,6 @@ html, body, body * {
         player.dy = 0;
         break;
       }
-      if (platform.hole && player.dy > 0 && player.x + 25 > platform.x && player.x + 10 < platform.x + platform.w && player.y + 35 > platform.y && player.y + 35 < platform.y + platform.h + player.dy) {
-        hudPop(player.x + 15, 430, "ПОЛЫНЬЯ", "#2f6f9d");
-        sfx.fall();
-        player.y = WORLD_H + 1;
-        player.dy = 0;
-        break;
-      }
       if (player.dy > 0 && !platform.breaking && player.x + 25 > platform.x && player.x + 10 < platform.x + platform.w && player.y + 35 > platform.y && player.y + 35 < platform.y + platform.h + player.dy) {
         player.y = platform.y - 35;
         player.dy = -12.98 * perkBounceScale();
@@ -14438,7 +14289,7 @@ html, body, body * {
       const windLabel = hasWind ? "ВЕТЕР " + arrow : "";
       const windWidth = windLabel ? trackedWidth(windLabel, 2) : 0;
       const windBarsW = hasWind ? 18 : 0;
-      const padX = 9, gap = 14;
+      const padX = 13, gap = 14;
       const totalWidth = labelWidth + (label && windLabel ? gap : 0) + windWidth + (hasWind ? 5 + windBarsW : 0);
       const plateW = totalWidth + padX * 2;
       const plateX = (WORLD_W - plateW) / 2;

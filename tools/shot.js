@@ -29,6 +29,7 @@ const label = arg("label", "");
 const hover = arg("hover", "");
 const hudVariant = arg("hud", "");
 const hazard = arg("hazard", "");
+const springs = arg("springs", "");
 
 const chromeCandidates = [
   path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
@@ -151,7 +152,7 @@ const HOOK = String.raw`
       if (ov) { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); }
     } catch (e) {}
   }, 700);
-` + (hudVariant ? require("./hud-variants.js").block(hudVariant) : "");
+` + (hudVariant ? require("./hud-variants.js").block(hudVariant) : "") + (springs ? require("./spring-variants.js").block() : "");
 
 const work = fs.mkdtempSync(path.join(os.tmpdir(), "mj-shot-"));
 const html = fs.readFileSync(source, "utf8");
@@ -209,7 +210,7 @@ for (const tab of tabs) {
     "--virtual-time-budget=4000",
     "--user-data-dir=" + path.join(work, "profile"),
     "--screenshot=" + out,
-    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : ""),
+    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (springs ? "&springs=1" : ""),
   ]);
   if (!fs.existsSync(out)) {
     console.error("Не удалось снять " + tab + " (код " + res.status + ")");
