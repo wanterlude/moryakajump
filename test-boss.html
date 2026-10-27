@@ -10219,7 +10219,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.60";
+  var GAME_VERSION = "1.0.61";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -13482,10 +13482,19 @@ html, body, body * {
       }
       if (player.dy > 0 && !platform.breaking && player.x + 25 > platform.x && player.x + 10 < platform.x + platform.w && player.y + 35 > platform.y && player.y + 35 < platform.y + platform.h + player.dy) {
         player.y = platform.y - 35;
-        player.dy = -12.98 * perkBounceScale();
+        // Пружинка действует по всей длине платформы, а не только в точке подбора.
+        if (platform.spring) {
+          player.dy = -24 * perkSpringScale();
+          squash = -0.3;
+          questState.springUsed = true;
+          sfx.spring();
+          hudPop(platform.x + platform.w / 2, platform.y - 16, "\u041F\u0420\u042B\u0416\u041E\u041A", "#f5a623");
+        } else {
+          player.dy = -12.98 * perkBounceScale();
+          squash = 0.14;
+          sfx.land();
+        }
         refillJumps();
-        squash = 0.14;
-        sfx.land();
         registerComboLanding();
         lastLandedPlatform = platform;
         if (platform.type === "broken") {
