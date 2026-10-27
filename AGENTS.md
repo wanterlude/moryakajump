@@ -116,6 +116,29 @@ node desktop-lite/build.js --keep   # оставить распакованну�
 Лёгкая сборка требует установленного Edge (он есть в Windows 10/11). Electron
 не даёт опуститься ниже ~50 МБ: сам бинарь Chromium занимает 150 МБ в распаковке.
 
+## Самостоятельная сборка на WebView2
+
+```
+node desktop-webview2/build.js     # нужен .NET SDK 8+
+```
+
+Своё окно без Chromium: `desktop-webview2/` — WinForms на **.NET Framework 4.8**
+(он уже в Windows, игроку ничего доставлять не нужно), движок — системный
+WebView2 Runtime. Сборка кладёт zip в `desktop-webview2/build-out/`.
+
+| Что | Размер |
+|---|---|
+| `Moryaka-Jump.exe` | ~77 КБ (иконка вшита) |
+| Вся папка | ~2.8 МБ |
+| zip | ~1.3 МБ |
+
+При первом запуске `Program.Main` проверяет `CoreWebView2Environment.GetAvailableBrowserVersionString()`.
+Если рантайма нет — предлагает скачать официальный бутстраппер (≈1.9 МБ,
+`go.microsoft.com/fwlink/p/?LinkId=2124703`), запускает его с `/silent /install`
+через UAC и перепроверяет версию. Игра грузится с виртуального хоста
+`https://game.local` — так localStorage с рекордами ведёт себя как на обычном
+сайте, а не как на `file://`.
+
 ## Релиз
 
 1. Поднять `GAME_VERSION` в `index.html` (строка ~10196).
