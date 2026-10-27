@@ -76,6 +76,21 @@ const HOOK = String.raw`
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
       if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
+      if (shotHazard === "spring") {
+        setTimeout(function () {
+          try {
+            startGame();
+            window.requestAnimationFrame = function () { return 0; };
+            player.x = 120; player.y = 430;
+            platforms = [
+              makePlatform({ x: 70, y: 520, w: 150, h: 15, type: "spring" }),
+              makePlatform({ x: 240, y: 440, w: 130, h: 15, type: "spring" }),
+              makePlatform({ x: 90, y: 360, w: 140, h: 15, type: "spring" })
+            ];
+            draw(performance.now());
+          } catch (e) {}
+        }, 500);
+      }
       if (shotHazard === "hole" || shotHazard === "spikes" || shotHazard === "both") {
         setTimeout(function () {
           try {

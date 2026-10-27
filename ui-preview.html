@@ -10232,7 +10232,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.53-ui";
+  var GAME_VERSION = "1.0.54-ui";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -12443,14 +12443,95 @@ html, body, body * {
     else drawSnowPlatform(p);
   }
   function drawSpringPlatform(p) {
+    // «Магнит»: платформа держится на поле — кольца расходятся по её поверхности,
+    // в поле вьются искры. Всё считается от времени, кадры не зависят от FPS.
     drawSnowPlatform(p);
+    const now = frameNow();
+    const cx = p.x + p.w / 2;
+    const cy = p.y + p.h / 2;
     ctx.save();
-    roundedRect(p.x, p.y, p.w, p.h, 5);
-    ctx.clip();
-    ctx.fillStyle = "rgba(255,210,63,.55)";
-    for (let sx = p.x + 6; sx < p.x + p.w - 6; sx += 14) {
-      ctx.fillRect(sx, p.y + p.h - 4, 7, 2.2);
+
+    // Поле вокруг платформы.
+    const field = ctx.createRadialGradient(cx, cy, 1, cx, cy, p.w * 0.72);
+    field.addColorStop(0, "rgba(122,226,255,.26)");
+    field.addColorStop(0.55, "rgba(122,226,255,.09)");
+    field.addColorStop(1, "rgba(122,226,255,0)");
+    ctx.fillStyle = field;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, p.w * 0.74, p.h * 2.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Кольца левитации: рождаются на поверхности и гаснут, поднимаясь.
+    for (let i = 0; i < 3; i++) {
+      const phase = (now * 0.55 + i / 3) % 1;
+      const alpha = (1 - phase) * 0.9;
+      if (alpha <= 0.02) continue;
+      const ringY = p.y + 2.4 - phase * 13;
+      const rx = p.w * (0.3 + phase * 0.2);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "rgba(150,240,255,1)";
+      ctx.lineWidth = 2.1 - phase * 0.9;
+      ctx.beginPath();
+      ctx.ellipse(cx, ringY, rx, 2.6 + phase * 1.5, 0, 0, Math.PI * 2);
+      ctx.stroke();
     }
+    ctx.globalAlpha = 1;
+
+    // Обмотка магнита по телу платформы.
+    ctx.save();
+    roundedRect(p.x, p.y, p.w, p.h, 6);
+    ctx.clip();
+    const coil = ctx.createLinearGradient(0, p.y, 0, p.y + p.h);
+    coil.addColorStop(0, "rgba(186,246,255,.9)");
+    coil.addColorStop(0.5, "rgba(92,202,236,.38)");
+    coil.addColorStop(1, "rgba(34,110,150,.2)");
+    ctx.fillStyle = coil;
+    ctx.fillRect(p.x + 3, p.y + 1.2, p.w - 6, p.h - 2.4);
+    ctx.strokeStyle = "rgba(18,68,98,.26)";
+    ctx.lineWidth = 0.8;
+    for (let sx = p.x + 8; sx < p.x + p.w - 5; sx += 11) {
+      ctx.beginPath();
+      ctx.moveTo(sx, p.y + 2.4);
+      ctx.lineTo(sx - 2.6, p.y + p.h - 2.4);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Полюса на концах: два холодных огонька, между ними и держится поле.
+    for (let side = 0; side < 2; side++) {
+      const px = side === 0 ? p.x + 4.5 : p.x + p.w - 4.5;
+      const pulse = 0.55 + 0.45 * Math.sin(now * 2.2 + side * Math.PI);
+      const pole = ctx.createRadialGradient(px, cy, 0.5, px, cy, 9);
+      pole.addColorStop(0, "rgba(190,248,255," + (0.85 * pulse).toFixed(2) + ")");
+      pole.addColorStop(1, "rgba(120,226,255,0)");
+      ctx.fillStyle = pole;
+      ctx.beginPath();
+      ctx.arc(px, cy, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "rgba(232,254,255," + (0.7 + 0.3 * pulse).toFixed(2) + ")";
+      ctx.beginPath();
+      ctx.arc(px, cy, 1.7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Блик по верхней кромке.
+    ctx.fillStyle = "rgba(240,254,255,.95)";
+    roundedRect(p.x + 5, p.y + 1.6, p.w - 10, 2, 1);
+    ctx.fill();
+
+    // Искры в поле.
+    for (let i = 0; i < 4; i++) {
+      const angle = now * 1.1 + i * (Math.PI / 2);
+      const sx = cx + Math.cos(angle) * p.w * 0.34;
+      const sy = cy - 5 + Math.sin(angle * 1.3) * 9;
+      const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(angle * 2.1 + i));
+      ctx.globalAlpha = twinkle;
+      ctx.fillStyle = "#eafcff";
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1.1 + twinkle * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
   function drawVanishPlatform(p) {
@@ -16710,7 +16791,7 @@ html, body, body * {
      */
     panel: { x: 38, y: 63, w: 324, h: 426, r: 28 },
     /** Аватар в рамке: диск чуть больше, чтобы рамка не липла к краю. */
-    avatarY: 160,
+    avatarY: 147,
     avatarR: 50,
     /** Ник под аватаром. */
     nickY: 240,
