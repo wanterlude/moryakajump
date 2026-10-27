@@ -1,11 +1,9 @@
-Move the perk icons into src/ with coverage for every kind
+Move the winter palette into src/ and lift the src block to the top of the IIFE
 
-src/game/perk-icons.ts now owns drawPerkIconShape and shieldGlyph, typed against a
-narrow IconDeps (ctx, coinBadge, heart), so the module does not reach into the bundle.
+src/game/winter.ts is now the single source for sky, peaks, ice and snow colours, with
+three tests: required keys present, every value parses as hex or rgba, no stray spaces.
+33 module tests in total.
 
-The tests read the kind list straight from the module source and call every one with a
-recording canvas, which is the first coverage these icons have ever had: all kinds draw
-something, unknown kinds do not throw, and save/restore stay balanced.
-
-tsconfig gains the DOM lib for CanvasRenderingContext2D. 30 tests, tsc clean, check.js
-green, golden frames unchanged.
+The injection point moved from just above drawPlatformMagnet to the very start of the
+IIFE, so modules that export constants (not only functions) are available before the
+first use. Golden frames unchanged.

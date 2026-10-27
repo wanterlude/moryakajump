@@ -48,6 +48,11 @@ const MODULES = [
     global: "__srcPerkIcons",
     exports: ["drawPerkIconShape", "shieldGlyph"],
   },
+  {
+    entry: path.join(root, "src/game/winter.ts"),
+    global: "__srcWinter",
+    exports: ["WINTER"],
+  },
 ];
 
 function buildBlock() {
@@ -96,17 +101,17 @@ function main() {
     return;
   }
 
-  let next;
+  // Вставка живёт в самом начале IIFE: тогда модули с константами тоже доступны
+  // до первого обращения, а не только функции.
+  const IIFE = "(() => {\n";
+  let next = html;
   if (hasStart) {
     const from = html.indexOf(START);
     const to = html.indexOf(END) + END.length;
-    next = html.slice(0, from) + block + html.slice(to);
-  } else {
-    // Первый раз вставляем перед функцией, которой эти модули служат.
-    const anchor = "  function drawPlatformMagnet(p) {";
-    if (!html.includes(anchor)) throw new Error("не нашёл точку вставки src");
-    next = html.replace(anchor, block + "\n" + anchor);
+    next = html.slice(0, from) + html.slice(to);
   }
+  if (!next.includes(IIFE)) throw new Error("не нашёл начало IIFE в index.html");
+  next = next.replace(IIFE, IIFE + block + "\n");
 
   if (next === html) {
     console.log("вставка уже свежая");
