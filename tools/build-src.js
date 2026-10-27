@@ -28,6 +28,11 @@ const MODULES = [
     global: "__srcSpikes",
     exports: ["spikeLayout"],
   },
+  {
+    entry: path.join(root, "src/game/color.ts"),
+    global: "__srcColor",
+    exports: ["hexToRgba"],
+  },
 ];
 
 function buildBlock() {

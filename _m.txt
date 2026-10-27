@@ -1,11 +1,7 @@
-Move the spike layout into src/ and restore the edge margins
+Move hexToRgba into src/ with tests
 
-src/game/spikes-layout.ts owns the spacing, the 8 px left / 6 px right margins and the
-coordinate-derived spike heights, with tests for bounds, determinism and variation.
+src/game/color.ts keeps the behaviour identical (alpha is interpolated as given, channels
+masked the same way), which the unchanged golden frames confirm: the string produced for
+all 52 call sites is byte-for-byte the same.
 
-This also restores the margin fix that was lost in an earlier checkout: the loop had
-drifted back to p.x + 2 with no right margin, so spikes sat on the rounded corners
-again.
-
-Pipeline stays green: 12 module tests, tsc, build-src --check, check.js, and the
-golden frames are unchanged (the frozen run frame has no spike event).
+Module tests: 16 total across field-layout, spikes-layout and color.
