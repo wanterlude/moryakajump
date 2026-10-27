@@ -124,9 +124,7 @@ node desktop-webview2/build.js     # нужен .NET SDK 8+
 
 Своё окно без Chromium: `desktop-webview2/` — WinForms на **.NET Framework 4.8**
 (он уже в Windows, игроку ничего доставлять не нужно), движок — системный
-WebView2 Runtime. Сборка кладёт zip в `desktop-webview2/build-out/`.
-
-Сборка даёт **один самодостаточный exe** — рядом ничего не нужно:
+WebView2 Runtime. Сборка даёт **один самодостаточный exe** — рядом ничего не нужно:
 `Moryaka-Jump.exe` ~2.25 МБ. Внутри: код, иконка, сборки WebView2 (грузятся из
 памяти через `AssemblyResolve`), нативный `WebView2Loader.dll` (распаковывается
 в `%LOCALAPPDATA%\MoryakaJump\bin` и подключается `SetLoaderDllFolderPath`) и
