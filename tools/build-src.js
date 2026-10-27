@@ -33,6 +33,16 @@ const MODULES = [
     global: "__srcColor",
     exports: ["hexToRgba"],
   },
+  {
+    entry: path.join(root, "src/game/format.ts"),
+    global: "__srcFormat",
+    exports: ["fmt"],
+  },
+  {
+    entry: path.join(root, "src/game/daily-date.ts"),
+    global: "__srcDaily",
+    exports: ["localDateKey", "yesterdayDateKey", "dailyHash"],
+  },
 ];
 
 function buildBlock() {

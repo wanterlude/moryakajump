@@ -1,7 +1,9 @@
-Move hexToRgba into src/ with tests
+Move fmt and the daily-date helpers into src/
 
-src/game/color.ts keeps the behaviour identical (alpha is interpolated as given, channels
-masked the same way), which the unchanged golden frames confirm: the string produced for
-all 52 call sites is byte-for-byte the same.
+src/game/format.ts keeps the thin-space grouping and floor exactly as before.
+src/game/daily-date.ts owns localDateKey, yesterdayDateKey and the FNV-1a dailyHash
+used to pick the daily quest.
 
-Module tests: 16 total across field-layout, spikes-layout and color.
+Tests grew to 25: formatting edge cases (fractions, negatives), local date without UTC
+drift, hash determinism and a check that 200 consecutive days reach all six daily quest
+variants. Golden frames unchanged, so the bundle output is identical.
