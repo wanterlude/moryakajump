@@ -10193,7 +10193,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.46";
+  var GAME_VERSION = "1.0.47";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -13961,12 +13961,14 @@ html, body, body * {
     const d = dailyState;
     const shown = Math.min(d.progress, def.target);
     if (compact) {
-      const cx0 = 252, cy0 = 14, ch = 20;
+      const ch = 20;
       const frac = Math.max(0, Math.min(1, shown / def.target));
       const label = Math.floor(frac * 100) + "%" + (d.streak > 0 ? " ·" + d.streak : "");
       setFont(6.6, "bold");
       const tw = trackedWidth(label, 0.4);
       const w = 20 + tw + 12;
+      // Компактная ежедневка стоит в том же слоте, что и полная: по центру.
+      const cx0 = (WORLD_W - w) / 2, cy0 = 544;
       drawHudChip(cx0, cy0, w, ch, null);
       const ix = cx0 + 11, iy = cy0 + ch / 2 - 0.5;
       ctx.save();
@@ -13995,7 +13997,8 @@ html, body, body * {
       }
       return;
     }
-    const x = 15, y = 91, h = 20;
+    let x = 15;
+    const y = 544, h = 20;
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
     setFont(6.5, "bold");
     const head = `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
@@ -14005,6 +14008,7 @@ html, body, body * {
     const gap = right ? 14 : 0;
     // Компактная рамка: ширина по контенту, длинная полоса не растягивает её.
     const w = Math.min(252, 40 + headW + gap + rightW + 16);
+    x = (WORLD_W - w) / 2;
     ctx.save();
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
@@ -14206,7 +14210,7 @@ html, body, body * {
     const dailyActive = !dailyState.done && !!dailyDef();
     const dailyCompact = dailyActive && runStartedAt > 0 && performance.now() - runStartedAt > 4000;
     const dailyFull = dailyActive && !dailyCompact;
-    const infoY = dailyFull ? 115 : 91;
+    const infoY = dailyFull ? 568 : 544;
     if (hasQuest || hasWind) {
       ctx.save();
       ctx.textBaseline = "middle";
@@ -14230,7 +14234,7 @@ html, body, body * {
       const padX = 9, gap = 14;
       const totalWidth = labelWidth + (label && windLabel ? gap : 0) + windWidth + (hasWind ? 5 + windBarsW : 0);
       const plateW = totalWidth + padX * 2;
-      const plateX = 15;
+      const plateX = (WORLD_W - plateW) / 2;
       const textX = plateX + padX;
       roundedRect(plateX, infoY, plateW, 17, 8.5);
       ctx.fillStyle = "rgba(255,255,255,.90)";
