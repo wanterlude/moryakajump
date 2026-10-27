@@ -114,9 +114,6 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
 .sheetActions button{flex:1;padding:11px 8px;border-radius:13px;border:1px solid rgba(15,61,92,.18);font:bold 11.5px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;background:rgba(255,255,255,.9);color:#0f3d5c;touch-action:manipulation}
 .sheetActions button.primary{background:linear-gradient(180deg,#23b6e2,#0a5fa0);border-color:transparent;color:#fff}
 .sheetActions button:active{transform:scale(.97)}
-.sheetWide{display:block;width:100%;margin:2px 0 12px;padding:11px 8px;border-radius:13px;border:1px solid rgba(15,61,92,.18);background:rgba(255,255,255,.9);color:#0f3d5c;font:bold 11.5px Arial,sans-serif;letter-spacing:.4px;cursor:pointer;touch-action:manipulation}
-.sheetWide:hover{background:#fff}
-.sheetWide:active{transform:scale(.97)}
 .sheetRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid rgba(15,61,92,.08);font-size:12.5px;text-align:left}
 .sheetRow:last-of-type{border-bottom:0}
 .sheetRow input[type=range]{width:150px;accent-color:#12a08c}
@@ -300,7 +297,6 @@ html, body, body * {
         <input id="sideVolRange" class="sideRange" type="range" min="0" max="100" step="1" value="100">
         <label class="sideCheck"><input id="sideVibToggle" type="checkbox" checked> Вибрация</label>
         <label class="sideCheck"><input id="sideTiltToggle" type="checkbox"> Наклон</label>
-        <button id="sideSave" class="sideBtn" type="button">СОХРАНИТЬ ПРОГРЕСС</button>
         <button id="sideReset" class="sideBtn danger" type="button">СБРОСИТЬ ПРОГРЕСС</button>
     </div>
 </aside>
@@ -318,7 +314,6 @@ html, body, body * {
             <button id="settingsClose" type="button" class="primary">ГОТОВО</button>
         </div>
         <div class="sheetActions" style="margin-top:8px">
-            <button id="settingsSave" type="button">СОХРАНИТЬ</button>
             <button id="settingsReset" type="button">СБРОС ПРОГРЕССА</button>
         </div>
     </div>
@@ -356,7 +351,6 @@ html, body, body * {
         <div id="profileStats" class="profileStats"></div>
         <div class="profileSection">ЖУРНАЛ БОССОВ · ПОБЕДЫ / БОИ</div>
         <div id="profileBosses"></div>
-        <button id="profileTrain" class="sheetWide" type="button">ТРЕНИРОВКА БОССОВ</button>
         <div class="profileSection">ДОСТИЖЕНИЯ <span id="profileAchCount"></span></div>
         <div id="profileAch" class="profileAch"></div>
         <div class="sheetActions">
@@ -10199,7 +10193,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.34-ui";
+  var GAME_VERSION = "1.0.35-ui";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -10409,6 +10403,100 @@ html, body, body * {
     setMenuMessage("Аватар выбран", avatarName(i));
     sfx.click();
   }
+  function drawMenuGateIcon(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    const g = ctx.createLinearGradient(-16, -16, 16, 16);
+    g.addColorStop(0, "#f4fdff");
+    g.addColorStop(0.45, "#bfe5f2");
+    g.addColorStop(1, "#5f9bb7");
+    ctx.fillStyle = g;
+    roundedRect(-15, -16, 6, 30, 3);
+    ctx.fill();
+    roundedRect(9, -16, 6, 30, 3);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-15, -8);
+    ctx.quadraticCurveTo(0, -30, 15, -8);
+    ctx.lineTo(15, -1);
+    ctx.quadraticCurveTo(0, -23, -15, -1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "rgba(8,30,48,.8)";
+    ctx.beginPath();
+    ctx.moveTo(-8, 14);
+    ctx.lineTo(-8, -4);
+    ctx.quadraticCurveTo(0, -14, 8, -4);
+    ctx.lineTo(8, 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#ffc247";
+    ctx.beginPath();
+    ctx.arc(-3, -1, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(3, -1, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(-11, -16, 5, 2.2, -0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(11, -16, 5, 2.2, 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawMenuChestIcon(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    const body = ctx.createLinearGradient(0, -10, 0, 14);
+    body.addColorStop(0, "#c98f58");
+    body.addColorStop(0.55, "#9a6039");
+    body.addColorStop(1, "#6a4128");
+    ctx.fillStyle = body;
+    roundedRect(-16, -6, 32, 20, 4);
+    ctx.fill();
+    const lid = ctx.createLinearGradient(0, -18, 0, -4);
+    lid.addColorStop(0, "#d8a06a");
+    lid.addColorStop(1, "#8f5834");
+    ctx.fillStyle = lid;
+    ctx.beginPath();
+    ctx.moveTo(-16, -6);
+    ctx.quadraticCurveTo(-16, -18, 0, -18);
+    ctx.quadraticCurveTo(16, -18, 16, -6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#e0b45c";
+    ctx.fillRect(-16, -7, 32, 2.4);
+    ctx.fillRect(-3, -18, 6, 32);
+    ctx.fillStyle = "#f2c14e";
+    roundedRect(-4, 1, 8, 8, 2);
+    ctx.fill();
+    ctx.fillStyle = "#6a4128";
+    ctx.beginPath();
+    ctx.arc(0, 4.5, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.ellipse(0, -18, 12, 2.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  function drawMenuObjectButton(x, y, w, h, label, type) {
+    const hovered = pauseState.hover === "menu-btn-" + label;
+    uiPill(x, y, w, h, {
+      fill: hovered ? UI.surfaceSolid : "rgba(255,255,255,.62)",
+      radius: 13
+    });
+    const cx = x + w / 2;
+    if (type === "gate") drawMenuGateIcon(cx, y + 24, 0.78);
+    else drawMenuChestIcon(cx, y + 21, 0.78);
+    setFont(type === "chest" ? 6.0 : 6.4, "bold");
+    ctx.fillStyle = UI.ink;
+    trackedText(label, cx, y + h - 9, type === "chest" ? 0.2 : 0.4);
+  }
   // Плоские тона кнопок: сплошная заливка, мягкая тень, светлая обводка.
   // Раньше здесь была «казуальная» 3D-кнопка с рантом и бликом — она выбивалась
   // из плоских карточек и капсул остального интерфейса.
@@ -10416,6 +10504,11 @@ html, body, body * {
     blue: { fill: "#1a78b0", hover: "#1d88c4", shadow: "rgba(26,120,176,.34)", ink: "#ffffff" },
     green: { fill: "#0f7f6b", hover: "#119078", shadow: "rgba(15,127,107,.32)", ink: "#ffffff" },
     gold: { fill: "#d99a1f", hover: "#e6a628", shadow: "rgba(217,154,31,.36)", ink: "#3d2600" },
+    // Приглушённые: морозное стекло с цветным текстом. Ими рисуются «Играть»
+    // и «Крутить», чтобы они не перетягивали внимание с карточек.
+    ghostBlue: { fill: "rgba(255,255,255,.5)", hover: "rgba(255,255,255,.74)", shadow: "rgba(10,40,62,.16)", ink: "#15608d", border: "rgba(21,96,141,.24)" },
+    ghostGreen: { fill: "rgba(255,255,255,.5)", hover: "rgba(255,255,255,.74)", shadow: "rgba(10,40,62,.16)", ink: "#0b6b59", border: "rgba(11,107,89,.24)" },
+    ghostGold: { fill: "rgba(255,255,255,.5)", hover: "rgba(255,255,255,.74)", shadow: "rgba(10,40,62,.16)", ink: "#8a5a00", border: "rgba(138,90,0,.26)" },
     dim: { fill: "rgba(255,255,255,.62)", hover: "rgba(255,255,255,.62)", shadow: "rgba(8,28,48,.12)", ink: "rgba(21,85,118,.5)" }
   };
   function drawCasualButtonBase(x, y, w, h, toneKey, hovered, glowBoost = 0) {
@@ -10433,7 +10526,7 @@ html, body, body * {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
     roundedRect(x + 0.6, y + 0.6, w - 1.2, h - 1.2, r - 0.6);
-    ctx.strokeStyle = dim ? "rgba(15,61,92,.12)" : "rgba(255,255,255,.22)";
+    ctx.strokeStyle = t.border || (dim ? "rgba(15,61,92,.12)" : "rgba(255,255,255,.22)");
     ctx.lineWidth = 1.2;
     ctx.stroke();
     ctx.restore();
@@ -10687,8 +10780,9 @@ html, body, body * {
   }
   function menuActionButtons() {
     return [
-      { id: "primary", x: MENU.padX, y: MENU.barY, w: 228, h: MENU.barH, label: menuPrimary().label },
-      { id: "play", x: 260, y: MENU.barY, w: 120, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" }
+      { id: "train", x: MENU.padX, y: MENU.barY, w: 60, h: MENU.barH, label: "БОССЫ" },
+      { id: "play", x: 88, y: MENU.barY, w: 224, h: MENU.barH, label: "\u0418\u0413\u0420\u0410\u0422\u042C" },
+      { id: "save", x: 320, y: MENU.barY, w: 60, h: MENU.barH, label: "СОХРАНИТЬ" }
     ];
   }
   function bossTrainRows() {
@@ -10846,6 +10940,12 @@ html, body, body * {
       locked: false
     };
   }
+  // Кнопка выбора под именем аватара в витрине.
+  function showcasePrimaryRect() {
+    const L = showcaseLayout();
+    const w = 132;
+    return { x: L.x + (L.w - w) / 2, y: L.y + L.h - 38, w, h: 26 };
+  }
   function drawShowcase() {
     const i = menuCursor();
     const isShop = menuState.tab === "shop";
@@ -10925,7 +11025,7 @@ html, body, body * {
     ctx.fill();
     const title = isShop ? FRAMES[i].name.toUpperCase() : avatarName(i).toUpperCase();
     // У открытых аватаров блок из двух строк — опускаем его ниже, чтобы не оставалось пустоты снизу.
-    const titleY = !isShop && !locked ? y + h - 44 : L.titleY;
+    const titleY = !isShop && !locked ? y + h - 58 : L.titleY;
     setFont(title.length > 22 ? 12 : 15, "bold");
     ctx.fillStyle = "#0f3d5c";
     trackedText(title, cx, titleY, 0.9);
@@ -10970,23 +11070,36 @@ html, body, body * {
       ctx.fillStyle = "rgba(21,85,118,.55)";
       trackedText("\u0415\u0429\u0401 " + fmt(Math.max(0, need - highScore)) + " \u0414\u041E \u041E\u0422\u041A\u0420\u042B\u0422\u0418\u042F", cx, L.meterTextY, 0.85);
     } else {
-      // \u041E\u0442\u043A\u0440\u044B\u0442\u044B\u0439 \u0430\u0432\u0430\u0442\u0430\u0440: \u0441\u0442\u0430\u0442\u0443\u0441 \u0440\u0438\u0441\u0443\u0435\u043C \u043F\u043B\u0430\u0448\u043A\u043E\u0439 \u0432\u043D\u0438\u0437\u0443 \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438, \u0430 \u043D\u0435 \u0441\u0442\u0440\u043E\u043A\u043E\u0439 \u043F\u043E\u0434 \u0438\u043C\u0435\u043D\u0435\u043C.
-      const worn = menuItemWorn(i);
-      const label = worn ? "\u0412\u042B\u0411\u0420\u0410\u041D" : "\u041E\u0422\u041A\u0420\u042B\u0422";
-      const pw = worn ? 70 : 64;
-      const ph = 17;
-      const px = cx - pw / 2;
-      const py = y + h - 26;
-      ctx.fillStyle = worn ? "rgba(18,160,140,.95)" : "rgba(255,255,255,.72)";
-      roundedRect(px, py, pw, ph, 8.5);
-      ctx.fill();
-      ctx.strokeStyle = worn ? "rgba(255,255,255,.7)" : "rgba(21,85,118,.18)";
-      ctx.lineWidth = 1;
-      roundedRect(px, py, pw, ph, 8.5);
-      ctx.stroke();
-      setFont(7, "bold");
-      ctx.fillStyle = worn ? "#ffffff" : "rgba(21,85,118,.62)";
-      trackedText(label, cx, py + ph / 2 + 0.5, 1.2);
+      // Открытый аватар: кнопка выбора прямо под именем, вместо плашки «ОТКРЫТ».
+      const rect = showcasePrimaryRect();
+      if (menuItemWorn(i)) {
+        uiPill(rect.x, rect.y, rect.w, rect.h, { fill: "rgba(255,255,255,.6)" });
+        ctx.save();
+        ctx.textBaseline = "middle";
+        setFont(9.5, "bold");
+        const label = "ВЫБРАН";
+        const tw = trackedWidth(label, 1.4);
+        const groupW = 18 + tw;
+        const gx = rect.x + (rect.w - groupW) / 2;
+        const gy = rect.y + rect.h / 2;
+        ctx.strokeStyle = UI.accent;
+        ctx.lineWidth = 1.7;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(gx, gy + 1);
+        ctx.lineTo(gx + 3.6, gy + 4.6);
+        ctx.lineTo(gx + 10.4, gy - 5);
+        ctx.stroke();
+        ctx.fillStyle = UI.inkSoft;
+        trackedText(label, gx + groupW - tw / 2, gy + 0.5, 1.4);
+        ctx.restore();
+      } else {
+        drawMenuButton(rect.x, rect.y, rect.w, rect.h, "ВЫБРАТЬ", "green", {
+          size: 10,
+          tracking: 1.6
+        });
+      }
     }
     ctx.restore();
   }
@@ -11121,44 +11234,17 @@ html, body, body * {
     }
   }
   function drawMenuActions() {
-    const primary = menuPrimary();
-    const back = menuActionButtons()[0];
-    const play = menuActionButtons()[1];
-    if (primary.passive) {
-      uiPill(back.x, back.y, back.w, back.h, { fill: "rgba(255,255,255,.55)" });
-      ctx.save();
-      ctx.textBaseline = "middle";
-      setFont(11, "bold");
-      const label = "ВЫБРАН";
-      const tw = trackedWidth(label, 1.4);
-      const groupW = 22 + tw;
-      const gx = back.x + (back.w - groupW) / 2;
-      const cy = back.y + back.h / 2;
-      ctx.strokeStyle = UI.accent;
-      ctx.lineWidth = 1.8;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      ctx.moveTo(gx, cy + 1);
-      ctx.lineTo(gx + 4, cy + 5);
-      ctx.lineTo(gx + 12, cy - 6);
-      ctx.stroke();
-      ctx.fillStyle = UI.inkSoft;
-      trackedText(label, gx + groupW - tw / 2, cy + 0.5, 1.4);
-      ctx.restore();
-    } else {
-      drawMenuButton(back.x, back.y, back.w, back.h, primary.label, primary.enabled ? "gold" : "green", {
-        size: 11,
-        tracking: 1.4,
-        dim: !primary.enabled,
-        icon: primary.enabled ? "check" : "lock"
-      });
-    }
-    drawMenuButton(play.x, play.y, play.w, play.h, "ИГРАТЬ", "blue", {
+    const bar = menuActionButtons();
+    const train = bar[0];
+    const play = bar[1];
+    const save = bar[2];
+    drawMenuObjectButton(train.x, train.y, train.w, train.h, "БОССЫ", "gate");
+    drawMenuButton(play.x, play.y, play.w, play.h, "ИГРАТЬ", "ghostBlue", {
       size: 11,
       tracking: 1.1,
       icon: "play"
     });
+    drawMenuObjectButton(save.x, save.y, save.w, save.h, "СОХРАНИТЬ", "chest");
     ctx.save();
     ctx.textBaseline = "middle";
     setFont(7.5, "bold");
@@ -15060,15 +15146,25 @@ html, body, body * {
         );
         if (hit) {
           if (hit.id === "play") startGame();
-          else if (menuPrimary().enabled) runPrimary();
-          else {
-            const i = menuCursor();
-            if (menuState.tab === "avatars" && !menuItemUnlocked(i)) runPrimary();
-            else sfx.click();
+          else if (hit.id === "train") {
+            bossTrainOpen = true;
+            sfx.click();
+          } else if (hit.id === "save") {
+            openSaveDialog();
+            sfx.click();
           }
         }
         event.preventDefault();
         return;
+      }
+      if (menuState.tab === "avatars" && !bossTrainOpen) {
+        const sr = showcasePrimaryRect();
+        if (point.x >= sr.x && point.x <= sr.x + sr.w && point.y >= sr.y && point.y <= sr.y + sr.h) {
+          if (menuPrimary().enabled) runPrimary();
+          else sfx.click();
+          event.preventDefault();
+          return;
+        }
       }
       if (point.y >= MENU.gridY - 8 && point.y <= MENU.gridY + MENU.gridH + 8) {
         menuState.dragging = true;
@@ -15891,7 +15987,7 @@ html, body, body * {
     const gap = 8;
     const text = busy ? "ОТКРЫВАЕМ…" : dim ? "НЕ ХВАТАЕТ" : label;
     const fg = (CASUAL_BUTTON_TONES[key] || CASUAL_BUTTON_TONES.blue).ink;
-    const onGold = key === "gold";
+    const onLight = key === "gold" || key === "ghostGold";
     setFont(11.5, "bold");
     const labelW = trackedWidth(text, 1.3);
     let badgeW = 0;
@@ -15910,9 +16006,9 @@ html, body, body * {
       const coinR = Math.min(6, bh * 0.3);
       ctx.save();
       roundedRect(bx, by, badgeW, bh, bh / 2);
-      ctx.fillStyle = onGold ? "rgba(61,38,0,.12)" : "rgba(0,0,0,.22)";
+      ctx.fillStyle = onLight ? "rgba(15,61,92,.10)" : "rgba(0,0,0,.22)";
       ctx.fill();
-      ctx.strokeStyle = onGold ? "rgba(61,38,0,.2)" : "rgba(255,255,255,.32)";
+      ctx.strokeStyle = onLight ? "rgba(15,61,92,.16)" : "rgba(255,255,255,.32)";
       ctx.lineWidth = 1;
       ctx.stroke();
       ctx.restore();
@@ -15929,7 +16025,7 @@ html, body, body * {
     }
   }
   function drawGachaPlayButton() {
-    drawMenuButton(GACHA_UI.playX, GACHA_UI.spinY, GACHA_UI.playW, GACHA_UI.spinH, "ИГРАТЬ", "blue", {
+    drawMenuButton(GACHA_UI.playX, GACHA_UI.spinY, GACHA_UI.playW, GACHA_UI.spinH, "ИГРАТЬ", "ghostBlue", {
       size: 11,
       tracking: 1,
       icon: "play",
@@ -15939,7 +16035,7 @@ html, body, body * {
   function drawGachaSpinButton() {
     const spinning = gachaState.phase === "spin";
     const canSpin = !spinning && bankCoins >= GACHA_COST;
-    drawGachaActionButton(GACHA_UI.spinX, GACHA_UI.spinY, GACHA_UI.spinW, GACHA_UI.spinH, "КРУТИТЬ", "green", {
+    drawGachaActionButton(GACHA_UI.spinX, GACHA_UI.spinY, GACHA_UI.spinW, GACHA_UI.spinH, "КРУТИТЬ", "ghostGreen", {
       cost: GACHA_COST,
       dim: !canSpin,
       busy: spinning,
@@ -16248,12 +16344,12 @@ html, body, body * {
     }
     const spinBusy = platformShop.phase === "spin";
     const canAfford = bankCoins >= PLATFORM_GACHA_COST;
-    drawGachaActionButton(MENU.padX, MENU.barY, 228, MENU.barH, "КРУТИТЬ", "gold", {
+    drawGachaActionButton(MENU.padX, MENU.barY, 228, MENU.barH, "КРУТИТЬ", "ghostGold", {
       cost: PLATFORM_GACHA_COST,
       dim: !canAfford,
       busy: spinBusy
     });
-    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "blue", { size: 11, tracking: 1, icon: "play" });
+    drawMenuButton(260, MENU.barY, 120, MENU.barH, "\u0418\u0413\u0420\u0410\u0422\u042C", "ghostBlue", { size: 11, tracking: 1, icon: "play" });
     ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -17843,8 +17939,6 @@ html, body, body * {
     }
     const rs = document.getElementById("settingsReset");
     if (rs) rs.addEventListener("click", () => { closeSettings(); openResetDialog(); });
-    const sv = document.getElementById("settingsSave");
-    if (sv) sv.addEventListener("click", () => { closeSettings(); openSaveDialog(); });
     const vol = document.getElementById("settingsVolume");
     if (vol) vol.addEventListener("input", () => applyVolume(vol.value));
     const vib = document.getElementById("settingsVibration");
@@ -17953,8 +18047,6 @@ html, body, body * {
     if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; syncSideSettings(); });
     const reset = document.getElementById("sideReset");
     if (reset) reset.addEventListener("click", () => openResetDialog());
-    const sideSave = document.getElementById("sideSave");
-    if (sideSave) sideSave.addEventListener("click", () => openSaveDialog());
     syncSideSettings();
     lbRenderSide();
     lbRefreshGlobal(true);
@@ -18085,11 +18177,6 @@ html, body, body * {
     if (close) close.addEventListener("click", closeProfile);
     const x = document.getElementById("profileX");
     if (x) x.addEventListener("click", closeProfile);
-    const train = document.getElementById("profileTrain");
-    if (train) train.addEventListener("click", () => {
-      closeProfile();
-      bossTrainOpen = true;
-    });
     const ov = document.getElementById("profileOverlay");
     if (ov) ov.addEventListener("pointerdown", (event) => { if (event.target === ov) closeProfile(); });
   }
