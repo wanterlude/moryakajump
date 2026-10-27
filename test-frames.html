@@ -11766,6 +11766,56 @@ var __srcFieldLayout = (() => {
   var fieldLayout = __srcFieldLayout.fieldLayout;
   var ringPhase = __srcFieldLayout.ringPhase;
   var polePulse = __srcFieldLayout.polePulse;
+
+"use strict";
+var __srcSpikes = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/game/spikes-layout.ts
+  var spikes_layout_exports = {};
+  __export(spikes_layout_exports, {
+    spikeCount: () => spikeCount,
+    spikeLayout: () => spikeLayout
+  });
+  var MARGIN_LEFT = 8;
+  var MARGIN_RIGHT = 6;
+  var STEP = 15;
+  var HALF = 6.4;
+  var MIN_HEIGHT = 12;
+  var HEIGHT_SPREAD = 7;
+  function seedFrom(x) {
+    return Math.abs(Math.sin(Math.round(x) * 12.9898) * 43758.5453) % 1;
+  }
+  function spikeLayout(platform) {
+    const spikes = [];
+    const limit = platform.x + platform.w - MARGIN_RIGHT;
+    for (let x = platform.x + MARGIN_LEFT; x + HALF * 2 <= limit; x += STEP) {
+      spikes.push({ x, half: HALF, height: MIN_HEIGHT + seedFrom(x) * HEIGHT_SPREAD });
+    }
+    return spikes;
+  }
+  function spikeCount(platform) {
+    return spikeLayout(platform).length;
+  }
+  return __toCommonJS(spikes_layout_exports);
+})();
+  var spikeLayout = __srcSpikes.spikeLayout;
   // <<< src: конец вставки >>>
 
   function drawPlatformMagnet(p) {
@@ -17611,11 +17661,11 @@ var __srcFieldLayout = (() => {
       roundedRect(p.x + 2, p.y + 2.4, p.w - 4, 1.6, 0.8);
       ctx.fill();
 
-      const step = 15;
-      const half = 6.4;
-      for (let x = p.x + 2; x + half * 2 <= p.x + p.w - 1; x += step) {
-        const seed = Math.abs(Math.sin(Math.round(x) * 12.9898) * 43758.5453) % 1;
-        const h = 12 + seed * 7;
+      // Раскладка из src/game/spikes-layout.ts: отступы от краёв и стабильная высота.
+      for (const spike of spikeLayout(p)) {
+        const x = spike.x;
+        const half = spike.half;
+        const h = spike.height;
 
         // Тень у основания: шип «врос» в наледь.
         ctx.fillStyle = "rgba(26,78,110,.16)";

@@ -23,6 +23,11 @@ const MODULES = [
     global: "__srcFieldLayout",
     exports: ["fieldLayout", "ringPhase", "polePulse"],
   },
+  {
+    entry: path.join(root, "src/game/spikes-layout.ts"),
+    global: "__srcSpikes",
+    exports: ["spikeLayout"],
+  },
 ];
 
 function buildBlock() {
