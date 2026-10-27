@@ -83,10 +83,13 @@ const HOOK = String.raw`
             window.requestAnimationFrame = function () { return 0; };
             player.x = 120; player.y = 430;
             platforms = [
-              makePlatform({ x: 70, y: 520, w: 150, h: 15, type: "spring" }),
-              makePlatform({ x: 240, y: 440, w: 130, h: 15, type: "spring" }),
-              makePlatform({ x: 90, y: 360, w: 140, h: 15, type: "spring" })
+              makePlatform({ x: 70, y: 520, w: 150, h: 15, type: "static" }),
+              makePlatform({ x: 240, y: 440, w: 130, h: 15, type: "static" }),
+              makePlatform({ x: 90, y: 360, w: 140, h: 15, type: "static" })
             ];
+            springs = platforms.map(function (p) {
+              return { x: p.x + p.w / 2 - 10, y: p.y - 15, owner: p, offsetX: p.w / 2 - 10 };
+            });
             draw(performance.now());
           } catch (e) {}
         }, 500);

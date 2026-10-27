@@ -657,13 +657,13 @@ html, body, body * {
   }
 
   // src/platform_skins.ts
-  var PLATFORM_TYPES = ["static", "moving", "ice", "broken", "spring", "vanish", "sticky"];
+  
+  var PLATFORM_TYPES = ["static", "moving", "ice", "broken", "vanish", "sticky"];
   var PLATFORM_TYPE_LABEL = {
     static: "\u0421\u043D\u0435\u0433",
     moving: "\u041B\u0451\u0434 \u043F\u043E\u0434\u0432\u0438\u0436\u043D\u044B\u0439",
     ice: "\u041A\u0430\u0442\u043E\u043A",
     broken: "\u0414\u043E\u0441\u043A\u0438",
-    spring: "\u041F\u0440\u0443\u0436\u0438\u043D\u0430",
     vanish: "\u0422\u0443\u043C\u0430\u043D",
     sticky: "\u041A\u043B\u0435\u0439"
   };
@@ -672,7 +672,6 @@ html, body, body * {
     moving: "\u041B\u0401\u0414",
     ice: "\u041A\u0410\u0422\u041E\u041A",
     broken: "\u0414\u041E\u0421\u041A\u0418",
-    spring: "\u041F\u0420\u0423\u0416.",
     vanish: "\u0422\u0423\u041C\u0410\u041D",
     sticky: "\u041A\u041B\u0415\u0419"
   };
@@ -720,19 +719,7 @@ html, body, body * {
     { id: "broken_legendary_1", type: "broken", tier: "legendary", name: "Доски · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["planks","nails","gloss"] },
     { id: "broken_legendary_2", type: "broken", tier: "legendary", name: "Доски · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["planks","rivets"] },
     { id: "broken_divine_1", type: "broken", tier: "divine", name: "Доски · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["planks","sparkle","glowline"] },
-    { id: "broken_divine_2", type: "broken", tier: "divine", name: "Доски · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["planks","sparkle"] },
-    { id: "spring_base", type: "spring", tier: "base", name: "Пружина · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
-    { id: "spring_common_1", type: "spring", tier: "common", name: "Пружина · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["ribs","coils"] },
-    { id: "spring_common_2", type: "spring", tier: "common", name: "Пружина · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["ribs","coils"] },
-    { id: "spring_rare_1", type: "spring", tier: "rare", name: "Пружина · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["checker","coils"] },
-    { id: "spring_rare_2", type: "spring", tier: "rare", name: "Пружина · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["glowline","coils"] },
-    { id: "spring_epic_1", type: "spring", tier: "epic", name: "Пружина · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["ribs","coils","gloss"] },
-    { id: "spring_epic_2", type: "spring", tier: "epic", name: "Пружина · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["ribs","coils"] },
-    { id: "spring_legendary_1", type: "spring", tier: "legendary", name: "Пружина · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["ribs","coils","sparkle"] },
-    { id: "spring_legendary_2", type: "spring", tier: "legendary", name: "Пружина · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["gloss","coils","rivets"] },
-    { id: "spring_divine_1", type: "spring", tier: "divine", name: "Пружина · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["coils","sparkle","glowline"] },
-    { id: "spring_divine_2", type: "spring", tier: "divine", name: "Пружина · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["coils","stripes","sparkle"] },
-    { id: "vanish_base", type: "vanish", tier: "base", name: "Туман · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+    { id: "broken_divine_2", type: "broken", tier: "divine", name: "Доски · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["planks","sparkle"] },    { id: "spring_common_1", type: "spring", tier: "common", name: "Пружина · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["ribs","coils"] },    { id: "spring_rare_1", type: "spring", tier: "rare", name: "Пружина · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["checker","coils"] },    { id: "spring_epic_1", type: "spring", tier: "epic", name: "Пружина · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["ribs","coils","gloss"] },    { id: "spring_legendary_1", type: "spring", tier: "legendary", name: "Пружина · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["ribs","coils","sparkle"] },    { id: "spring_divine_1", type: "spring", tier: "divine", name: "Пружина · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["coils","sparkle","glowline"] },    { id: "vanish_base", type: "vanish", tier: "base", name: "Туман · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
     { id: "vanish_common_1", type: "vanish", tier: "common", name: "Туман · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["mist"] },
     { id: "vanish_common_2", type: "vanish", tier: "common", name: "Туман · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["mist","bubbles"] },
     { id: "vanish_rare_1", type: "vanish", tier: "rare", name: "Туман · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["mist","sparkle"] },
@@ -9291,7 +9278,6 @@ html, body, body * {
     moving: { base: 0.05, perLevel: 0.05, max: 0.22, from: 0 },
     ice: { base: 0.02, perLevel: 0.025, max: 0.16, from: 3 },
     /* новые типы: каждый должен быть заметен, иначе его механику не освоить */
-    spring: { base: 0.02, perLevel: 0.02, max: 0.06, from: 1 },
     vanish: { base: 0.01, perLevel: 0.02, max: 0.06, from: 2 },
     sticky: { base: 0.01, perLevel: 0.02, max: 0.06, from: 2 }
   };
@@ -9391,7 +9377,7 @@ html, body, body * {
     if (bossState.phase === "fight") return Math.random() < 0.7 ? "static" : "moving";
     const roll = Math.random();
     let acc = 0;
-    for (const key of ["broken", "moving", "ice", "spring", "vanish", "sticky"]) {
+      for (const key of ["broken", "moving", "ice", "vanish", "sticky"]) {
       acc += mixShare(key, level);
       if (roll < acc) return key;
     }
@@ -9413,7 +9399,7 @@ html, body, body * {
     };
     const holdsPickups = type === "static" || type === "ice" || type === "sticky";
     const holdsSpring = holdsPickups || type === "moving";
-    if (type === "spring" || holdsSpring && Math.random() > 0.78) {
+    if (holdsSpring && Math.random() > 0.78) {    
       springs.push({
         x: platform.x + platform.w / 2 - 10,
         y: y - 15,
@@ -10232,7 +10218,7 @@ html, body, body * {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.57-ui";
+  var GAME_VERSION = "1.0.58-ui";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -11698,57 +11684,82 @@ html, body, body * {
     ctx.restore();
   }
   function drawSpring(s) {
-    const { x, y } = s;
+    // Пружинка — магнитная катушка: кольца поля поднимаются над ней, вокруг вьются искры.
     const w = 20;
-    drawGroundShadow(x + w / 2, y + 20, 11, 3, 0.22);
+    const cx = s.x + w / 2;
+    const cy = s.y + 10;
+    const now = frameNow();
+    drawGroundShadow(cx, s.y + 20, 11, 3, 0.22);
     ctx.save();
-    ctx.translate(x, y);
-    const base = cachedLinear("spring.base", 0, 13, 0, 19, [
-      [0, "#b6c0ca"],
-      [1, "#4a525c"]
-    ]);
-    roundedRect(1, 13.5, w - 2, 5.5, 2.5);
-    ctx.fillStyle = base;
+
+    // Поле вокруг пружинки.
+    const field = ctx.createRadialGradient(cx, cy, 1, cx, cy, 26);
+    field.addColorStop(0, "rgba(120,226,255,.34)");
+    field.addColorStop(0.55, "rgba(120,226,255,.12)");
+    field.addColorStop(1, "rgba(120,226,255,0)");
+    ctx.fillStyle = field;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 24, 18, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#ffd23f";
-    ctx.fillRect(4, 15, 3, 2.2);
-    ctx.fillRect(13, 15, 3, 2.2);
-    const coil = () => {
+
+    // Кольца: рождаются у основания и гаснут, поднимаясь вверх.
+    for (let i = 0; i < 3; i++) {
+      const phase = (now * 0.7 + i / 3) % 1;
+      const alpha = (1 - phase) * 0.75;
+      if (alpha <= 0.03) continue;
+      const ringY = s.y + 15 - phase * 14;
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "rgba(160,242,255,1)";
+      ctx.lineWidth = 1.6 - phase * 0.8;
       ctx.beginPath();
-      ctx.moveTo(10, 12.5);
-      ctx.lineTo(4, 10.5);
-      ctx.lineTo(16, 8.5);
-      ctx.lineTo(4, 6.5);
-      ctx.lineTo(16, 4.5);
-      ctx.lineTo(4, 2.5);
-      ctx.lineTo(10, 0.5);
-    };
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    coil();
-    ctx.strokeStyle = "rgba(74,44,0,.85)";
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    const brass = cachedLinear("spring.brass", 4, 0, 16, 0, [
-      [0, "#8a5a00"],
-      [0.32, "#ffe9a8"],
-      [0.68, "#e0b030"],
-      [1, "#8a5a00"]
-    ]);
-    coil();
-    ctx.strokeStyle = brass;
-    ctx.lineWidth = 2.3;
-    ctx.stroke();
-    const top = cachedLinear("spring.top", 0, -1, 0, 3, [
-      [0, "#ff7b7b"],
-      [1, "#b3202a"]
-    ]);
-    roundedRect(1, -1, w - 2, 4, 2);
-    ctx.fillStyle = top;
+      ctx.ellipse(cx, ringY, 6.4 + phase * 3.2, 1.8 + phase * 1.1, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // Катушка: три витка с холодной подсветкой.
+    for (let i = 0; i < 3; i++) {
+      const coilY = s.y + 9 + i * 3.4;
+      ctx.strokeStyle = "rgba(24,74,104,.55)";
+      ctx.lineWidth = 3.2;
+      ctx.beginPath();
+      ctx.ellipse(cx, coilY + 0.8, 5.6 - i * 0.5, 2.2, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      const coil = ctx.createLinearGradient(cx - 6, coilY, cx + 6, coilY);
+      coil.addColorStop(0, "#6fb6d6");
+      coil.addColorStop(0.45, "#e6fbff");
+      coil.addColorStop(1, "#4f93b4");
+      ctx.strokeStyle = coil;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.ellipse(cx, coilY, 5.6 - i * 0.5, 2.2, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Сердечник и полюса.
+    ctx.fillStyle = "rgba(240,254,255,.95)";
+    ctx.beginPath();
+    ctx.arc(cx, s.y + 6.4, 1.7, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "rgba(255,255,255,.5)";
-    roundedRect(3, -0.4, 8, 1.3, 0.6);
+    const pulse = 0.5 + 0.5 * Math.sin(now * 3);
+    ctx.fillStyle = "rgba(150,240,255," + (0.45 + pulse * 0.45).toFixed(2) + ")";
+    ctx.beginPath();
+    ctx.arc(cx, s.y + 6.4, 3.4 + pulse * 1.2, 0, Math.PI * 2);
     ctx.fill();
+
+    // Искры по орбите.
+    for (let i = 0; i < 3; i++) {
+      const angle = now * 1.4 + i * (Math.PI * 2 / 3);
+      const sx = cx + Math.cos(angle) * 8.5;
+      const sy = s.y + 9 + Math.sin(angle) * 4.2;
+      const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(angle * 2 + i));
+      ctx.globalAlpha = twinkle;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(sx, sy, 0.9 + twinkle * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
   function drawCoin(c) {
@@ -12437,103 +12448,11 @@ html, body, body * {
     if (p.type === "broken") drawWoodPlatform(p);
     else if (p.type === "moving") drawIcePlatform(p);
     else if (p.type === "ice") drawSlipperyIce(p);
-    else if (p.type === "spring") drawSpringPlatform(p);
     else if (p.type === "vanish") drawVanishPlatform(p);
     else if (p.type === "sticky") drawStickyPlatform(p);
     else drawSnowPlatform(p);
   }
-  function drawSpringPlatform(p) {
-    // «Магнит»: платформа держится на поле — кольца расходятся по её поверхности,
-    // в поле вьются искры. Всё считается от времени, кадры не зависят от FPS.
-    drawSnowPlatform(p);
-    const now = frameNow();
-    const cx = p.x + p.w / 2;
-    const cy = p.y + p.h / 2;
-    ctx.save();
 
-    // Поле вокруг платформы.
-    const field = ctx.createRadialGradient(cx, cy, 1, cx, cy, p.w * 0.72);
-    field.addColorStop(0, "rgba(122,226,255,.26)");
-    field.addColorStop(0.55, "rgba(122,226,255,.09)");
-    field.addColorStop(1, "rgba(122,226,255,0)");
-    ctx.fillStyle = field;
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, p.w * 0.74, p.h * 2.8, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Кольца левитации: рождаются на поверхности и гаснут, поднимаясь.
-    for (let i = 0; i < 3; i++) {
-      const phase = (now * 0.55 + i / 3) % 1;
-      const alpha = (1 - phase) * 0.9;
-      if (alpha <= 0.02) continue;
-      const ringY = p.y + 2.4 - phase * 13;
-      const rx = p.w * (0.3 + phase * 0.2);
-      ctx.globalAlpha = alpha;
-      ctx.strokeStyle = "rgba(150,240,255,1)";
-      ctx.lineWidth = 2.1 - phase * 0.9;
-      ctx.beginPath();
-      ctx.ellipse(cx, ringY, rx, 2.6 + phase * 1.5, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
-    // Обмотка магнита по телу платформы.
-    ctx.save();
-    roundedRect(p.x, p.y, p.w, p.h, 6);
-    ctx.clip();
-    const coil = ctx.createLinearGradient(0, p.y, 0, p.y + p.h);
-    coil.addColorStop(0, "rgba(186,246,255,.9)");
-    coil.addColorStop(0.5, "rgba(92,202,236,.38)");
-    coil.addColorStop(1, "rgba(34,110,150,.2)");
-    ctx.fillStyle = coil;
-    ctx.fillRect(p.x + 3, p.y + 1.2, p.w - 6, p.h - 2.4);
-    ctx.strokeStyle = "rgba(18,68,98,.26)";
-    ctx.lineWidth = 0.8;
-    for (let sx = p.x + 8; sx < p.x + p.w - 5; sx += 11) {
-      ctx.beginPath();
-      ctx.moveTo(sx, p.y + 2.4);
-      ctx.lineTo(sx - 2.6, p.y + p.h - 2.4);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Полюса на концах: два холодных огонька, между ними и держится поле.
-    for (let side = 0; side < 2; side++) {
-      const px = side === 0 ? p.x + 4.5 : p.x + p.w - 4.5;
-      const pulse = 0.55 + 0.45 * Math.sin(now * 2.2 + side * Math.PI);
-      const pole = ctx.createRadialGradient(px, cy, 0.5, px, cy, 9);
-      pole.addColorStop(0, "rgba(190,248,255," + (0.85 * pulse).toFixed(2) + ")");
-      pole.addColorStop(1, "rgba(120,226,255,0)");
-      ctx.fillStyle = pole;
-      ctx.beginPath();
-      ctx.arc(px, cy, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "rgba(232,254,255," + (0.7 + 0.3 * pulse).toFixed(2) + ")";
-      ctx.beginPath();
-      ctx.arc(px, cy, 1.7, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Блик по верхней кромке.
-    ctx.fillStyle = "rgba(240,254,255,.95)";
-    roundedRect(p.x + 5, p.y + 1.6, p.w - 10, 2, 1);
-    ctx.fill();
-
-    // Искры в поле.
-    for (let i = 0; i < 4; i++) {
-      const angle = now * 1.1 + i * (Math.PI / 2);
-      const sx = cx + Math.cos(angle) * p.w * 0.34;
-      const sy = cy - 5 + Math.sin(angle * 1.3) * 9;
-      const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(angle * 2.1 + i));
-      ctx.globalAlpha = twinkle;
-      ctx.fillStyle = "#eafcff";
-      ctx.beginPath();
-      ctx.arc(sx, sy, 1.1 + twinkle * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-    ctx.restore();
-  }
   function drawVanishPlatform(p) {
     const left = p.vanishT ?? Infinity;
     const blink = left < 400 && Math.floor(frameNow() * 14) % 2 === 0;
