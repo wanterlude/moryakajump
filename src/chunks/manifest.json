@@ -9,8 +9,12 @@
       "name": "boss-duel",
       "parts": [
         "boss-duel/01-duel-core.js",
-        "boss-duel/02-arena-sky.js",
-        "boss-duel/03-arena-effects.js",
+        "boss-duel/02a-arena-defs.js",
+        "boss-duel/02b-arena-paint.js",
+        "boss-duel/02c-arena-land.js",
+        "boss-duel/03a-avalanche.js",
+        "boss-duel/03b-telegraphs.js",
+        "boss-duel/03c-boss-parts.js",
         "boss-duel/04a-kraken.js",
         "boss-duel/04b-yeti.js",
         "boss-duel/04c-storm.js",
@@ -26,7 +30,8 @@
         "game/03-wind-and-perks.js",
         "game/04-sound-and-effects.js",
         "game/05-events-and-spawn.js"
-      ]
+      ],
+      "openBraces": 1
     }
   ]
 }

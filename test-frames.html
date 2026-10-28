@@ -3203,8 +3203,7 @@ var __srcSkins = (() => {
       c.stroke();
     }
     c.restore();
-  }
-  function duelBuildBackdrop() {
+  }  function duelBuildBackdrop() {
     const cv = document.createElement("canvas");
     cv.width = DUEL_W;
     cv.height = DUEL_H;
@@ -3795,8 +3794,7 @@ var __srcSkins = (() => {
     c.lineTo(cx - halfW * 0.12, apexY + h * 0.22);
     c.lineTo(cx, apexY);
     c.stroke();
-  }
-  function duelArenaCanyon(c) {
+  }  function duelArenaCanyon(c) {
     const W = DUEL_W, H = DUEL_H;
     const rand = duelArenaRand(0x51ca11);
     c.save();
@@ -4634,7 +4632,6 @@ var __srcSkins = (() => {
 
     c.restore();
   }
-
   var duelBackdropCache = {};
   function duelBackdropFor(arena) {
     const key = arena || "shore";
@@ -4941,8 +4938,7 @@ var __srcSkins = (() => {
     c.fillStyle = duelHexToRgba(color, 0.12);
     c.fill();
     c.restore();
-  }
-  function duelDrawTelegraph(c) {
+  }  function duelDrawTelegraph(c) {
     const t = duelState.telegraph;
     if (!t) return;
     const frame = duelState.frame;

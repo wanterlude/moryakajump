@@ -18,6 +18,37 @@ const manifestFile = path.join(chunksDir, "manifest.json");
 const startMarker = (name) => `  // <<< chunk ${name}: начало — генерируется из src/chunks/ >>>\n`;
 const endMarker = (name) => `  // <<< chunk ${name}: конец >>>\n`;
 
+/** Вложенность скобок в конце текста, с учётом строк и комментариев. */
+function depthAtEnd(text) {
+  let depth = 0;
+  let quote = null;
+  let lineComment = false;
+  let blockComment = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (lineComment) {
+      if (ch === "\n") lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (ch === "*" && next === "/") { blockComment = false; i++; }
+      continue;
+    }
+    if (quote) {
+      if (ch === "\\") { i++; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === "/" && next === "/") { lineComment = true; i++; continue; }
+    if (ch === "/" && next === "*") { blockComment = true; i++; continue; }
+    if (ch === '"' || ch === "'" || ch === "`") { quote = ch; continue; }
+    if (ch === "{" || ch === "(" || ch === "[") depth++;
+    else if (ch === "}" || ch === ")" || ch === "]") depth--;
+  }
+  return depth;
+}
+
 function main() {
   const check = process.argv.includes("--check");
   const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
@@ -33,6 +64,22 @@ function main() {
       problems.push("нет файлов: " + missing.map((f) => path.relative(root, f)).join(", "));
       continue;
     }
+    // Граница части должна быть на нулевой вложенности: иначе разрез прошёл
+    // посреди функции. Исключение — последняя часть куска, после которой в
+    // index.html остаётся закрытие внешней IIFE; сколько именно скобок там
+    // открыто, сказано в манифесте (openBraces).
+    const expectedTail = chunk.openBraces || 0;
+    files.forEach((file, index) => {
+      const depth = depthAtEnd(fs.readFileSync(file, "utf8"));
+      const expected = index === files.length - 1 ? expectedTail : 0;
+      if (depth !== expected) {
+        problems.push(
+          "разрез посреди конструкции: " + path.relative(root, file) +
+          " (глубина " + depth + ", ожидалось " + expected + ")"
+        );
+      }
+    });
+
     const content = files.map((f) => fs.readFileSync(f, "utf8")).join("");
     const start = startMarker(chunk.name);
     const end = endMarker(chunk.name);
