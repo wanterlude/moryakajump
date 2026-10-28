@@ -14,3 +14,4 @@ tools/sim/last-run.log
 tools/shot-out/
 *.cjs
 _*.txt
+msg.txt
