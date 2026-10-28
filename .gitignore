@@ -1,5 +1,6 @@
-/node_modules/
+﻿node_modules/
 graphify-out/
+.dshwolf/
 desktop-webview2/bin/
 desktop-webview2/obj/
 desktop-webview2/build-out/
@@ -11,5 +12,5 @@ tools/sim/last-run.json
 tools/sim/last-run.md
 tools/sim/last-run.log
 tools/shot-out/
-
-.dshwolf/
+*.cjs
+_*.txt
