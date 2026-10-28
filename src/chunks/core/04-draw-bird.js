@@ -740,8 +740,23 @@
   }
   var mouseControl = { targetX: null, inside: false };
   var SENS_MIN = 0.4;
-  var SENS_MAX = 2;
   var SENS_STEP = 0.2;
+  // Предел и значение по умолчанию для каждой настройки свои: мышь быстрее,
+  // клавиши и геймпад чуть мягче, и выше своего потолка не поднимаются.
+  var SENS_LIMITS = {
+    key: { max: 1.1, def: 1.1 },
+    mouse: { max: 1.25, def: 1.25 },
+    pad: { max: 1.1, def: 1.1 }
+  };
+  function sensLimit(which) {
+    return SENS_LIMITS[which] || { max: 1, def: 1 };
+  }
+  function sensMax(which) {
+    return sensLimit(which).max;
+  }
+  function clampSens(which, value) {
+    return Math.max(SENS_MIN, Math.min(sensMax(which), value));
+  }
   var ZONE_MIN = 0.15;
   var ZONE_MAX = 0.6;
   var ZONE_STEP = 0.05;
@@ -771,20 +786,21 @@
       return 5;
     }
   }
-  function readSens(key) {
+  function readSens(key, which) {
+    const fallback = sensLimit(which).def;
     try {
       const raw = localStorage.getItem(key);
-      if (raw === null) return 1;
+      if (raw === null) return fallback;
       const value = Number(raw) / 10;
-      return Number.isFinite(value) ? value : 1;
+      return Number.isFinite(value) ? value : fallback;
     } catch {
-      return 1;
+      return fallback;
     }
   }
   var controls = {
-    key: Math.max(SENS_MIN, Math.min(SENS_MAX, readSens("morjakaKeySens"))),
-    mouse: Math.max(SENS_MIN, Math.min(SENS_MAX, readSens("morjakaMouseSens"))),
-    pad: Math.max(SENS_MIN, Math.min(SENS_MAX, readSens("morjakaPadSens"))),
+    key: clampSens("key", readSens("morjakaKeySens", "key")),
+    mouse: clampSens("mouse", readSens("morjakaMouseSens", "mouse")),
+    pad: clampSens("pad", readSens("morjakaPadSens", "pad")),
     padZone: readPadZone(),
     tiltZone: readTiltZone()
   };
@@ -828,7 +844,7 @@
     }
     const current = controls[which];
     const next = Math.round((current + SENS_STEP * direction) * 10) / 10;
-    controls[which] = Math.max(SENS_MIN, Math.min(SENS_MAX, next));
+    controls[which] = clampSens(which, next);
     saveControls();
     sfx.click();
   }

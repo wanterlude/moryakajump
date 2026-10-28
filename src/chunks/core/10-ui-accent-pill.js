@@ -930,7 +930,7 @@
     trackedText(label, x + w / 2, y + 10, 1.2);
     const zones = [[sensMinusZone(row), -1], [sensPlusZone(row), 1]];
     for (const [zone, sign] of zones) {
-      const enabled = sign < 0 ? value > SENS_MIN + 0.01 : value < SENS_MAX - 0.01;
+      const enabled = sign < 0 ? value > SENS_MIN + 0.01 : value < sensMax(id) - 0.01;
       roundedRect(zone.x, zone.y, zone.w, zone.h, 6);
       ctx.fillStyle = enabled ? "rgba(21,85,118,.10)" : "rgba(21,85,118,.04)";
       ctx.fill();
@@ -953,7 +953,7 @@
     roundedRect(barX, barY, barW, barH, 2.5);
     ctx.fillStyle = "rgba(21,85,118,.12)";
     ctx.fill();
-    const fill = (value - SENS_MIN) / (SENS_MAX - SENS_MIN);
+    const fill = (value - SENS_MIN) / (sensMax(id) - SENS_MIN);
     if (fill > 1e-3) {
       roundedRect(barX, barY, Math.max(3, barW * fill), barH, 2.5);
       const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
@@ -4541,11 +4541,11 @@
     for (const [id, which] of sensPairs) {
       const el = document.getElementById(id);
       if (!el) continue;
-      el.min = String(SENS_MIN); el.max = String(SENS_MAX); el.step = String(SENS_STEP);
+      el.min = String(SENS_MIN); el.max = String(sensMax(which)); el.step = "0.05";
       el.addEventListener("input", () => {
         const v = Number(el.value);
         if (!Number.isFinite(v)) return;
-        controls[which] = Math.max(SENS_MIN, Math.min(SENS_MAX, v));
+        controls[which] = clampSens(which, v);
         saveControls();
         refreshSensUI();
       });
