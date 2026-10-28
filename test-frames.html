@@ -2386,7 +2386,7 @@ var __srcSkins = (() => {
   // hexToRgba живёт в src/game/color.ts и вставляется сборкой.
 
   // src/boss_duel.ts
-  // <<< chunk boss-duel: начало — генерируется из src/chunks/boss-duel.js >>>
+  // <<< chunk boss-duel: начало — генерируется из src/chunks/ >>>
   var DUEL_W = 400;
   var DUEL_H = 600;
   var DUEL_PLAYER_Y = DUEL_H - 90;
@@ -2958,8 +2958,7 @@ var __srcSkins = (() => {
     { name: "ХРАНИТЕЛЬ ЛАВИН", kind: "avalanche", arena: "avalanche", subtitle: "ГОЛОС ЛАВИНЫ", accent: "#ffc247" },
     { name: "ЛЕДЯНОЙ ЛЕВИАФАН", kind: "leviathan", arena: "abyss", subtitle: "ЦАРЬ ГЛУБИН", accent: "#5ce8ff" }
   ];
-  var DUEL_BOSS_NAMES = DUEL_BOSS_DEFS.map((d) => d.name);
-  function duelBossDef(index) {
+  var DUEL_BOSS_NAMES = DUEL_BOSS_DEFS.map((d) => d.name);  function duelBossDef(index) {
     return DUEL_BOSS_DEFS[Math.min(Math.max(index | 0, 0), DUEL_BOSS_DEFS.length - 1)];
   }
   function duelBossKind() {
@@ -4194,8 +4193,7 @@ var __srcSkins = (() => {
     }
 
     c.restore();
-  }
-  function duelArenaAvalanche(c) {
+  }  function duelArenaAvalanche(c) {
     const W = DUEL_W, H = DUEL_H;
     const rand = duelArenaRand(0xbadc0de);
     c.save();
@@ -5438,8 +5436,7 @@ var __srcSkins = (() => {
     c.stroke();
     c.restore();
     c.restore();
-  }
-  function duelBossCrown(c, t, tension, accent) {
+  }  function duelBossCrown(c, t, tension, accent) {
     const shards = [
       { x: -30, h: 24, w: 13, lean: -5 },
       { x: -16, h: 34, w: 16, lean: -2 },
@@ -8065,7 +8062,7 @@ var __srcSkins = (() => {
   
 
   // src/game.ts
-  // <<< chunk game: начало — генерируется из src/chunks/game.js >>>
+  // <<< chunk game: начало — генерируется из src/chunks/ >>>
   var canvas = document.getElementById("game");
   var WORLD_W = 400;
   var WORLD_H = 600;

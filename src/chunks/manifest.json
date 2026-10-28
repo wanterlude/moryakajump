@@ -3,7 +3,12 @@
   "chunks": [
     {
       "name": "boss-duel",
-      "file": "boss-duel.js"
+      "parts": [
+        "boss-duel/01-duel-core.js",
+        "boss-duel/02-arena-sky.js",
+        "boss-duel/03-arena-effects.js",
+        "boss-duel/04-boss-bodies.js"
+      ]
     },
     {
       "name": "game",

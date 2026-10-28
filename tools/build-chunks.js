@@ -15,7 +15,7 @@ const indexFile = path.join(root, "index.html");
 const chunksDir = path.join(root, "src", "chunks");
 const manifestFile = path.join(chunksDir, "manifest.json");
 
-const startMarker = (name) => `  // <<< chunk ${name}: начало — генерируется из src/chunks/${name}.js >>>\n`;
+const startMarker = (name) => `  // <<< chunk ${name}: начало — генерируется из src/chunks/ >>>\n`;
 const endMarker = (name) => `  // <<< chunk ${name}: конец >>>\n`;
 
 function main() {
@@ -26,12 +26,14 @@ function main() {
   const problems = [];
 
   for (const chunk of manifest.chunks) {
-    const file = path.join(chunksDir, chunk.file);
-    if (!fs.existsSync(file)) {
-      problems.push("нет файла " + chunk.file);
+    // Кусок может быть одним файлом или склейкой нескольких частей по порядку.
+    const files = chunk.parts ? chunk.parts.map((p) => path.join(chunksDir, p)) : [path.join(chunksDir, chunk.file)];
+    const missing = files.filter((f) => !fs.existsSync(f));
+    if (missing.length) {
+      problems.push("нет файлов: " + missing.map((f) => path.relative(root, f)).join(", "));
       continue;
     }
-    const content = fs.readFileSync(file, "utf8");
+    const content = files.map((f) => fs.readFileSync(f, "utf8")).join("");
     const start = startMarker(chunk.name);
     const end = endMarker(chunk.name);
 
