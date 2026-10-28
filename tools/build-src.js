@@ -54,6 +54,11 @@ const MODULES = [
     exports: ["WINTER"],
   },
   {
+    entry: path.join(root, "src/game/frames.ts"),
+    global: "__srcFrames",
+    exports: ["BASE_FRAMES", "EXTRA_FRAMES", "EXTRA_FRAMES_2", "EXTRA_FRAMES_3", "FRAMES"],
+  },
+  {
     entry: path.join(root, "src/game/content.ts"),
     global: "__srcContent",
     exports: ["BIOME_PALETTES", "BIRD_KINDS", "QUEST_DEFS", "PERK_NEUTRAL", "PERK_RARITY_WEIGHTS", "PERK_RARITY_ORDER", "PERK_RARITY", "LEGENDARY_SPAN", "PERK_DEFS"],
