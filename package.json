@@ -5,8 +5,11 @@
   "description": "Зимний эндлесс-платформер: один HTML-файл, Canvas 2D",
   "scripts": {
     "build:src": "node tools/build-src.js",
-    "check:src": "node tools/build-src.js --check",
-    "test": "node --test src"
+    "build:chunks": "node tools/build-chunks.js",
+    "build:all": "node tools/build-src.js && node tools/build-chunks.js && node tools/build-variants.js",
+    "check:src": "node tools/build-src.js --check && node tools/build-chunks.js --check",
+    "test": "node --test src",
+    "verify": "node tools/check.js && npx tsc --noEmit && node --test src && node tools/golden.js"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
