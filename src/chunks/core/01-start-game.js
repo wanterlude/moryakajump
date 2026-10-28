@@ -131,6 +131,13 @@
     const t = Math.min(1, spawnLevel() / Math.max(1, SPAWN.highItemLevel));
     return 1 + (SPAWN.highItemBonus - 1) * t;
   }
+  // Ширина всех платформ ужимается с 0 до 150 000 очков: к финишу остаётся 15 px.
+  var PLATFORM_SHRINK_SCORE = 15e4;
+  var PLATFORM_MIN_WIDTH = 15;
+  function shrinkWidth(base) {
+    const t = Math.min(1, Math.max(0, player.score) / PLATFORM_SHRINK_SCORE);
+    return base + (PLATFORM_MIN_WIDTH - base) * t;
+  }
   function platformStep() {
     const t = Math.min(1, player.score / 1e5);
     const base = 90 + Math.random() * 40;
@@ -150,7 +157,7 @@
   function spawnPlatform(y) {
     const level = mixLevel();
     const type = pickPlatformType(level);
-    const width = Math.max(56, 70 * Math.max(0.7, 2 - level * 0.25)) * perkWidthScale();
+    const width = shrinkWidth(140) * perkWidthScale();
     const platform = {
       x: Math.random() * (WORLD_W - width),
       y,
@@ -209,7 +216,7 @@
     const gap = platformStep();
     const created = [];
     for (let i = 0; i < 2; i++) {
-      const width = 60;
+      const width = shrinkWidth(60);
       created.push(makePlatform({
         x: Math.random() * (WORLD_W - width),
         y: baseY - gap * i,
@@ -222,14 +229,14 @@
     return created;
   }
   function spawnTwinPlatforms(y) {
-    const width = 60;
+    const width = shrinkWidth(60);
     return [
       { x: 14 + Math.random() * 40, y, w: width, h: 15, type: "static", dir: 2 },
       { x: WORLD_W - width - 14 - Math.random() * 40, y: y - 26, w: width, h: 15, type: "static", dir: 2 }
     ];
   }
   function spawnVerticalPlatform(y) {
-    const w = 80;
+    const w = shrinkWidth(80);
     const sideWidth = 70;
     const x = Math.random() < 0.5 ? Math.random() * sideWidth : WORLD_W - w - Math.random() * sideWidth;
     return makePlatform({
@@ -250,7 +257,7 @@
     const crystalAtLeft = crystal.x < 200;
     const freeStart = crystalAtLeft ? crystal.x + crystal.w + gap : 0;
     const freeEnd = crystalAtLeft ? WORLD_W : crystal.x - gap;
-    const freeWidth = Math.max(40, freeEnd - freeStart);
+    const freeWidth = Math.max(PLATFORM_MIN_WIDTH, freeEnd - freeStart);
     const regular = spawnPlatform(y);
     regular.w = Math.min(regular.w, freeWidth);
     regular.x = freeStart + Math.random() * Math.max(0, freeWidth - regular.w);
@@ -267,7 +274,7 @@
     }
     if (dryRowsLeft > 0) {
       dryRowsLeft--;
-      const width = 70;
+      const width = shrinkWidth(70);
       const x = dryRowsLeft % 2 === 0 ? 8 : WORLD_W - width - 8;
       const dry = { x, y, w: width, h: 15, type: "static", dir: 0 };
       dryPlatforms.add(dry);

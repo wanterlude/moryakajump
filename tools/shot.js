@@ -31,6 +31,7 @@ const hudVariant = arg("hud", "");
 const hazard = arg("hazard", "");
 const springs = arg("springs", "");
 const event = arg("event", "");
+const score = arg("score", "");
 
 const chromeCandidates = [
   path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
@@ -57,11 +58,13 @@ const HOOK = String.raw`
       var shotHover = "";
       var shotHazard = "";
       var shotEvent = "";
+      var shotScore = "";
       for (var pi = 0; pi < shotParts.length; pi++) {
         if (shotParts[pi].indexOf("shot=") === 0) shotTab = shotParts[pi].slice(5);
         else if (shotParts[pi].indexOf("hover=") === 0) shotHover = decodeURIComponent(shotParts[pi].slice(6));
         else if (shotParts[pi].indexOf("hazard=") === 0) shotHazard = shotParts[pi].slice(7);
         else if (shotParts[pi].indexOf("event=") === 0) shotEvent = shotParts[pi].slice(6);
+        else if (shotParts[pi].indexOf("score=") === 0) shotScore = shotParts[pi].slice(6);
       }
       bankCoins = 4321;
       var shotIdx = -1;
@@ -79,6 +82,23 @@ const HOOK = String.raw`
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
       if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
+      if (shotTab === "play" && shotScore) {
+        setTimeout(function () {
+          try {
+            startGame();
+            window.requestAnimationFrame = function () { return 0; };
+            player.score = Number(shotScore) || 0;
+            platforms.length = 0;
+            verticalPlatforms.length = 0;
+            for (var ri = 0; ri < 7; ri++) {
+              var step = spawnTerrainStep(500 - ri * 100);
+              for (var pi = 0; pi < step.platforms.length; pi++) platforms.push(step.platforms[pi]);
+              for (var vi = 0; vi < step.verticals.length; vi++) verticalPlatforms.push(step.verticals[vi]);
+            }
+            scheduleDraw();
+          } catch (err) {}
+        }, 400);
+      }
       if (shotEvent) {
         setTimeout(function () {
           try {
@@ -247,7 +267,7 @@ for (const tab of tabs) {
     "--virtual-time-budget=4000",
     "--user-data-dir=" + path.join(work, "profile"),
     "--screenshot=" + out,
-    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (event ? "&event=" + event : "") + (springs ? "&springs=1" : ""),
+    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (event ? "&event=" + event : "") + (score ? "&score=" + score : "") + (springs ? "&springs=1" : ""),
   ]);
   if (!fs.existsSync(out)) {
     console.error("Не удалось снять " + tab + " (код " + res.status + ")");
