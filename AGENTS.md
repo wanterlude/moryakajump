@@ -235,7 +235,7 @@ WebView2 Runtime. Сборка даёт **один самодостаточны�
 
 - UTF-8 без BOM; в репозитории LF. Русские тексты — обычными символами
   (в бандле они уже частично как `\uXXXX` — это результат минификации, так и надо).
-- localStorage-ключи: `morjakaStats`, `morjakaTopScores`, `morjakaSound`,
+- localStorage-ключи: `morjakaTiltZone`, `morjakaPadZone`, `morjakaPadSens`, `morjakaStats`, `morjakaTopScores`, `morjakaSound`,
   `morjakaVolume`, `morjakaVib`, `morjakaKeySens`, `morjakaMouseSens`,
   `morjakaSchema`, `morjakaNick`, `morjakaSelectedFrame`, `morjakaTutorialDone`,
   `morjakaSideLbCollapsed`, `morjakaSideSetCollapsed`.

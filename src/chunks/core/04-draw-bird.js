@@ -712,10 +712,15 @@
     if (typeof event.gamma !== "number") return;
     if (neutralGamma === null) neutralGamma = event.gamma;
     const tilt = event.gamma - neutralGamma;
-    const deadZone = 5;
+    const deadZone = controls.tiltZone;
     if (tilt < -deadZone) tiltDirection = -1;
     else if (tilt > deadZone) tiltDirection = 1;
     else tiltDirection = 0;
+  }
+  function disableTilt() {
+    tiltEnabled = false;
+    tiltDirection = 0;
+    neutralGamma = null;
   }
   async function enableTilt() {
     if (!("DeviceOrientationEvent" in window)) return;
@@ -740,6 +745,10 @@
   var ZONE_MIN = 0.15;
   var ZONE_MAX = 0.6;
   var ZONE_STEP = 0.05;
+  // Порог наклона в градусах: пока телефон наклонён слабее, движения нет.
+  var TILT_MIN = 2;
+  var TILT_MAX = 20;
+  var TILT_STEP = 2;
   function readPadZone() {
     try {
       const raw = localStorage.getItem("morjakaPadZone");
@@ -749,6 +758,17 @@
       return Math.max(ZONE_MIN, Math.min(ZONE_MAX, value));
     } catch {
       return 0.35;
+    }
+  }
+  function readTiltZone() {
+    try {
+      const raw = localStorage.getItem("morjakaTiltZone");
+      if (raw === null) return 5;
+      const value = Number(raw);
+      if (!Number.isFinite(value)) return 5;
+      return Math.max(TILT_MIN, Math.min(TILT_MAX, value));
+    } catch {
+      return 5;
     }
   }
   function readSens(key) {
@@ -765,7 +785,8 @@
     key: Math.max(SENS_MIN, Math.min(SENS_MAX, readSens("morjakaKeySens"))),
     mouse: Math.max(SENS_MIN, Math.min(SENS_MAX, readSens("morjakaMouseSens"))),
     pad: Math.max(SENS_MIN, Math.min(SENS_MAX, readSens("morjakaPadSens"))),
-    padZone: readPadZone()
+    padZone: readPadZone(),
+    tiltZone: readTiltZone()
   };
   function saveControls() {
     try {
@@ -773,6 +794,7 @@
       localStorage.setItem("morjakaMouseSens", String(Math.round(controls.mouse * 10)));
       localStorage.setItem("morjakaPadSens", String(Math.round(controls.pad * 10)));
       localStorage.setItem("morjakaPadZone", String(Math.round(controls.padZone * 100)));
+      localStorage.setItem("morjakaTiltZone", String(Math.round(controls.tiltZone)));
     } catch {
     }
   }
@@ -785,9 +807,23 @@
   function zoneText(value) {
     return Math.round(value * 100) + "%";
   }
+  function tiltZoneText(value) {
+    return Math.round(value) + "\u00B0";
+  }
+  function stepTiltZone(direction) {
+    const next = Math.round(controls.tiltZone + TILT_STEP * direction);
+    controls.tiltZone = Math.max(TILT_MIN, Math.min(TILT_MAX, next));
+    neutralGamma = null;
+    saveControls();
+    sfx.click();
+  }
   function stepSensitivity(which, direction) {
     if (which === "padZone") {
       stepPadZone(direction);
+      return;
+    }
+    if (which === "tiltZone") {
+      stepTiltZone(direction);
       return;
     }
     const current = controls[which];

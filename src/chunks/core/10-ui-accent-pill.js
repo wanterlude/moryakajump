@@ -4366,31 +4366,48 @@
     if (main) main.checked = vibrationEnabled;
   }
   function sensText(v) { return Math.round(v * 100) + "%"; }
+  function setTilt(on) {
+    if (on) enableTilt();
+    else disableTilt();
+    const ids = ["sideTiltToggle", "tiltToggle", "settingsTilt"];
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (el) el.checked = !!on;
+    }
+  }
   function refreshSensUI() {
     const kv = document.getElementById("sensKeyVal");
     const mv = document.getElementById("sensMouseVal");
     const pv = document.getElementById("sensPadVal");
     const pzv = document.getElementById("padZoneVal");
+    const tzv = document.getElementById("tiltZoneVal");
     if (kv) kv.textContent = sensText(controls.key);
     if (mv) mv.textContent = sensText(controls.mouse);
     if (pv) pv.textContent = sensText(controls.pad);
     if (pzv) pzv.textContent = zoneText(controls.padZone);
+    if (tzv) tzv.textContent = tiltZoneText(controls.tiltZone);
     const sk = document.getElementById("sideKeySens");
     const sm = document.getElementById("sideMouseSens");
     const sp = document.getElementById("sidePadSens");
     const spz = document.getElementById("sidePadZone");
+    const stz = document.getElementById("sideTiltZone");
     if (sk && document.activeElement !== sk) sk.value = String(controls.key);
     if (sm && document.activeElement !== sm) sm.value = String(controls.mouse);
     if (sp && document.activeElement !== sp) sp.value = String(controls.pad);
     if (spz && document.activeElement !== spz) spz.value = String(controls.padZone);
+    if (stz && document.activeElement !== stz) stz.value = String(controls.tiltZone);
     const skv = document.getElementById("sideKeyVal");
     const smv = document.getElementById("sideMouseVal");
     const spv = document.getElementById("sidePadVal");
     const spzv = document.getElementById("sidePadZoneVal");
+    const stzv = document.getElementById("sideTiltZoneVal");
+    const setTiltBox = document.getElementById("settingsTilt");
     if (skv) skv.textContent = sensText(controls.key);
     if (smv) smv.textContent = sensText(controls.mouse);
     if (spv) spv.textContent = sensText(controls.pad);
     if (spzv) spzv.textContent = zoneText(controls.padZone);
+    if (stzv) stzv.textContent = tiltZoneText(controls.tiltZone);
+    if (setTiltBox) setTiltBox.checked = !!tiltEnabled;
   }
   function openSettings() {
     const ov = document.getElementById("settingsOverlay"); if (!ov) return;
@@ -4417,7 +4434,7 @@
       sfx.click();
       if (typeof setMenuMessage === "function") setMenuMessage("НИК", playerNick || "МОРЯКА");
     });
-    const pairs = [["sensKey", "key"], ["sensMouse", "mouse"], ["sensPad", "pad"], ["padZone", "padZone"]];
+    const pairs = [["sensKey", "key"], ["sensMouse", "mouse"], ["sensPad", "pad"], ["padZone", "padZone"], ["tiltZone", "tiltZone"]];
     for (const [prefix, which] of pairs) {
       const minus = document.getElementById(prefix + "Minus");
       const plus = document.getElementById(prefix + "Plus");
@@ -4430,12 +4447,15 @@
     if (vol) vol.addEventListener("input", () => applyVolume(vol.value));
     const vib = document.getElementById("settingsVibration");
     if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
+    const tiltBox = document.getElementById("settingsTilt");
+    if (tiltBox) tiltBox.addEventListener("change", () => { setTilt(tiltBox.checked); refreshSensUI(); });
   }
   function openSoundSettings() {
     const ov = document.getElementById("soundOverlay"); if (!ov) return;
     const r = document.getElementById("volRange"); if (r) r.value = String(storedVolume());
     loadVibration();
     const t = document.getElementById("tiltToggle"); if (t) t.checked = !!tiltEnabled;
+    refreshSensUI();
     ov.classList.add("open"); ov.setAttribute("aria-hidden", "false");
     sfx.click();
   }
@@ -4451,7 +4471,7 @@
     const range = document.getElementById("volRange"); if (range) range.addEventListener("input", () => applyVolume(range.value));
     const vib = document.getElementById("vibToggle"); if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
     const tilt = document.getElementById("tiltToggle");
-    if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; if (typeof syncSideSettings === "function") syncSideSettings(); });
+    if (tilt) tilt.addEventListener("change", () => { setTilt(tilt.checked); if (typeof syncSideSettings === "function") syncSideSettings(); refreshSensUI(); });
   }
   function syncSideSettings() {
     const nick = document.getElementById("sideNick");
@@ -4543,7 +4563,16 @@
     const vib = document.getElementById("sideVibToggle");
     if (vib) vib.addEventListener("change", () => setVibration(vib.checked));
     const tilt = document.getElementById("sideTiltToggle");
-    if (tilt) tilt.addEventListener("change", () => { if (tilt.checked) enableTilt(); else tiltEnabled = false; syncSideSettings(); });
+    if (tilt) tilt.addEventListener("change", () => { setTilt(tilt.checked); syncSideSettings(); refreshSensUI(); });
+    const stz = document.getElementById("sideTiltZone");
+    if (stz) stz.addEventListener("input", () => {
+      const value = Number(stz.value);
+      if (!Number.isFinite(value)) return;
+      controls.tiltZone = Math.max(TILT_MIN, Math.min(TILT_MAX, value));
+      neutralGamma = null;
+      saveControls();
+      refreshSensUI();
+    });
     const reset = document.getElementById("sideReset");
     if (reset) reset.addEventListener("click", () => openResetDialog());
     syncSideSettings();
