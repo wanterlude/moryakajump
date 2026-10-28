@@ -49,6 +49,46 @@ function depthAtEnd(text) {
   return depth;
 }
 
+/** Имена верхнеуровневых объявлений (два пробела отступа, нулевая вложенность). */
+function topLevelNames(text) {
+  const names = [];
+  let depth = 0;
+  let quote = null;
+  let lineComment = false;
+  let blockComment = false;
+  let atLineStart = true;
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (atLineStart && depth === 0) {
+      // Проверяем объявление только в начале строки на нулевой вложенности.
+      const rest = text.slice(i, text.indexOf("\n", i) < 0 ? text.length : text.indexOf("\n", i));
+      const match = /^  (?:function|var|const|let) ([A-Za-z_$][\w$]*)/.exec(rest);
+      if (match) names.push(match[1]);
+      atLineStart = false;
+    }
+    if (ch === "\n") { atLineStart = true; lineComment = false; continue; }
+    if (lineComment) continue;
+    if (blockComment) {
+      if (ch === "*" && next === "/") { blockComment = false; i++; }
+      continue;
+    }
+    if (quote) {
+      if (ch === "\\") { i++; continue; }
+      if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === "/" && next === "/") { lineComment = true; i++; continue; }
+    if (ch === "/" && next === "*") { blockComment = true; i++; continue; }
+    if (ch === '"' || ch === "'" || ch === "`") { quote = ch; continue; }
+    if (ch === "{" || ch === "(" || ch === "[") depth++;
+    else if (ch === "}" || ch === ")" || ch === "]") depth--;
+  }
+  return names;
+}
+
 function main() {
   const check = process.argv.includes("--check");
   const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
@@ -79,6 +119,20 @@ function main() {
         );
       }
     });
+
+    // Части живут в одной области видимости: повторное объявление молча
+    // перекроет предыдущее, поэтому дубли между частями запрещены.
+    const seen = new Map();
+    for (const file of files) {
+      for (const name of topLevelNames(fs.readFileSync(file, "utf8"))) {
+        const where = path.relative(root, file);
+        if (seen.has(name)) {
+          problems.push("повторное объявление " + name + ": " + seen.get(name) + " и " + where);
+        } else {
+          seen.set(name, where);
+        }
+      }
+    }
 
     const content = files.map((f) => fs.readFileSync(f, "utf8")).join("");
     const start = startMarker(chunk.name);
