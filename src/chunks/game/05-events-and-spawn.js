@@ -12,7 +12,8 @@
     avalanche: { title: "\u041B\u0410\u0412\u0418\u041D\u0410", text: "\u0421\u0432\u0435\u0440\u0445\u0443 \u043F\u0430\u0434\u0430\u044E\u0442 \u043A\u0430\u043C\u043D\u0438. \u041E\u043D\u0438 \u0442\u043E\u043B\u043A\u0430\u044E\u0442 \u0438\u0433\u0440\u043E\u043A\u0430, \u043D\u043E \u0436\u0438\u0437\u043D\u044C \u043D\u0435 \u043E\u0442\u043D\u0438\u043C\u0430\u044E\u0442." },
     walls: { title: "\u0421\u0422\u0415\u041D\u042B", text: "\u041F\u043E \u043A\u0440\u0430\u044F\u043C \u0432\u044B\u0440\u0430\u0441\u0442\u0430\u044E\u0442 \u043B\u0435\u0434\u044F\u043D\u044B\u0435 \u0441\u0442\u0435\u043D\u044B. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0431\u043B\u0438\u0436\u0435 \u043A \u0446\u0435\u043D\u0442\u0440\u0443." },
     spikes: { title: "\u0428\u0418\u041F\u042B", text: "\u0427\u0430\u0441\u0442\u044C \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C \u043F\u043E\u043A\u0440\u044B\u0442\u0430 \u0448\u0438\u043F\u0430\u043C\u0438. \u041A\u0430\u0441\u0430\u043D\u0438\u0435 \u0448\u0438\u043F\u0430 \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043A\u0430\u043A \u043F\u0430\u0434\u0435\u043D\u0438\u0435." },
-    blizzard: { title: "\u041C\u0415\u0422\u0415\u041B\u042C", text: "\u0421\u043D\u0435\u0433 \u0437\u0430\u0441\u0442\u0438\u043B\u0430\u0435\u0442 \u044D\u043A\u0440\u0430\u043D, \u0430 \u0432\u0435\u0442\u0435\u0440 \u0441\u0431\u0438\u0432\u0430\u0435\u0442 \u0441 \u043A\u0443\u0440\u0441\u0430. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0446\u0435\u043D\u0442\u0440\u0430." }
+    blizzard: { title: "\u041C\u0415\u0422\u0415\u041B\u042C", text: "\u0421\u043D\u0435\u0433 \u0437\u0430\u0441\u0442\u0438\u043B\u0430\u0435\u0442 \u044D\u043A\u0440\u0430\u043D, \u0430 \u0432\u0435\u0442\u0435\u0440 \u0441\u0431\u0438\u0432\u0430\u0435\u0442 \u0441 \u043A\u0443\u0440\u0441\u0430. \u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0446\u0435\u043D\u0442\u0440\u0430." },
+    magnetStorm: { title: "\u041C\u0410\u0413\u041D\u0418\u0422\u041D\u0410\u042F \u0411\u0423\u0420\u042F", text: "\u041C\u043E\u043D\u0435\u0442\u044B \u0441\u043E \u0432\u0441\u0435\u0445 \u0441\u0442\u043E\u0440\u043E\u043D \u0441\u0442\u044F\u0433\u0438\u0432\u0430\u0435\u0442 \u043A \u0442\u0435\u0431\u0435. \u0423\u0441\u043F\u0435\u0432\u0430\u0439 \u043B\u043E\u0432\u0438\u0442\u044C." }
   };
   var EVENT_ACCENTS = {
     darkness: "#3f6fa8",
@@ -20,7 +21,8 @@
     avalanche: "#6b8fa8",
     walls: "#4b8fd1",
     spikes: "#e0575f",
-    blizzard: "#8fc9e8"
+    blizzard: "#8fc9e8",
+    magnetStorm: "#ffb300"
   };
   var EVENT_DURATION_MS = 1e4;
   var EVENT_DURATION_GROWTH_MS = 5e3;
@@ -43,6 +45,9 @@
   var HUNTER_STILL_MS = HUNTER_STILL_FRAMES * 1e3 / 60;
   var HUNTER_CHASE_MS = HUNTER_CHASE_FRAMES * 1e3 / 60;
   var EVENT_BOUNCE_LIMIT = 4;
+  // Магнитная буря: как часто с экрана прилетает новая монета.
+  var STORM_COIN_EVERY_MS = 420;
+  var stormCoinTimer = 0;
   var activeEvents = [];
   var nextEventScore = EVENT_FIRST_SCORE;
   var introKind = "";
@@ -57,6 +62,7 @@
     nextEventScore = EVENT_FIRST_SCORE;
     introKind = "";
     spikyBudget = 0;
+    stormCoinTimer = 0;
     lastLandedPlatform = null;
     frameSinceLanding = 0;
   }
@@ -87,7 +93,36 @@
     const max = WALLS_MAX_PX;
     return Math.min(max, (w.total - w.left) / WALLS_GROW_MS * max);
   }
+  function updateStormCoins() {
+    const cx = player.x + 15;
+    const cy = player.y + 15;
+    const k = SIM_STEP_MS / (1e3 / 60);
+    for (const coin of coins) {
+      if (!coin.storm) continue;
+      const dx = cx - (coin.x + 9);
+      const dy = cy - (coin.y + 9);
+      const d = Math.hypot(dx, dy) || 1;
+      const speed = 5 + Math.min(10, d * 0.03);
+      coin.x += dx / d * speed * k;
+      coin.y += dy / d * speed * k;
+    }
+  }
   function updateEventWorld(dt) {
+    const storm = eventOf("magnetStorm");
+    if (storm) {
+      stormCoinTimer -= SIM_STEP_MS;
+      if (stormCoinTimer <= 0) {
+        stormCoinTimer = STORM_COIN_EVERY_MS / storm.power;
+        coins.push({
+          x: 12 + Math.random() * (WORLD_W - 30),
+          y: player.y - 240 + Math.random() * 420,
+          r: 9,
+          phase: Math.random() * Math.PI * 2,
+          storm: true
+        });
+      }
+      updateStormCoins();
+    }
     if (eventActive("slide")) {
       const power = eventPowerOf("slide");
       for (const [p, dir] of slidingPlatforms) {

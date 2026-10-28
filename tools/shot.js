@@ -30,6 +30,7 @@ const hover = arg("hover", "");
 const hudVariant = arg("hud", "");
 const hazard = arg("hazard", "");
 const springs = arg("springs", "");
+const event = arg("event", "");
 
 const chromeCandidates = [
   path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
@@ -55,10 +56,12 @@ const HOOK = String.raw`
       var shotTab = "avatars";
       var shotHover = "";
       var shotHazard = "";
+      var shotEvent = "";
       for (var pi = 0; pi < shotParts.length; pi++) {
         if (shotParts[pi].indexOf("shot=") === 0) shotTab = shotParts[pi].slice(5);
         else if (shotParts[pi].indexOf("hover=") === 0) shotHover = decodeURIComponent(shotParts[pi].slice(6));
         else if (shotParts[pi].indexOf("hazard=") === 0) shotHazard = shotParts[pi].slice(7);
+        else if (shotParts[pi].indexOf("event=") === 0) shotEvent = shotParts[pi].slice(6);
       }
       bankCoins = 4321;
       var shotIdx = -1;
@@ -76,6 +79,21 @@ const HOOK = String.raw`
       if (shotTab === "settings") openSettings();
       if (shotTab === "train") bossTrainOpen = true;
       if (shotTab === "play") setTimeout(function () { try { startGame(); } catch (e) {} }, 400);
+      if (shotEvent) {
+        setTimeout(function () {
+          try {
+            startGame();
+            window.requestAnimationFrame = function () { return 0; };
+            spawnEvent(shotEvent);
+            for (var fi = 0; fi < 45; fi++) {
+              updateRandomEvent();
+              updateEventWorld(1e3 / 60);
+              updateCoins(1);
+            }
+            scheduleDraw();
+          } catch (err) {}
+        }, 400);
+      }
       if (shotHazard === "spring") {
         setTimeout(function () {
           try {
@@ -229,7 +247,7 @@ for (const tab of tabs) {
     "--virtual-time-budget=4000",
     "--user-data-dir=" + path.join(work, "profile"),
     "--screenshot=" + out,
-    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (springs ? "&springs=1" : ""),
+    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (event ? "&event=" + event : "") + (springs ? "&springs=1" : ""),
   ]);
   if (!fs.existsSync(out)) {
     console.error("Не удалось снять " + tab + " (код " + res.status + ")");

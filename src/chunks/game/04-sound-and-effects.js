@@ -134,7 +134,7 @@
   };
   var PLATFORM_TIMER_ENABLED = false;
   var EVENT_FIRST_SCORE = 15e3;
-  var EVENT_POOL = ["darkness", "slide", "avalanche", "walls", "spikes", "blizzard"];
+  var EVENT_POOL = ["darkness", "slide", "avalanche", "walls", "spikes", "blizzard", "magnetStorm"];
   var spikyPlatforms = /* @__PURE__ */ new WeakMap();
   var SPIKY_CHANCE = 0.15;
   var SPIKY_MAX_PER_EVENT = 3;

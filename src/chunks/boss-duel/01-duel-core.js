@@ -63,7 +63,7 @@
   // Сложность боссов смягчена (~20–25%): снаряды медленнее, паузы между
   // атаками длиннее, телеграфы дают больше времени на реакцию.
   var DUEL_SPEED_BY_BOSS = [2.34, 2.79, 3.06, 3.42, 3.78];
-  var DUEL_COOL_BY_BOSS = [0.264, 0.231, 0.209, 0.187, 0.165];
+  var DUEL_COOL_BY_BOSS = [0.36, 0.231, 0.209, 0.187, 0.165];
   function duelBossIndexClamp(index, len) {
     return Math.min(index, len - 1);
   }
@@ -157,7 +157,7 @@
     const def = duelBossDef(index);
     duelState.bossKind = def.kind;
     duelState.arena = def.arena;
-    duelState.bmax = 40 + index * 15;
+    duelState.bmax = DUEL_BOSS_HP[duelBossIndexClamp(index, DUEL_BOSS_HP.length)];
     duelState.bhp = duelState.bmax;
     duelState.level = 0;
     duelState.cooldown = 120;
@@ -570,3 +570,6 @@
     { name: "ЛЕДЯНОЙ ЛЕВИАФАН", kind: "leviathan", arena: "abyss", subtitle: "ЦАРЬ ГЛУБИН", accent: "#5ce8ff" }
   ];
   var DUEL_BOSS_NAMES = DUEL_BOSS_DEFS.map((d) => d.name);
+  // Здоровье по номеру босса. Первый специально мягкий: раньше он брал 40 и
+  // становился стеной на 30 000 — игрок видел его первым и упирался.
+  var DUEL_BOSS_HP = [26, 42, 58, 74, 90];
