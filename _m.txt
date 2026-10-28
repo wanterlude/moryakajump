@@ -1,5 +1,13 @@
-Move the HUD colours into src/
+Move the platform skins table into src/
 
-src/game/hud-colors.ts owns the ink, gold, red and green used by capsules, plates and
-buttons, with three tests (required keys, every value parses as a colour, ink is not
-pure black). 36 module tests in total, golden frames unchanged.
+src/game/platform-skins.ts now holds PLATFORM_TYPES, the two label maps and all 66
+skins, typed as PlatformType / SkinTier / PlatformSkin. Nine tests pin the invariants:
+eleven skins per type, unique ids, exactly one base skin per type, known rarities, hex
+colours, filled names, labels for every type and no truncated captions.
+
+Five dead spring skins were dropped on the way, but the first attempt filtered lines and
+took broken_divine_2 and vanish_base with them (they shared lines with spring entries).
+The rebuild filters whole objects, so the count is now exactly 11 per type, and the
+golden frames confirm the shop renders identically.
+
+44 module tests, tsc clean, check.js green.

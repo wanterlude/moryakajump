@@ -58,6 +58,11 @@ const MODULES = [
     global: "__srcHudColors",
     exports: ["HUD_COLORS"],
   },
+  {
+    entry: path.join(root, "src/game/platform-skins.ts"),
+    global: "__srcSkins",
+    exports: ["PLATFORM_TYPES", "PLATFORM_TYPE_LABEL", "PLATFORM_TYPE_SHORT", "PLATFORM_SKINS"],
+  },
 ];
 
 function buildBlock() {

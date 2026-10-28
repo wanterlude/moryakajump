@@ -1,0 +1,113 @@
+/**
+ * Скины и типы платформ: единственная точка правды для магазина и отрисовки.
+ *
+ * Таблица перенесена из бандла целиком. Скины удалённого типа «пружина» (11 штук)
+ * не переносятся: типа нет в PLATFORM_TYPES, до них нельзя добраться, а мёртвые
+ * данные только путают.
+ */
+
+export type PlatformType = "static" | "moving" | "ice" | "broken" | "vanish" | "sticky";
+
+export type SkinTier = "base" | "common" | "rare" | "epic" | "legendary" | "divine";
+
+export type PlatformSkin = {
+  id: string;
+  type: PlatformType;
+  tier: SkinTier;
+  name: string;
+  top: string;
+  mid: string;
+  bottom: string;
+  edge: string;
+  accent: string;
+  details: string[];
+};
+
+  export const PLATFORM_TYPES: readonly PlatformType[] = ["static", "moving", "ice", "broken", "vanish", "sticky"];
+
+  export const PLATFORM_TYPE_LABEL: Record<PlatformType, string> = {
+    static: "\u0421\u043D\u0435\u0433",
+    moving: "\u041B\u0451\u0434 \u043F\u043E\u0434\u0432\u0438\u0436\u043D\u044B\u0439",
+    ice: "\u041A\u0430\u0442\u043E\u043A",
+    broken: "\u0414\u043E\u0441\u043A\u0438",
+    vanish: "\u0422\u0443\u043C\u0430\u043D",
+    sticky: "\u041A\u043B\u0435\u0439"
+  }
+
+  export const PLATFORM_TYPE_SHORT: Record<PlatformType, string> = {
+    static: "\u0421\u041D\u0415\u0413",
+    moving: "\u041B\u0401\u0414",
+    ice: "\u041A\u0410\u0422\u041E\u041A",
+    broken: "\u0414\u041E\u0421\u041A\u0418",
+    vanish: "\u0422\u0423\u041C\u0410\u041D",
+    sticky: "\u041A\u041B\u0415\u0419"
+  }
+
+  export const PLATFORM_SKINS: PlatformSkin[] = [
+  { id: "static_base", type: "static", tier: "base", name: "Снег · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+  { id: "static_common_1", type: "static", tier: "common", name: "Снег · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["snowcap","gloss"] },
+  { id: "static_common_2", type: "static", tier: "common", name: "Снег · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["cracks","sparkle"] },
+  { id: "static_rare_1", type: "static", tier: "rare", name: "Снег · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["icicles","gloss"] },
+  { id: "static_rare_2", type: "static", tier: "rare", name: "Снег · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["stripes","snowcap"] },
+  { id: "static_epic_1", type: "static", tier: "epic", name: "Снег · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["glowline","sparkle"] },
+  { id: "static_epic_2", type: "static", tier: "epic", name: "Снег · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["snowcap","icicles"] },
+  { id: "static_legendary_1", type: "static", tier: "legendary", name: "Снег · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["sparkle","snowcap","gloss"] },
+  { id: "static_legendary_2", type: "static", tier: "legendary", name: "Снег · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["stripes","snowcap"] },
+  { id: "static_divine_1", type: "static", tier: "divine", name: "Снег · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["icicles","sparkle","gloss"] },
+  { id: "static_divine_2", type: "static", tier: "divine", name: "Снег · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["cracks","sparkle","icicles"] },
+  { id: "moving_base", type: "moving", tier: "base", name: "Лёд подвижный · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+  { id: "moving_common_1", type: "moving", tier: "common", name: "Лёд подвижный · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["stripes"] },
+  { id: "moving_common_2", type: "moving", tier: "common", name: "Лёд подвижный · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["rivets","scratches"] },
+  { id: "moving_rare_1", type: "moving", tier: "rare", name: "Лёд подвижный · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["rivets","scratches"] },
+  { id: "moving_rare_2", type: "moving", tier: "rare", name: "Лёд подвижный · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["glowline","sparkle"] },
+  { id: "moving_epic_1", type: "moving", tier: "epic", name: "Лёд подвижный · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["stripes","rivets"] },
+  { id: "moving_epic_2", type: "moving", tier: "epic", name: "Лёд подвижный · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["glowline","gloss"] },
+  { id: "moving_legendary_1", type: "moving", tier: "legendary", name: "Лёд подвижный · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["stripes","rivets","gloss"] },
+  { id: "moving_legendary_2", type: "moving", tier: "legendary", name: "Лёд подвижный · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["rivets","glowline"] },
+  { id: "moving_divine_1", type: "moving", tier: "divine", name: "Лёд подвижный · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["glowline","sparkle","gloss"] },
+  { id: "moving_divine_2", type: "moving", tier: "divine", name: "Лёд подвижный · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["sparkle","glowline"] },
+  { id: "ice_base", type: "ice", tier: "base", name: "Каток · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+  { id: "ice_common_1", type: "ice", tier: "common", name: "Каток · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["scratches","gloss"] },
+  { id: "ice_common_2", type: "ice", tier: "common", name: "Каток · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["scratches"] },
+  { id: "ice_rare_1", type: "ice", tier: "rare", name: "Каток · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["mirror","gloss"] },
+  { id: "ice_rare_2", type: "ice", tier: "rare", name: "Каток · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["mirror","sparkle"] },
+  { id: "ice_epic_1", type: "ice", tier: "epic", name: "Каток · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["mirror","sparkle"] },
+  { id: "ice_epic_2", type: "ice", tier: "epic", name: "Каток · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["scratches","gloss"] },
+  { id: "ice_legendary_1", type: "ice", tier: "legendary", name: "Каток · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["mirror","scratches"] },
+  { id: "ice_legendary_2", type: "ice", tier: "legendary", name: "Каток · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["mirror","sparkle"] },
+  { id: "ice_divine_1", type: "ice", tier: "divine", name: "Каток · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["mirror","sparkle","gloss"] },
+  { id: "ice_divine_2", type: "ice", tier: "divine", name: "Каток · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["mirror","glowline"] },
+  { id: "broken_base", type: "broken", tier: "base", name: "Доски · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+  { id: "broken_common_1", type: "broken", tier: "common", name: "Доски · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["planks","nails"] },
+  { id: "broken_common_2", type: "broken", tier: "common", name: "Доски · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["planks","knots"] },
+  { id: "broken_rare_1", type: "broken", tier: "rare", name: "Доски · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["planks","nails","knots"] },
+  { id: "broken_rare_2", type: "broken", tier: "rare", name: "Доски · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["cracks","nails"] },
+  { id: "broken_epic_1", type: "broken", tier: "epic", name: "Доски · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["planks","knots","gloss"] },
+  { id: "broken_epic_2", type: "broken", tier: "epic", name: "Доски · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["planks","nails"] },
+  { id: "broken_legendary_1", type: "broken", tier: "legendary", name: "Доски · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["planks","nails","gloss"] },
+  { id: "broken_legendary_2", type: "broken", tier: "legendary", name: "Доски · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["planks","rivets"] },
+  { id: "broken_divine_1", type: "broken", tier: "divine", name: "Доски · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["planks","sparkle","glowline"] },
+  { id: "broken_divine_2", type: "broken", tier: "divine", name: "Доски · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["planks","sparkle"] },
+  { id: "vanish_base", type: "vanish", tier: "base", name: "Туман · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+  { id: "vanish_common_1", type: "vanish", tier: "common", name: "Туман · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["mist"] },
+  { id: "vanish_common_2", type: "vanish", tier: "common", name: "Туман · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["mist","bubbles"] },
+  { id: "vanish_rare_1", type: "vanish", tier: "rare", name: "Туман · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["mist","sparkle"] },
+  { id: "vanish_rare_2", type: "vanish", tier: "rare", name: "Туман · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["mist","sparkle"] },
+  { id: "vanish_epic_1", type: "vanish", tier: "epic", name: "Туман · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["mist","glowline"] },
+  { id: "vanish_epic_2", type: "vanish", tier: "epic", name: "Туман · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["mist","bubbles"] },
+  { id: "vanish_legendary_1", type: "vanish", tier: "legendary", name: "Туман · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["mist","sparkle","glowline"] },
+  { id: "vanish_legendary_2", type: "vanish", tier: "legendary", name: "Туман · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["mist","sparkle"] },
+  { id: "vanish_divine_1", type: "vanish", tier: "divine", name: "Туман · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["mist","sparkle","glowline"] },
+  { id: "vanish_divine_2", type: "vanish", tier: "divine", name: "Туман · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["sparkle","mist","glowline"] },
+  { id: "sticky_base", type: "sticky", tier: "base", name: "Клей · Базовый", top: "#ffffff", mid: "#ffffff", bottom: "#ffffff", edge: "#ffffff", accent: "#ffffff", details: [] },
+  { id: "sticky_common_1", type: "sticky", tier: "common", name: "Клей · Пороша", top: "#f2fdff", mid: "#cdefff", bottom: "#9ccfe4", edge: "#5d8fa8", accent: "#ffffff", details: ["drips","gloss"] },
+  { id: "sticky_common_2", type: "sticky", tier: "common", name: "Клей · Наст", top: "#dcecf5", mid: "#a9c6d6", bottom: "#7597ab", edge: "#486a80", accent: "#e8fbff", details: ["drips","bubbles"] },
+  { id: "sticky_rare_1", type: "sticky", tier: "rare", name: "Клей · Глетчер", top: "#a9e6f7", mid: "#62c0e0", bottom: "#2f86ad", edge: "#1b5c7b", accent: "#eaffff", details: ["drips","bubbles"] },
+  { id: "sticky_rare_2", type: "sticky", tier: "rare", name: "Клей · Глубина", top: "#5c9fc4", mid: "#336f95", bottom: "#184766", edge: "#0a2a40", accent: "#8fe8ff", details: ["drips","gloss"] },
+  { id: "sticky_epic_1", type: "sticky", tier: "epic", name: "Клей · Аврора", top: "#b0f7dc", mid: "#63dcb4", bottom: "#2e9f7f", edge: "#146855", accent: "#d8fff0", details: ["drips","bubbles","gloss"] },
+  { id: "sticky_epic_2", type: "sticky", tier: "epic", name: "Клей · Сумерки", top: "#bdb9ff", mid: "#827be3", bottom: "#504aa9", edge: "#292667", accent: "#e8e6ff", details: ["drips","bubbles"] },
+  { id: "sticky_legendary_1", type: "sticky", tier: "legendary", name: "Клей · Полярный свет", top: "#ffe9b8", mid: "#ffc75a", bottom: "#c98a2e", edge: "#7a4a12", accent: "#fff8de", details: ["drips","bubbles","sparkle"] },
+  { id: "sticky_legendary_2", type: "sticky", tier: "legendary", name: "Клей · Розовый иней", top: "#ffdbe7", mid: "#f5a8c1", bottom: "#b96484", edge: "#6f2f4a", accent: "#fff0f6", details: ["drips","bubbles","glowline"] },
+  { id: "sticky_divine_1", type: "sticky", tier: "divine", name: "Клей · Кристалл", top: "#f6feff", mid: "#d3f1ff", bottom: "#93cde3", edge: "#4b8aa8", accent: "#ffffff", details: ["drips","sparkle","glowline"] },
+  { id: "sticky_divine_2", type: "sticky", tier: "divine", name: "Клей · Бездна", top: "#3f7293", mid: "#244d69", bottom: "#102d46", edge: "#061826", accent: "#5ce8ff", details: ["drips","bubbles","sparkle"] },
+];
