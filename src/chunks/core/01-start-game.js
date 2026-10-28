@@ -138,7 +138,7 @@
   var PLATFORM_BASE_WIDTH = 140;
   // Показатель кривой: 1 — линейно, 2.5 — падение примерно в 2,5 раза быстрее на старте
   // при том же финише в 15 px на 150 000 очков.
-  var PLATFORM_SHRINK_POWER = 6;
+  var PLATFORM_SHRINK_POWER = 4;
   function shrinkWidth(base) {
     const t = Math.min(1, Math.max(0, player.score) / PLATFORM_SHRINK_SCORE);
     return PLATFORM_MIN_WIDTH + (base - PLATFORM_MIN_WIDTH) * Math.pow(1 - t, PLATFORM_SHRINK_POWER);
