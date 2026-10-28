@@ -21,6 +21,16 @@ function fail(message) {
   console.log("FAIL  " + message);
 }
 
+// 0a. Крупные куски src/chunks/ совпадают с index.html
+try {
+  execFileSync(process.execPath, [path.join(__dirname, "build-chunks.js"), "--check"], {
+    cwd: root,
+    stdio: "inherit",
+  });
+} catch (err) {
+  fail("куски src/chunks устарели — запустите node tools/build-chunks.js");
+}
+
 // 0. Вставка из src/ совпадает с исходниками
 try {
   execFileSync(process.execPath, [path.join(__dirname, "build-src.js"), "--check"], {

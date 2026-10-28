@@ -2386,6 +2386,7 @@ var __srcSkins = (() => {
   // hexToRgba живёт в src/game/color.ts и вставляется сборкой.
 
   // src/boss_duel.ts
+  // <<< chunk boss-duel: начало — генерируется из src/chunks/boss-duel.js >>>
   var DUEL_W = 400;
   var DUEL_H = 600;
   var DUEL_PLAYER_Y = DUEL_H - 90;
@@ -8039,6 +8040,7 @@ var __srcSkins = (() => {
     c.restore();
   }
 
+  // <<< chunk boss-duel: конец >>>
   // src/frames_extra.ts
   
 
@@ -8063,6 +8065,7 @@ var __srcSkins = (() => {
   
 
   // src/game.ts
+  // <<< chunk game: начало — генерируется из src/chunks/game.js >>>
   var canvas = document.getElementById("game");
   var WORLD_W = 400;
   var WORLD_H = 600;
@@ -9696,7 +9699,8 @@ var __srcSkins = (() => {
   function startGame() {
     trainingState.active = false;
     bossTrainOpen = false;
-    initDaily();
+    // <<< chunk game: конец >>>
+  initDaily();
     resetGame();
     resetHud();
     gameOverState.openedAt = 0;

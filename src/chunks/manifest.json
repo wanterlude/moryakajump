@@ -1,0 +1,13 @@
+{
+  "comment": "Крупные блоки index.html. Код вставляется дословно, область видимости не меняется.",
+  "chunks": [
+    {
+      "name": "boss-duel",
+      "file": "boss-duel.js"
+    },
+    {
+      "name": "game",
+      "file": "game.js"
+    }
+  ]
+}
