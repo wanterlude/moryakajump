@@ -134,9 +134,11 @@
   // Ширина всех платформ ужимается с 0 до 150 000 очков: к финишу остаётся 15 px.
   var PLATFORM_SHRINK_SCORE = 15e4;
   var PLATFORM_MIN_WIDTH = 15;
+  // Стартовая ширина одна для всех типов: обычных, досок, близнецов, кристаллов и сухих рядов.
+  var PLATFORM_BASE_WIDTH = 140;
   // Показатель кривой: 1 — линейно, 2.5 — падение примерно в 2,5 раза быстрее на старте
   // при том же финише в 15 px на 150 000 очков.
-  var PLATFORM_SHRINK_POWER = 2.5;
+  var PLATFORM_SHRINK_POWER = 4;
   function shrinkWidth(base) {
     const t = Math.min(1, Math.max(0, player.score) / PLATFORM_SHRINK_SCORE);
     return PLATFORM_MIN_WIDTH + (base - PLATFORM_MIN_WIDTH) * Math.pow(1 - t, PLATFORM_SHRINK_POWER);
@@ -160,7 +162,7 @@
   function spawnPlatform(y) {
     const level = mixLevel();
     const type = pickPlatformType(level);
-    const width = shrinkWidth(140) * perkWidthScale();
+    const width = shrinkWidth(PLATFORM_BASE_WIDTH) * perkWidthScale();
     const platform = {
       x: Math.random() * (WORLD_W - width),
       y,
@@ -219,7 +221,7 @@
     const gap = platformStep();
     const created = [];
     for (let i = 0; i < 2; i++) {
-      const width = shrinkWidth(60);
+      const width = shrinkWidth(PLATFORM_BASE_WIDTH);
       created.push(makePlatform({
         x: Math.random() * (WORLD_W - width),
         y: baseY - gap * i,
@@ -232,14 +234,14 @@
     return created;
   }
   function spawnTwinPlatforms(y) {
-    const width = shrinkWidth(60);
+    const width = shrinkWidth(PLATFORM_BASE_WIDTH);
     return [
       { x: 14 + Math.random() * 40, y, w: width, h: 15, type: "static", dir: 2 },
       { x: WORLD_W - width - 14 - Math.random() * 40, y: y - 26, w: width, h: 15, type: "static", dir: 2 }
     ];
   }
   function spawnVerticalPlatform(y) {
-    const w = shrinkWidth(80);
+    const w = shrinkWidth(PLATFORM_BASE_WIDTH);
     const sideWidth = 70;
     const x = Math.random() < 0.5 ? Math.random() * sideWidth : WORLD_W - w - Math.random() * sideWidth;
     return makePlatform({
@@ -277,7 +279,7 @@
     }
     if (dryRowsLeft > 0) {
       dryRowsLeft--;
-      const width = shrinkWidth(70);
+      const width = shrinkWidth(PLATFORM_BASE_WIDTH);
       const x = dryRowsLeft % 2 === 0 ? 8 : WORLD_W - width - 8;
       const dry = { x, y, w: width, h: 15, type: "static", dir: 0 };
       dryPlatforms.add(dry);
