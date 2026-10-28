@@ -5830,8 +5830,7 @@ var __srcSkins = (() => {
       }
     }
     c.restore();
-  }
-  function duelYetiFur(c, x, y, scale, seed, color) {
+  }  function duelYetiFur(c, x, y, scale, seed, color) {
     c.save();
     c.fillStyle = color;
     for (let i = 0; i < 7; i++) {
@@ -6364,8 +6363,7 @@ var __srcSkins = (() => {
       }
     }
     c.restore();
-  }
-  function duelStormCrown(c, t, tension, accent) {
+  }  function duelStormCrown(c, t, tension, accent) {
     const topY = -44;
     const spikes = [
       { x: -30, h: 32, w: 13, lean: -6 },
@@ -6765,7 +6763,6 @@ var __srcSkins = (() => {
     }
     c.restore();
   }
-
   function duelLerpWidth(widths, u) {
     const m = widths.length - 1;
     const pos = Math.max(0, Math.min(m, u * m));
@@ -7450,8 +7447,7 @@ var __srcSkins = (() => {
       }
     }
     c.restore();
-  }
-  function duelDrawBossBody(c) {
+  }  function duelDrawBossBody(c) {
     const kind = duelBossKind();
     if (kind === "yeti" || kind === "avalanche") duelYetiBody(c);
     else if (kind === "storm") duelStormBody(c);

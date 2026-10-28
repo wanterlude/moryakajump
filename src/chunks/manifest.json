@@ -7,7 +7,11 @@
         "boss-duel/01-duel-core.js",
         "boss-duel/02-arena-sky.js",
         "boss-duel/03-arena-effects.js",
-        "boss-duel/04-boss-bodies.js"
+        "boss-duel/04a-kraken.js",
+        "boss-duel/04b-yeti.js",
+        "boss-duel/04c-storm.js",
+        "boss-duel/04d-leviathan.js",
+        "boss-duel/04e-duel-draw.js"
       ]
     },
     {
