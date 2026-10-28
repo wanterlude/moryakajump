@@ -2,6 +2,10 @@
   "comment": "Крупные блоки index.html. Код вставляется дословно, область видимости не меняется.",
   "chunks": [
     {
+      "name": "fx",
+      "file": "fx.js"
+    },
+    {
       "name": "boss-duel",
       "parts": [
         "boss-duel/01-duel-core.js",
