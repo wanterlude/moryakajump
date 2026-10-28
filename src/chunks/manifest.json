@@ -12,7 +12,13 @@
     },
     {
       "name": "game",
-      "file": "game.js"
+      "parts": [
+        "game/01-canvas-background.js",
+        "game/02-daily-and-progress.js",
+        "game/03-wind-and-perks.js",
+        "game/04-sound-and-effects.js",
+        "game/05-events-and-spawn.js"
+      ]
     }
   ]
 }

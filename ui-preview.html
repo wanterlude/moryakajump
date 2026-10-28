@@ -8621,8 +8621,7 @@ var __srcSkins = (() => {
   var bankCoins = readStoredNumber("morjakaBankCoins");
   var highScore = readStoredNumber("doodleHighScore");
   var playerNick = readStoredText("morjakaNick", "");
-  var NICK_MAX_LENGTH = 20;
-  function normalizeNick(raw) {
+  var NICK_MAX_LENGTH = 20;  function normalizeNick(raw) {
     return String(raw ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, NICK_MAX_LENGTH);
   }
   function saveNick(value) {
@@ -8876,8 +8875,7 @@ var __srcSkins = (() => {
   var WIND_GUST_LONG_MAX = 330;
   var WIND_GUST_FAST_MIN = 75;
   var WIND_GUST_FAST_MAX = 130;
-  var WIND_WARN_START = 130;
-  var WIND_WARN_END = 80;
+  var WIND_WARN_START = 130;  var WIND_WARN_END = 80;
   var wind = {
     force: 0,
     dir: 0,
@@ -9217,8 +9215,7 @@ var __srcSkins = (() => {
       osc.stop(t0 + duration + 0.02);
     } catch {
     }
-  }
-  function playNoise(duration, volume = 1) {
+  }  function playNoise(duration, volume = 1) {
     if (!sound.enabled) return;
     const ac = initSound();
     if (!ac) return;
@@ -9366,8 +9363,7 @@ var __srcSkins = (() => {
   var avalancheTimer = 0;
   var EVENT_STEP = 1e4;
   var EVENT_INTRO_MS = 4e3;
-  var EVENT_FADE_MS = 333;
-  var EVENT_COUNTDOWN_MS = 3e3;
+  var EVENT_FADE_MS = 333;  var EVENT_COUNTDOWN_MS = 3e3;
   var eventIntroMs = 0;
   var eventCountdownMs = 0;
   var SIM_STEP_MS = 1e3 / 60;
