@@ -27,6 +27,11 @@ const SHOTS = [
   { name: "menu-shop", setup: (api) => { api.menuState.tab = "shop"; } },
   { name: "menu-platforms", setup: (api) => { api.menuState.tab = "platforms"; } },
   { name: "settings", setup: (api) => api.openSettings() },
+  { name: "pause", setup: (api) => { api.startGame(); api.setState("PAUSE"); } },
+  { name: "game-over", setup: (api) => { api.startGame(); api.setState("GAMEOVER"); } },
+  { name: "duel", setup: (api) => { api.startGame(); api.duelStart(0, 1, 200); } },
+  { name: "train", setup: (api) => { api.startGame(); api.openTrain(); } },
+  { name: "frames", setup: (api) => { api.menuState.tab = "shop"; api.selectFrame(21); } },
 ];
 
 function formatArg(value) {
@@ -41,7 +46,7 @@ function loadGame() {
   if (html.split(ANCHOR).length !== 2) throw new Error("якорь не найден в index.html");
   const patched = html.replace(
     ANCHOR,
-    ANCHOR + "  globalThis.__api = { draw, startGame, menuState, openSettings };\n"
+    ANCHOR + "  globalThis.__api = { draw, startGame, menuState, openSettings, duelStart, setState: function (kind) { currentState = STATE[kind]; }, openTrain: function () { bossTrainOpen = true; }, selectFrame: function (id) { selectedFrame = id; } };\n"
   );
 
   const sandbox = createSandbox();
