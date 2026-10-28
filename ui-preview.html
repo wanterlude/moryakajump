@@ -9721,10 +9721,11 @@ var __srcSkins = (() => {
       for (const v of step.verticals) verticalPlatforms.push(v);
     }
   }
+  // <<< chunk game: конец >>>
+  // <<< chunk core: начало — генерируется из src/chunks/ >>>
   function startGame() {
     trainingState.active = false;
     bossTrainOpen = false;
-    // <<< chunk game: конец >>>
   initDaily();
     resetGame();
     resetHud();
@@ -10679,8 +10680,7 @@ var __srcSkins = (() => {
     }
     for (const e of extras) if (FX_SPECS[e]) drawModernFx(ctx, e, cx, cy, r, look, t);
     ctx.restore();
-  }
-  function clipOutsideAvatar(cx, cy, r) {
+  }  function clipOutsideAvatar(cx, cy, r) {
     ctx.beginPath();
     ctx.rect(cx - r * 3, cy - r * 3, r * 6, r * 6);
     ctx.arc(cx, cy, r, 0, Math.PI * 2, true);
@@ -11620,8 +11620,7 @@ var __srcSkins = (() => {
       }
     }
     ctx.restore();
-  }
-  function drawMenuCard(index, x, y) {
+  }  function drawMenuCard(index, x, y) {
     const isShop = menuState.tab === "shop";
     const w = MENU.cardW;
     const h = MENU.cardH;
@@ -12442,8 +12441,7 @@ var __srcSkins = (() => {
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-  }
-  function drawBird(bird) {
+  }  function drawBird(bird) {
     if (avalancheRocks.has(bird)) {
       drawAvalancheRock(bird);
       return;
@@ -13415,8 +13413,7 @@ var __srcSkins = (() => {
     { x: 0.184, y: 0.515, rx: 0.048, ry: 0.083 },
     { x: 0.743, y: 0.49, rx: 0.055, ry: 0.09 }
   ];
-  var BOSS_TEETH = { x0: 0.25, x1: 0.74, y: 0.72, h: 0.1, n: 6 };
-  var BOSS_STEP_SCORE = 3e4;
+  var BOSS_TEETH = { x0: 0.25, x1: 0.74, y: 0.72, h: 0.1, n: 6 };  var BOSS_STEP_SCORE = 3e4;
   var BOSS_TOP = 300;
   var BOSS_H = 60;
   var BOSS_W = 120;
@@ -13746,8 +13743,7 @@ var __srcSkins = (() => {
       b.hurtCd = BOSS_HURT_COOLDOWN_MS;
       player.dy = Math.max(player.dy, 10);
     }
-  }
-  function drawBoss() {
+  }  function drawBoss() {
     if (duelIsActive()) {
       duelDraw(ctx);
       return;
@@ -13825,8 +13821,7 @@ var __srcSkins = (() => {
       ctx.fill();
     }
     ctx.restore();
-  }
-  function update(dt) {
+  }  function update(dt) {
     if (currentState === STATE.PLAYING && (eventIntroMs > 0 || eventCountdownMs > 0)) {
       if (eventIntroMs > 0) eventIntroMs = Math.max(0, eventIntroMs - SIM_STEP_MS);
       else eventCountdownMs = Math.max(0, eventCountdownMs - SIM_STEP_MS);
@@ -14155,8 +14150,7 @@ var __srcSkins = (() => {
       }
       finishRunStats();
     }
-  }
-  var UI = {
+  }  var UI = {
     /** Основа капсул: белый с лёгкой прозрачностью. */
     surface: "rgba(255,255,255,.88)",
     /** Капсула поверх светлого фона — чуть плотнее. */
@@ -14201,8 +14195,7 @@ var __srcSkins = (() => {
     pill: (h) => h / 2,
     /** Скругление для крупных панелей. */
     panelRadius: 26
-  };
-  function uiPill(x, y, w, h, opts = {}) {
+  };  function uiPill(x, y, w, h, opts = {}) {
     const r = opts.radius ?? UI.pill(h);
     const fill = opts.fill ?? UI.surface;
     ctx.save();
@@ -14220,8 +14213,7 @@ var __srcSkins = (() => {
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.restore();
-  }
-  function uiAccentPill(x, y, w, h, opts = {}) {
+  }  function uiAccentPill(x, y, w, h, opts = {}) {
     const tone = opts.tone ?? "green";
     const fill = opts.dim ? "rgba(120,150,160,.45)" : UI.accentTones[tone];
     const glow = UI.accentGlows[tone];
@@ -18956,7 +18948,7 @@ var __srcSkins = (() => {
   setupTutorial();
   checkAchievements(false);
   loadVibration();
-  loadVolume();
+  loadVolume();  // <<< chunk core: конец >>>
   setTimeout(maybeShowTutorial, 500);
   soundButton.addEventListener("click", () => toggleSound());
   syncSoundButton();

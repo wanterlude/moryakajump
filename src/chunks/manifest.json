@@ -30,8 +30,23 @@
         "game/03-wind-and-perks.js",
         "game/04-sound-and-effects.js",
         "game/05-events-and-spawn.js"
+      ]
+    },
+    {
+      "name": "core",
+      "parts": [
+        "core/01-start-game.js",
+        "core/02-clip-outside-avatar.js",
+        "core/03-draw-menu-card.js",
+        "core/04-draw-bird.js",
+        "core/05-boss-step-score.js",
+        "core/06-draw-boss.js",
+        "core/07-update.js",
+        "core/08-ui.js",
+        "core/09-ui-pill.js",
+        "core/10-ui-accent-pill.js"
       ],
-      "openBraces": 1
+      "openBraces": -1
     }
   ]
 }

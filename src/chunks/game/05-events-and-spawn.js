@@ -359,7 +359,3 @@
       for (const v of step.verticals) verticalPlatforms.push(v);
     }
   }
-  function startGame() {
-    trainingState.active = false;
-    bossTrainOpen = false;
-  
