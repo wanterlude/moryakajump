@@ -25,7 +25,7 @@
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.66";
+  var GAME_VERSION = "1.0.67";
   var MENU = {
     padX: 20,
     titleY: 20,

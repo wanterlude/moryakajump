@@ -134,9 +134,12 @@
   // Ширина всех платформ ужимается с 0 до 150 000 очков: к финишу остаётся 15 px.
   var PLATFORM_SHRINK_SCORE = 15e4;
   var PLATFORM_MIN_WIDTH = 15;
+  // Показатель кривой: 1 — линейно, 2.5 — падение примерно в 2,5 раза быстрее на старте
+  // при том же финише в 15 px на 150 000 очков.
+  var PLATFORM_SHRINK_POWER = 2.5;
   function shrinkWidth(base) {
     const t = Math.min(1, Math.max(0, player.score) / PLATFORM_SHRINK_SCORE);
-    return base + (PLATFORM_MIN_WIDTH - base) * t;
+    return PLATFORM_MIN_WIDTH + (base - PLATFORM_MIN_WIDTH) * Math.pow(1 - t, PLATFORM_SHRINK_POWER);
   }
   function platformStep() {
     const t = Math.min(1, player.score / 1e5);
