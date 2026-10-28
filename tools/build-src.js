@@ -54,6 +54,11 @@ const MODULES = [
     exports: ["WINTER"],
   },
   {
+    entry: path.join(root, "src/game/content.ts"),
+    global: "__srcContent",
+    exports: ["BIOME_PALETTES", "BIRD_KINDS", "QUEST_DEFS", "PERK_NEUTRAL", "PERK_RARITY_WEIGHTS", "PERK_RARITY_ORDER", "PERK_RARITY", "LEGENDARY_SPAN", "PERK_DEFS"],
+  },
+  {
     entry: path.join(root, "src/game/hud-colors.ts"),
     global: "__srcHudColors",
     exports: ["HUD_COLORS"],

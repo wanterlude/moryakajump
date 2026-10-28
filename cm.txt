@@ -1,0 +1,14 @@
+Move the content tables into src/ and drop a duplicate perk
+
+src/game/content.ts holds nine independent tables: biomes, bird kinds, run quests, the
+perk rarity scale, weights and all 48 perk definitions. The frame catalogue stays behind
+because FRAMES is built from EXTRA_FRAMES, which are declared later in the bundle and are
+not available at the top of the IIFE where modules are injected.
+
+The new tests found a real bug on the first run: two perks shared the id magnet2 with
+different hints but identical mods, so PERK_BY_ID kept one and the offer could show the
+other's text. The shadowed copy is removed; the surviving card now tells the truth.
+
+Eight new tests cover biome palettes, bird parameters, quest ids and rewards, rarity
+weights summing to one, rarity order consistency, unique perk ids and filled neutral
+modifiers. 52 tests total, tsc clean, golden frames unchanged.
