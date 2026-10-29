@@ -12,7 +12,7 @@
 html,body{margin:0;width:100%;min-height:100%;background:#101a35}
 body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-content:center;align-items:center;overflow:auto;touch-action:none;user-select:none;-webkit-user-select:none;font-family:Arial,sans-serif}
 #gameStage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative}
-#game{display:block;width:min(600px,94vw,calc((100dvh - 75px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
+#game{display:block;width:min(1400px,94vw,calc((100dvh - 75px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
 #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;gap:0;background:#101a35}
 #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-width:none;max-height:none;border-radius:0}
 /* Полноэкранный режим на весь stageWrap: на широком ПК боковые панели остаются видимыми. */
@@ -11894,7 +11894,7 @@ var __srcSkins = (() => {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.80";
+  var GAME_VERSION = "1.0.81";
   var MENU = {
     padX: 20,
     titleY: 20,
