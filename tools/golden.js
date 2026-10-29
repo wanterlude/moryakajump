@@ -23,19 +23,19 @@ const FRAME_MS = 5000;
 const update = process.argv.includes("--update");
 
 const SHOTS = [
-  { name: "run", setup: (api) => { api.setState("MENU"); api.startGame(); } },
-  { name: "menu-avatars", setup: (api) => { api.setState("MENU"); api.menuState.tab = "avatars"; api.menuState.swipe = 0; } },
-  { name: "menu-shop", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; } },
-  { name: "menu-shop-owned", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); } },
-  { name: "menu-shop-rarity", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); api.setSort("rarity"); } },
-  { name: "menu-platforms", setup: (api) => { api.setState("MENU"); api.menuState.tab = "platforms"; api.menuState.swipe = -2; } },
-  { name: "settings", setup: (api) => { api.setState("MENU"); api.openSettings(); } },
-  { name: "pause", setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("PAUSE"); } },
-  { name: "game-over", setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("GAMEOVER"); } },
-  { name: "duel", setup: (api) => { api.setState("MENU"); api.startGame(); api.duelStart(0, 1, 200); } },
-  { name: "train", setup: (api) => { api.setState("MENU"); api.startGame(); api.openTrain(); } },
-  { name: "frames", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([21]); api.selectFrame(21); } },
-  { name: "profile", setup: (api) => { api.setState("MENU"); api.openProfile(); } },
+  { name: "run", min: 700, setup: (api) => { api.setState("MENU"); api.startGame(); } },
+  { name: "menu-avatars", min: 900, setup: (api) => { api.setState("MENU"); api.menuState.tab = "avatars"; api.menuState.swipe = 0; } },
+  { name: "menu-shop", min: 500, setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; } },
+  { name: "menu-shop-owned", min: 800, setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); } },
+  { name: "menu-shop-rarity", min: 800, setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); api.setSort("rarity"); } },
+  { name: "menu-platforms", min: 450, setup: (api) => { api.setState("MENU"); api.menuState.tab = "platforms"; api.menuState.swipe = -2; } },
+  { name: "settings", min: 400, setup: (api) => { api.setState("MENU"); api.openSettings(); } },
+  { name: "pause", min: 900, setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("PAUSE"); } },
+  { name: "game-over", min: 450, setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("GAMEOVER"); } },
+  { name: "duel", min: 1500, setup: (api) => { api.setState("MENU"); api.startGame(); api.duelStart(0, 1, 200); } },
+  { name: "train", min: 500, setup: (api) => { api.setState("MENU"); api.startGame(); api.openTrain(); } },
+  { name: "frames", min: 1200, setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([21]); api.selectFrame(21); } },
+  { name: "profile", min: 1200, setup: (api) => { api.setState("MENU"); api.openProfile(); } },
 ];
 
 function formatArg(value) {
@@ -132,6 +132,13 @@ function main() {
     }
 
     const hash = hashCalls(calls);
+    // Кадр, который почти ничего не нарисовал, — тоже регрессия: например, панель
+    // перестала вызываться, а хеш при этом «стабильный».
+    if (shot.min && calls.length < shot.min) {
+      console.log("ПУСТО " + shot.name.padEnd(18) + " " + calls.length + " вызовов, минимум " + shot.min);
+      failed++;
+      continue;
+    }
     const expected = known[shot.name];
     const info = " (" + calls.length + " вызовов)";
 
