@@ -3271,7 +3271,6 @@ var __srcSkins = (() => {
 
 
 
-
   // src/fx.ts
   // <<< chunk fx: начало — генерируется из src/chunks/ >>>
   var FX_SPECS = {
@@ -11905,7 +11904,7 @@ var __srcSkins = (() => {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.79";
+  var GAME_VERSION = "1.0.78";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -11914,13 +11913,13 @@ var __srcSkins = (() => {
     showcaseY: 80,
     showcaseH: 172,
     gridY: 260,
-    gridH: 226,
+    gridH: 300,
     cols: 5,
     cardW: 64,
     cardH: 78,
     gapX: 8,
     gapY: 10,
-    barY: 494,
+    barY: WORLD_H - 106,
     barH: 52
   };
   // Иконки в главном меню: настройки и глобальный рейтинг.
@@ -12971,11 +12970,11 @@ var __srcSkins = (() => {
     ctx.textBaseline = "middle";
     setFont(7.5, "bold");
     ctx.fillStyle = "rgba(21,85,118,.7)";
-    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, 566, 1.2, "left");
+    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, WORLD_H - 120, 1.2, "left");
     trackedText(
       isCoarsePointer() ? "\u041F\u0420\u041E\u0412\u0415\u0414\u0418 \u041F\u041E \u0421\u0415\u0422\u041A\u0415 \u2014 \u041F\u0420\u041E\u041A\u0420\u0423\u0422\u041A\u0410" : "\u2190 \u2192 \u0412\u042B\u0411\u041E\u0420 \xB7 ENTER \u0414\u0415\u0419\u0421\u0422\u0412\u0418\u0415",
       WORLD_W - MENU.padX,
-      566,
+      WORLD_H - 120,
       1.2,
       "right"
     );
@@ -17953,18 +17952,18 @@ var __srcSkins = (() => {
     }
   }
   var GACHA_UI = {
-    panel: { x: 20, y: 82, w: 360, h: 200 },
-    reel: { x: 34, y: 94, w: 332, h: 146 },
-    collectY: 292,
-    ratesY: 330,
-    spinY: 374,
+    panel: { x: 20, y: 122, w: 360, h: 200 },
+    reel: { x: 34, y: 134, w: 332, h: 146 },
+    collectY: 332,
+    ratesY: 370,
+    spinY: 414,
     spinH: 44,
     spinX: 20,
     spinW: 228,
     playX: 260,
     playW: 120,
-    hintY: 432,
-    picker: { x: 0, y: 472, w: WORLD_W, h: 112 },
+    hintY: 472,
+    picker: { x: 0, y: 528, w: WORLD_W, h: 112 },
     cellW: 76
   };
   // Сортировка витрины рамок: базовый порядок FRAMES уже по цене.
@@ -17974,7 +17973,7 @@ var __srcSkins = (() => {
     { id: "name", label: "ИМЯ" },
     { id: "owned", label: "МОИ" }
   ];
-  var FRAME_SORT_ROW = { y: 450, h: 20 };
+  var FRAME_SORT_ROW = { y: 492, h: 20 };
   var frameSort = readFrameSort();
   function readFrameSort() {
     try {
@@ -18440,16 +18439,16 @@ var __srcSkins = (() => {
   var PLATFORM_REEL_LEN = 36;
   var PLATFORM_REEL_LAND = 30;
   var PLATFORM_UI = {
-    panel: { x: 20, y: 80, w: 360, h: 122 },
-    chipY: [210, 242],
+    panel: { x: 20, y: 140, w: 360, h: 222 },
+    chipY: [370, 402],
     chipW: 80,
     chipH: 26,
     chipGap: 6,
-    reel: { x: 20, y: 278, w: 360, h: 96 },
+    reel: { x: 20, y: 438, w: 360, h: 96 },
     cellStep: 90,
-    resultY: 390,
-    collectY: 410,
-    tileY: 420,
+    resultY: 550,
+    collectY: 570,
+    tileY: 580,
     tileW: 28,
     tileH: 22,
     tileGap: 3

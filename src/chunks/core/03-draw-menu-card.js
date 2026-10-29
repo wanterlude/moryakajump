@@ -144,11 +144,11 @@
     ctx.textBaseline = "middle";
     setFont(7.5, "bold");
     ctx.fillStyle = "rgba(21,85,118,.7)";
-    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, 566, 1.2, "left");
+    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, WORLD_H - 120, 1.2, "left");
     trackedText(
       isCoarsePointer() ? "\u041F\u0420\u041E\u0412\u0415\u0414\u0418 \u041F\u041E \u0421\u0415\u0422\u041A\u0415 \u2014 \u041F\u0420\u041E\u041A\u0420\u0423\u0422\u041A\u0410" : "\u2190 \u2192 \u0412\u042B\u0411\u041E\u0420 \xB7 ENTER \u0414\u0415\u0419\u0421\u0422\u0412\u0418\u0415",
       WORLD_W - MENU.padX,
-      566,
+      WORLD_H - 120,
       1.2,
       "right"
     );
