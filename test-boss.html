@@ -12,9 +12,9 @@
 html,body{margin:0;width:100%;min-height:100%;background:#101a35}
 body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-content:center;align-items:center;overflow:auto;touch-action:none;user-select:none;-webkit-user-select:none;font-family:Arial,sans-serif}
 #gameStage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative}
-#game{display:block;width:min(1400px,94vw,calc((100dvh - 75px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
+#game{display:block;width:min(1400px,94vw,calc((100dvh - 95px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
 /* Компактный размер: кнопка возвращает прежние 600 px. */
-#stageWrap.compact #game{width:min(600px,94vw,calc((100dvh - 75px)*2/3))}
+#stageWrap.compact #game{width:min(600px,94vw,calc((100dvh - 95px)*2/3))}
 #sizeButton{width:52px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:#eaf6ff;cursor:pointer}
 #sizeButton:hover{background:rgba(255,255,255,.22)}
 #sizeButton svg{display:block}
@@ -35,7 +35,9 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     #stageWrap:fullscreen{width:100vw;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
     #stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*2/3));height:auto;border-radius:0}
 }
-#toolbar{display:flex;gap:10px;align-items:center;justify-content:center}
+#toolbar{display:flex;gap:10px;align-items:flex-start;justify-content:center}
+.toolCell{display:flex;flex-direction:column;align-items:center;gap:4px}
+.toolCap{font:8.5px 'Trebuchet MS',Arial;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.72);white-space:nowrap}
 #fullscreenButton{width:52px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;font:28px Arial,sans-serif;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 #soundButton{width:52px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:0}
 #soundButton svg{display:block}
@@ -234,7 +236,8 @@ html, body, body * {
 <div id="gameStage">
 <canvas id="game" width="1600" height="2400" aria-label="Игра «Моряка Jump»"></canvas>
 <div id="toolbar">
-    <button id="soundButton" type="button" aria-label="Выключить звук" title="Звук включён">
+    <div class="toolCell">
+<button id="soundButton" type="button" aria-label="Выключить звук" title="Звук включён">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
             <path class="spkBody" d="M4 9.2h3.1L11.6 5v14L7.1 14.8H4z" fill="currentColor"/>
             <path class="spkWave" d="M15 8.6a4.2 4.2 0 0 1 0 6.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -242,19 +245,30 @@ html, body, body * {
             <path class="spkCross" d="M15.6 9.2l5 5.6M20.6 9.2l-5 5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
     </button>
-    <button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
-  <button id="sizeButton" type="button" aria-label="Уменьшить игру" title="Прежний размер">
+    <span class="toolCap">Звук</span>
+    </div>
+    <div class="toolCell">
+<button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
+    <span class="toolCap">Экран</span>
+    </div>
+    <div class="toolCell">
+<button id="sizeButton" type="button" aria-label="Уменьшить игру" title="Прежний размер">
   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
   <path class="szIn" d="M4 9h5V4M20 9h-5V4M15 20v-5h5M9 20v-5H4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
   <path class="szOut" d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
   </button>
-    <button id="resetButton" type="button" aria-label="Сбросить прогресс" title="Сбросить прогресс">
+    <span class="toolCap">Размер</span>
+    </div>
+    <div class="toolCell">
+<button id="resetButton" type="button" aria-label="Сбросить прогресс" title="Сбросить прогресс">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
             <path d="M5 7h14M10 7V5.4c0-.5.4-.9.9-.9h2.2c.5 0 .9.4.9.9V7M7.2 7l.8 11.2c.05.7.63 1.2 1.33 1.2h5.34c.7 0 1.28-.5 1.33-1.2L16.8 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M10.4 10.6v6M13.6 10.6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".75"/>
         </svg>
     </button>
+    <span class="toolCap">Сброс</span>
+    </div>
 </div>
 <div id="resetOverlay" role="dialog" aria-modal="true" aria-labelledby="resetTitle" aria-hidden="true">
     <div id="resetCard">
@@ -11908,7 +11922,7 @@ var __srcSkins = (() => {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.82";
+  var GAME_VERSION = "1.0.83";
   var MENU = {
     padX: 20,
     titleY: 20,
