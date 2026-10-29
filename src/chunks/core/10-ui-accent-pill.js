@@ -1850,6 +1850,12 @@
       gachaState.pickerDrag = false;
       gachaState.pickerPointerId = null;
       if (moved < 6) {
+        const sortHit = frameSortIndexAt(point);
+        if (sortHit >= 0) {
+          setFrameSort(FRAME_SORTS[sortHit].id);
+          event.preventDefault();
+          return;
+        }
         const index = gachaPickerIndexAt(point);
         const list = gachaOwnedList();
         if (index >= 0 && list[index]) equipFrameById(list[index].id);
@@ -2095,9 +2101,95 @@
     playX: 260,
     playW: 120,
     hintY: 432,
-    picker: { x: 0, y: 448, w: WORLD_W, h: 112 },
+    picker: { x: 0, y: 472, w: WORLD_W, h: 112 },
     cellW: 76
   };
+  // Сортировка витрины рамок: базовый порядок FRAMES уже по цене.
+  var FRAME_SORTS = [
+    { id: "price", label: "ЦЕНА" },
+    { id: "rarity", label: "РЕДКОСТЬ" },
+    { id: "name", label: "ИМЯ" },
+    { id: "owned", label: "МОИ" }
+  ];
+  var FRAME_SORT_ROW = { y: 450, h: 20 };
+  var frameSort = readFrameSort();
+  function readFrameSort() {
+    try {
+      const raw = localStorage.getItem("morjakaFrameSort");
+      if (FRAME_SORTS.some((s) => s.id === raw)) return raw;
+    } catch {}
+    return "price";
+  }
+  function frameTierRank(frame) {
+    const index = GACHA_TIER_ORDER.indexOf(GACHA_TIER(frame));
+    return index < 0 ? 0 : index;
+  }
+  function shopFrames() {
+    if (frameSort === "rarity") {
+      return FRAMES.slice().sort((a, b) => frameTierRank(b) - frameTierRank(a) || a.price - b.price || a.id - b.id);
+    }
+    if (frameSort === "name") {
+      return FRAMES.slice().sort((a, b) => a.name.localeCompare(b.name, "ru") || a.id - b.id);
+    }
+    if (frameSort === "owned") {
+      return FRAMES.slice().sort((a, b) =>
+        (ownedFrames.includes(b.id) ? 1 : 0) - (ownedFrames.includes(a.id) ? 1 : 0) ||
+        a.price - b.price || a.id - b.id
+      );
+    }
+    return FRAMES;
+  }
+  function setFrameSort(id) {
+    if (!FRAME_SORTS.some((s) => s.id === id) || id === frameSort) return;
+    const current = shopFrames()[menuCursors.shop];
+    frameSort = id;
+    try { localStorage.setItem("morjakaFrameSort", id); } catch {}
+    const next = shopFrames();
+    const index = current ? next.findIndex((f) => f.id === current.id) : 0;
+    menuCursors.shop = Math.max(0, index);
+    gachaState.pickerScroll = 0;
+    sfx.click();
+  }
+  function frameSortRects() {
+    const gap = 6;
+    const w = 84;
+    const rowW = FRAME_SORTS.length * w + (FRAME_SORTS.length - 1) * gap;
+    const x0 = (WORLD_W - rowW) / 2;
+    return FRAME_SORTS.map((sort, i) => ({
+      id: sort.id,
+      label: sort.label,
+      x: x0 + i * (w + gap),
+      y: FRAME_SORT_ROW.y,
+      w,
+      h: FRAME_SORT_ROW.h
+    }));
+  }
+  function frameSortIndexAt(point) {
+    return frameSortRects().findIndex((rect) =>
+      point.x >= rect.x && point.x <= rect.x + rect.w &&
+      point.y >= rect.y && point.y <= rect.y + rect.h
+    );
+  }
+  function drawFrameSortChips() {
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (const rect of frameSortRects()) {
+      const on = rect.id === frameSort;
+      roundedRect(rect.x, rect.y, rect.w, rect.h, 10);
+      ctx.fillStyle = on ? "#0f8a76" : "rgba(255,255,255,.62)";
+      ctx.fill();
+      if (!on) {
+        ctx.strokeStyle = "rgba(21,85,118,.18)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      setFont(6.6, "bold");
+      ctx.fillStyle = on ? "#ffffff" : "rgba(21,85,118,.62)";
+      trackedText(rect.label, rect.x + rect.w / 2, rect.y + rect.h / 2, 1.1);
+    }
+    ctx.restore();
+  }
   var GACHA_PICKER = {
     cellW: 62,
     cellH: 84,
@@ -2806,10 +2898,11 @@
     drawGachaSpinButton();
     drawGachaPlayButton();
     drawGachaHint();
+    drawFrameSortChips();
     drawGachaPicker();
   }
   function gachaOwnedList() {
-    const list = FRAMES.filter((f) => ownedFrames.includes(f.id));
+    const list = shopFrames().filter((f) => ownedFrames.includes(f.id));
     return list.length ? list : [FRAMES[0]];
   }
   function gachaPickerCellX(index) {
@@ -2837,7 +2930,8 @@
   }
   function isInsideGachaPicker(point) {
     const { y, h } = GACHA_UI.picker;
-    return point.y >= y && point.y <= y + h;
+    // Захватываем и ряд сортировки над рядом рамок.
+    return point.y >= FRAME_SORT_ROW.y && point.y <= y + h;
   }
   function equipFrameById(id) {
     if (gachaState.phase === "reveal") {

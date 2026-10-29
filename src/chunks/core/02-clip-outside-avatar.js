@@ -25,7 +25,7 @@
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.73";
+  var GAME_VERSION = "1.0.74";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -65,7 +65,7 @@
   }
   var menuCursors = {
     avatars: selectedAvatar,
-    shop: Math.max(0, FRAMES.findIndex((f) => f.id === selectedFrame)),
+    shop: Math.max(0, shopFrames().findIndex((f) => f.id === selectedFrame)),
     platforms: 0
   };
   var menuState = {
@@ -190,10 +190,10 @@
     return index < menuTabCount() ? index : -1;
   }
   function menuItemUnlocked(index) {
-    return menuState.tab === "shop" ? ownedFrames.includes(FRAMES[index].id) : unlockedAvatars.includes(index);
+    return menuState.tab === "shop" ? ownedFrames.includes(shopFrames()[index].id) : unlockedAvatars.includes(index);
   }
   function menuItemWorn(index) {
-    return menuState.tab === "shop" ? selectedFrame === FRAMES[index].id : selectedAvatar === index;
+    return menuState.tab === "shop" ? selectedFrame === shopFrames()[index].id : selectedAvatar === index;
   }
   var FRAME_RARITY = (frame) => frame.price === 0 ? "\u0411\u0410\u0417\u041E\u0412\u0410\u042F" : frame.price < 100 ? "\u041E\u0411\u042B\u0427\u041D\u0410\u042F" : frame.price < 200 ? "\u0420\u0415\u0414\u041A\u0410\u042F" : frame.price < 340 ? "\u042D\u041F\u0418\u0427\u0415\u0421\u041A\u0410\u042F" : frame.price < 560 ? "\u041B\u0415\u0413\u0415\u041D\u0414\u0410\u0420\u041D\u0410\u042F" : "\u0411\u041E\u0416\u0415\u0421\u0422\u0412\u0415\u041D\u041D\u0410\u042F";
   var EXTRAS_LABELS = {
@@ -789,7 +789,7 @@
     const y = MENU.showcaseY;
     const w = WORLD_W - MENU.padX * 2;
     const h = MENU.showcaseH;
-    const frameId = isShop ? FRAMES[i].id : selectedFrame;
+    const frameId = isShop ? shopFrames()[i].id : selectedFrame;
     const look = (FRAMES.find((f) => f.id === frameId) || {}).look || null;
     const glow = (a) => look ? hexToRgba(look.glow, a) : "rgba(30,110,150," + a + ")";
     const L = showcaseLayout();
@@ -859,7 +859,7 @@
     ctx.fillStyle = "#0f8a76";
     roundedRect(cbarX, cbarY, Math.max(2, cbarW * (i + 1) / menuTabCount()), 3, 1.5);
     ctx.fill();
-    const title = isShop ? FRAMES[i].name.toUpperCase() : avatarName(i).toUpperCase();
+    const title = isShop ? shopFrames()[i].name.toUpperCase() : avatarName(i).toUpperCase();
     // У открытых аватаров блок из двух строк — опускаем его ниже, чтобы не оставалось пустоты снизу.
     const titleY = !isShop && !locked ? y + h - 54 : L.titleY;
     setFont(title.length > 22 ? 12 : 15, "bold");
@@ -867,7 +867,7 @@
     trackedText(title, cx, titleY, 0.9);
     setFont(9, "bold");
     if (isShop) {
-      const frame = FRAMES[i];
+      const frame = shopFrames()[i];
       const rarity = FRAME_RARITY(frame);
       if (locked) {
         ctx.fillStyle = "#c28000";

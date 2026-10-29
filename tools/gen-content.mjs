@@ -92,6 +92,16 @@ const existingIds = new Set(existingFrames.map((l) => Number(/id: (\d+)/.exec(l)
 const existingCount = existingFrames.length;
 const hasFourthBatch = framesLine.includes("EXTRA_FRAMES_4");
 
+const usedFrameNames = new Set(existingFrames.map((l) => /name: "([^"]+)"/.exec(l)[1]));
+const uniqueName = (base, used) => {
+  if (!used.has(base)) { used.add(base); return base; }
+  const romans = ["II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+  for (const r of romans) {
+    const candidate = base + " · " + r;
+    if (!used.has(candidate)) { used.add(candidate); return candidate; }
+  }
+  return base;
+};
 const rand = mulberry32(20261029);
 const newFrameEntries = [];
 let nextId = 0;
@@ -121,7 +131,7 @@ for (let i = existingCount; i < FRAMES_TARGET; i++) {
   if (rand() < 0.35) extras.push(FX_KEYS[Math.floor(rand() * FX_KEYS.length)]);
   newFrameEntries.push({
     id,
-    name: `${ORNAMENT_NAMES[ornament]} · ${paletteName}`,
+    name: uniqueName(`${ORNAMENT_NAMES[ornament]} · ${paletteName}`, usedFrameNames),
     price,
     colors,
     glow,

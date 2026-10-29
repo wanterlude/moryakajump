@@ -28,7 +28,7 @@
     ctx.save();
     if (!unlocked) ctx.globalAlpha = 0.62;
     drawAvatarCircle(cx, cy, r, isShop ? selectedAvatar : index);
-    drawFrame(cx, cy, r, isShop ? FRAMES[index].id : selectedFrame, true);
+    drawFrame(cx, cy, r, isShop ? shopFrames()[index].id : selectedFrame, true);
     ctx.restore();
     if (!unlocked) {
       ctx.save();
