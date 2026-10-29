@@ -11,10 +11,10 @@ import {
 const HEX = /^#[0-9a-f]{6}$/i;
 const TIERS: SkinTier[] = ["base", "common", "rare", "epic", "legendary", "divine"];
 
-test("каждого типа по одиннадцать скинов", () => {
+test("каждого типа по пятьдесят скинов", () => {
   for (const type of PLATFORM_TYPES) {
     const count = PLATFORM_SKINS.filter((skin) => skin.type === type).length;
-    assert.equal(count, 11, `тип ${type}: ${count} скинов`);
+    assert.equal(count, 50, `тип ${type}: ${count} скинов`);
   }
 });
 

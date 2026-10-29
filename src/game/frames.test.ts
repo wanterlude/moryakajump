@@ -1,13 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { BASE_FRAMES, EXTRA_FRAMES, EXTRA_FRAMES_2, EXTRA_FRAMES_3, FRAMES } from "./frames.ts";
+import { BASE_FRAMES, EXTRA_FRAMES, EXTRA_FRAMES_2, EXTRA_FRAMES_3, EXTRA_FRAMES_4, FRAMES } from "./frames.ts";
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
 test("рамок достаточно много и каталог собран из всех наборов", () => {
-  const expected = BASE_FRAMES.length + EXTRA_FRAMES.length + EXTRA_FRAMES_2.length + EXTRA_FRAMES_3.length;
+  const expected = BASE_FRAMES.length + EXTRA_FRAMES.length + EXTRA_FRAMES_2.length +
+    EXTRA_FRAMES_3.length + EXTRA_FRAMES_4.length;
   assert.equal(FRAMES.length, expected);
-  assert.ok(FRAMES.length >= 200, "рамок: " + FRAMES.length);
+  assert.equal(FRAMES.length, 1000, "рамок: " + FRAMES.length);
 });
 
 test("идентификаторы уникальны", () => {
