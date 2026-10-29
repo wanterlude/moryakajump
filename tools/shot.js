@@ -34,6 +34,7 @@ const event = arg("event", "");
 const score = arg("score", "");
 const frameId = arg("frame", "");
 const sortMode = arg("sort", "");
+const compact = arg("compact", "");
 
 const chromeCandidates = [
   path.join(process.env.ProgramFiles || "", "Google/Chrome/Application/chrome.exe"),
@@ -63,6 +64,7 @@ const HOOK = String.raw`
       var shotScore = "";
       var shotFrame = "";
       var shotSort = "";
+      var shotCompact = false;
       for (var pi = 0; pi < shotParts.length; pi++) {
         if (shotParts[pi].indexOf("shot=") === 0) shotTab = shotParts[pi].slice(5);
         else if (shotParts[pi].indexOf("hover=") === 0) shotHover = decodeURIComponent(shotParts[pi].slice(6));
@@ -71,6 +73,7 @@ const HOOK = String.raw`
         else if (shotParts[pi].indexOf("score=") === 0) shotScore = shotParts[pi].slice(6);
         else if (shotParts[pi].indexOf("frame=") === 0) shotFrame = shotParts[pi].slice(6);
         else if (shotParts[pi].indexOf("sort=") === 0) shotSort = shotParts[pi].slice(5);
+        else if (shotParts[pi].indexOf("compact=") === 0) shotCompact = true;
       }
       bankCoins = 4321;
       var shotIdx = -1;
@@ -282,7 +285,7 @@ for (const tab of tabs) {
     "--virtual-time-budget=4000",
     "--user-data-dir=" + path.join(work, "profile"),
     "--screenshot=" + out,
-    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (event ? "&event=" + event : "") + (score ? "&score=" + score : "") + (frameId ? "&frame=" + frameId : "") + (sortMode ? "&sort=" + sortMode : "") + (springs ? "&springs=1" : ""),
+    url + "#shot=" + tab + (hover ? "&hover=" + encodeURIComponent(hover) : "") + (hazard ? "&hazard=" + hazard : "") + (event ? "&event=" + event : "") + (score ? "&score=" + score : "") + (frameId ? "&frame=" + frameId : "") + (sortMode ? "&sort=" + sortMode : "") + (compact ? "&compact=1" : "") + (springs ? "&springs=1" : ""),
   ]);
   if (!fs.existsSync(out)) {
     console.error("Не удалось снять " + tab + " (код " + res.status + ")");
