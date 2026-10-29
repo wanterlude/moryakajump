@@ -23,17 +23,19 @@ const FRAME_MS = 5000;
 const update = process.argv.includes("--update");
 
 const SHOTS = [
-  { name: "run", setup: (api) => api.startGame() },
-  { name: "menu-avatars", setup: (api) => { api.menuState.tab = "avatars"; } },
-  { name: "menu-shop", setup: (api) => { api.menuState.tab = "shop"; } },
-  { name: "menu-platforms", setup: (api) => { api.menuState.tab = "platforms"; } },
-  { name: "settings", setup: (api) => api.openSettings() },
-  { name: "pause", setup: (api) => { api.startGame(); api.setState("PAUSE"); } },
-  { name: "game-over", setup: (api) => { api.startGame(); api.setState("GAMEOVER"); } },
-  { name: "duel", setup: (api) => { api.startGame(); api.duelStart(0, 1, 200); } },
-  { name: "train", setup: (api) => { api.startGame(); api.openTrain(); } },
-  { name: "frames", setup: (api) => { api.menuState.tab = "shop"; api.selectFrame(21); } },
-  { name: "profile", setup: (api) => { api.openProfile(); } },
+  { name: "run", setup: (api) => { api.setState("MENU"); api.startGame(); } },
+  { name: "menu-avatars", setup: (api) => { api.setState("MENU"); api.menuState.tab = "avatars"; api.menuState.swipe = 0; } },
+  { name: "menu-shop", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; } },
+  { name: "menu-shop-owned", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); } },
+  { name: "menu-shop-rarity", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); api.setSort("rarity"); } },
+  { name: "menu-platforms", setup: (api) => { api.setState("MENU"); api.menuState.tab = "platforms"; api.menuState.swipe = -2; } },
+  { name: "settings", setup: (api) => { api.setState("MENU"); api.openSettings(); } },
+  { name: "pause", setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("PAUSE"); } },
+  { name: "game-over", setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("GAMEOVER"); } },
+  { name: "duel", setup: (api) => { api.setState("MENU"); api.startGame(); api.duelStart(0, 1, 200); } },
+  { name: "train", setup: (api) => { api.setState("MENU"); api.startGame(); api.openTrain(); } },
+  { name: "frames", setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([21]); api.selectFrame(21); } },
+  { name: "profile", setup: (api) => { api.setState("MENU"); api.openProfile(); } },
 ];
 
 function formatArg(value) {
@@ -48,7 +50,7 @@ function loadGame() {
   if (html.split(ANCHOR).length !== 2) throw new Error("якорь не найден в index.html");
   const patched = html.replace(
     ANCHOR,
-    ANCHOR + "  globalThis.__api = { draw, startGame, menuState, openSettings, duelStart, setState: function (kind) { currentState = STATE[kind]; }, openTrain: function () { bossTrainOpen = true; }, openProfile: function () { openProfile(); }, selectFrame: function (id) { selectedFrame = id; } };\n"
+    ANCHOR + "  globalThis.__api = { draw, startGame, menuState, openSettings, duelStart, setState: function (kind) { currentState = STATE[kind]; }, openTrain: function () { bossTrainOpen = true; }, openProfile: function () { openProfile(); }, grantFrames: function (ids) { for (const id of ids) if (!ownedFrames.includes(id)) ownedFrames.push(id); }, setSort: function (mode) { setFrameSort(mode); }, selectFrame: function (id) { selectedFrame = id; } };\n"
   );
 
   const sandbox = createSandbox();

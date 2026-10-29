@@ -1,13 +1,15 @@
 {
   "run": "1676029ea47d24a9",
-  "menu-avatars": "fd4981a58eaf787a",
-  "menu-shop": "fa199afeba88347b",
-  "menu-platforms": "4258177fcc8b121f",
-  "settings": "bbcb558090d8aedf",
-  "pause": "ecf36d21808fe0c8",
+  "menu-avatars": "517608fcb30d0241",
+  "menu-shop": "f89505d5dda84bd4",
+  "menu-platforms": "d8376b0e951fcd36",
+  "settings": "070ed5c4bbf492ad",
+  "pause": "c16dea3e7ec18094",
   "game-over": "b55c8aac1d5db1f4",
   "duel": "3eb027bddbe379c3",
-  "train": "ecf302edd86fdde5",
-  "frames": "f95241685fe3f72c",
-  "profile": "b54c3f59a9dd7fa2"
+  "train": "75642914fca4f763",
+  "frames": "202b632c67bcd1c6",
+  "profile": "118c2e0782afd011",
+  "menu-shop-owned": "eeacb3aae5880fa2",
+  "menu-shop-rarity": "b7c0d311b476d8c7"
 }
