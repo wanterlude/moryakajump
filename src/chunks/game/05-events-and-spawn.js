@@ -311,8 +311,8 @@
     setMenuMessage("Геймпад подключён", "A — прыжок, START — пауза");
   });
   function resetGame() {
-    player = { x: 185, y: WORLD_H - 100, vx: 0, dy: 0, score: 0 };
-    platforms = [makePlatform({ x: 120, y: WORLD_H - 50, w: 160, h: 15, type: "static" })];
+    player = { x: 185, y: 500, vx: 0, dy: 0, score: 0 };
+    platforms = [makePlatform({ x: 120, y: 550, w: 160, h: 15, type: "static" })];
     fallingPlatforms = [];
     verticalPlatforms = [];
     springs = [];
@@ -341,7 +341,7 @@
     runStartedAt = performance.now();
     clearTouchInput();
     for (let i = 0; i < 7; i++) {
-      const y = WORLD_H - 100 - i * 100;
+      const y = 500 - i * 100;
       const step = spawnTerrainStep(y);
       for (const p of step.platforms) platforms.push(p);
       for (const v of step.verticals) verticalPlatforms.push(v);

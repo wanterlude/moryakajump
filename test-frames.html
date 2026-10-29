@@ -12,20 +12,20 @@
 html,body{margin:0;width:100%;min-height:100%;background:#101a35}
 body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-content:center;align-items:center;overflow:auto;touch-action:none;user-select:none;-webkit-user-select:none;font-family:Arial,sans-serif}
 #gameStage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative}
-#game{display:block;width:min(600px,94vw,calc((100dvh - 75px)*4/7));height:auto;aspect-ratio:4/7;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
+#game{display:block;width:min(600px,94vw,calc((100dvh - 75px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
 #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;gap:0;background:#101a35}
-#gameStage:fullscreen #game{width:min(100vw,calc(100dvh*4/7));height:min(100dvh,calc(100vw*7/4));max-width:none;max-height:none;border-radius:0}
+#gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-width:none;max-height:none;border-radius:0}
 /* Полноэкранный режим на весь stageWrap: на широком ПК боковые панели остаются видимыми. */
 #stageWrap:fullscreen{width:100vw;height:100vh;height:100dvh;gap:0;padding:0;background:#101a35;align-items:center;justify-content:center}
 #stageWrap:fullscreen #gameStage{flex:0 1 auto}
-#stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*4/7));height:auto;max-width:none;max-height:none;border-radius:0}
+#stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*2/3));height:auto;max-width:none;max-height:none;border-radius:0}
 @media (min-width:1180px) and (pointer:fine){
     #stageWrap:fullscreen{gap:22px;padding:0 16px}
-    #stageWrap:fullscreen #game{width:min(calc(100vw - 556px),calc((100dvh - 80px)*4/7))}
+    #stageWrap:fullscreen #game{width:min(calc(100vw - 556px),calc((100dvh - 80px)*2/3))}
 }
 @media (max-width:600px) and (pointer:coarse){
     #stageWrap:fullscreen{width:100vw;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-    #stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*4/7));height:auto;border-radius:0}
+    #stageWrap:fullscreen #game{width:min(100vw,calc((100dvh - 80px)*2/3));height:auto;border-radius:0}
 }
 #toolbar{display:flex;gap:10px;align-items:center;justify-content:center}
 #fullscreenButton{width:52px;height:44px;flex:0 0 auto;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:white;font:28px Arial,sans-serif;cursor:pointer;touch-action:manipulation;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
@@ -89,10 +89,10 @@ body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-cont
     html,body{width:100%;height:100%;min-height:100%;overflow:hidden;overscroll-behavior:none}
     body{padding:max(6px, env(safe-area-inset-top)) 0}
     #gameStage{width:100%;gap:8px}
-    #game{width:min(96vw,calc((100dvh - 120px)*4/7));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
+    #game{width:min(96vw,calc((100dvh - 120px)*2/3));max-height:calc(100dvh - 120px);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.38)}
     #fullscreenButton{display:none}
     #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
-    #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*4/7));height:min(100dvh,calc(100vw*7/4));max-height:none;border-radius:0}
+    #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-height:none;border-radius:0}
     #gameStage:fullscreen #toolbar{right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}
 }
 @media (max-width:900px) and (pointer:coarse) and (orientation:landscape){
@@ -3250,10 +3250,6 @@ var __srcSkins = (() => {
   var PLATFORM_TYPE_SHORT = __srcSkins.PLATFORM_TYPE_SHORT;
   var PLATFORM_SKINS = __srcSkins.PLATFORM_SKINS;
   // <<< src: конец вставки >>>
-
-
-
-
 
 
 
@@ -9253,10 +9249,8 @@ var __srcSkins = (() => {
   // <<< chunk game: начало — генерируется из src/chunks/ >>>
   var canvas = document.getElementById("game");
   var WORLD_W = 400;
-  var WORLD_H = 700;
-  // Насколько вырос экран: оверлеи, рассчитанные на 600, центрируем на 700.
-  var UI_CENTER_DY = (WORLD_H - 600) / 2;
-  var RENDER_SCALE = Math.max(1, Math.min(8, Math.ceil(
+  var WORLD_H = 600;
+  var RENDER_SCALE = Math.max(1, Math.min(4, Math.ceil(
     canvas.getBoundingClientRect().width / WORLD_W * (window.devicePixelRatio || 1)
   )));
   canvas.width = WORLD_W * RENDER_SCALE;
@@ -10049,7 +10043,7 @@ var __srcSkins = (() => {
       console.warn("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441:", error);
     }
   }
-  var player = { x: 185, y: WORLD_H - 100, vx: 0, dy: 0, score: 0 };
+  var player = { x: 185, y: 500, vx: 0, dy: 0, score: 0 };
   var squash = 0;
   var fallCooldown = 0;
   var WIND_FROM_SCORE = 1e4;
@@ -10866,8 +10860,8 @@ var __srcSkins = (() => {
     setMenuMessage("Геймпад подключён", "A — прыжок, START — пауза");
   });
   function resetGame() {
-    player = { x: 185, y: WORLD_H - 100, vx: 0, dy: 0, score: 0 };
-    platforms = [makePlatform({ x: 120, y: WORLD_H - 50, w: 160, h: 15, type: "static" })];
+    player = { x: 185, y: 500, vx: 0, dy: 0, score: 0 };
+    platforms = [makePlatform({ x: 120, y: 550, w: 160, h: 15, type: "static" })];
     fallingPlatforms = [];
     verticalPlatforms = [];
     springs = [];
@@ -10896,7 +10890,7 @@ var __srcSkins = (() => {
     runStartedAt = performance.now();
     clearTouchInput();
     for (let i = 0; i < 7; i++) {
-      const y = WORLD_H - 100 - i * 100;
+      const y = 500 - i * 100;
       const step = spawnTerrainStep(y);
       for (const p of step.platforms) platforms.push(p);
       for (const v of step.verticals) verticalPlatforms.push(v);
@@ -11900,7 +11894,7 @@ var __srcSkins = (() => {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.77";
+  var GAME_VERSION = "1.0.76";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -11909,13 +11903,13 @@ var __srcSkins = (() => {
     showcaseY: 80,
     showcaseH: 172,
     gridY: 260,
-    gridH: 300,
+    gridH: 226,
     cols: 5,
     cardW: 64,
     cardH: 78,
     gapX: 8,
     gapY: 10,
-    barY: WORLD_H - 106,
+    barY: 494,
     barH: 52
   };
   // Иконки в главном меню: настройки и глобальный рейтинг.
@@ -12966,11 +12960,11 @@ var __srcSkins = (() => {
     ctx.textBaseline = "middle";
     setFont(7.5, "bold");
     ctx.fillStyle = "rgba(21,85,118,.7)";
-    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, WORLD_H - 120, 1.2, "left");
+    trackedText("РЕКОРД " + fmt(highScore), MENU.padX, 566, 1.2, "left");
     trackedText(
       isCoarsePointer() ? "\u041F\u0420\u041E\u0412\u0415\u0414\u0418 \u041F\u041E \u0421\u0415\u0422\u041A\u0415 \u2014 \u041F\u0420\u041E\u041A\u0420\u0423\u0422\u041A\u0410" : "\u2190 \u2192 \u0412\u042B\u0411\u041E\u0420 \xB7 ENTER \u0414\u0415\u0419\u0421\u0422\u0412\u0418\u0415",
       WORLD_W - MENU.padX,
-      WORLD_H - 120,
+      566,
       1.2,
       "right"
     );
@@ -13081,8 +13075,8 @@ var __srcSkins = (() => {
     ctx.textBaseline = "middle";
     setFont(6.5, "bold");
     ctx.fillStyle = "rgba(21,85,118,.34)";
-    trackedText("СОЗДАТЕЛЬ \xB7 WANTERLUDE", WORLD_W / 2, WORLD_H - 15, 1.4);
-    trackedText("v" + GAME_VERSION, WORLD_W - MENU.padX, WORLD_H - 15, 1.2, "right");
+    trackedText("СОЗДАТЕЛЬ \xB7 WANTERLUDE", WORLD_W / 2, 585, 1.4);
+    trackedText("v" + GAME_VERSION, WORLD_W - MENU.padX, 585, 1.2, "right");
     ctx.restore();
     drawMenuGear();
     drawMenuTrophy();
@@ -14506,7 +14500,7 @@ var __srcSkins = (() => {
       sfx.jump();
       vibrate(18);
       hudPop(player.x + 15, 470, "\u041D\u0415\u0423\u042F\u0417\u0412\u0418\u041C", PERK_RARITY.legendary.color);
-      player.y = WORLD_H - 100;
+      player.y = 500;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
@@ -14517,7 +14511,7 @@ var __srcSkins = (() => {
       sfx.jump();
       vibrate(18);
       hudPop(player.x + 15, 470, "\u0411\u0415\u0417 \u041F\u0410\u0414\u0415\u041D\u0418\u0419", PERK_RARITY.epic.color);
-      player.y = WORLD_H - 100;
+      player.y = 500;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
@@ -14528,7 +14522,7 @@ var __srcSkins = (() => {
       sfx.fall();
       vibrate(40);
       lives--;
-      player.y = WORLD_H - 100;
+      player.y = 500;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
@@ -14840,7 +14834,7 @@ var __srcSkins = (() => {
     lives = end.livesLeft;
     player.x = duelPlayerX();
     player.vx = 0;
-    player.y = WORLD_H - 100;
+    player.y = 500;
     player.dy = -15;
     refillJumps();
     if (end.won) {
@@ -14999,11 +14993,7 @@ var __srcSkins = (() => {
     }
   }  function drawBoss() {
     if (duelIsActive()) {
-      // Сцена дуэли нарисована под 400×600: центрируем её в кадре 700.
-      ctx.save();
-      ctx.translate(0, UI_CENTER_DY);
       duelDraw(ctx);
-      ctx.restore();
       return;
     }
     const b = bossState;
@@ -15320,7 +15310,7 @@ var __srcSkins = (() => {
       const platform = fallingPlatforms[i];
       platform.vy = (platform.vy ?? 0) + fallingGravity * dt;
       platform.y += (platform.vy ?? 0) * dt;
-      if (platform.y > WORLD_H + 40) fallingPlatforms.splice(i, 1);
+      if (platform.y > 640) fallingPlatforms.splice(i, 1);
     }
     for (const spring of springs) {
       if (player.dy > 0 && player.x + 25 > spring.x && player.x < spring.x + 20 && player.y + 35 > spring.y && player.y + 35 < spring.y + 20) {
@@ -15364,14 +15354,14 @@ var __srcSkins = (() => {
         bird.y += diff;
       });
     }
-    removeWhere(platforms, (platform) => platform.y >= WORLD_H + 50);
-    removeWhere(verticalPlatforms, (platform) => (platform.baseY ?? 0) >= WORLD_H + 50);
-    removeWhere(springs, (spring) => spring.y >= WORLD_H + 50 || spring.owner !== void 0 && !platforms.includes(spring.owner));
-    removeWhere(coins, (coin) => coin.y >= WORLD_H + 50);
-    removeWhere(lifePickups, (life) => life.y >= WORLD_H + 50);
-    removeWhere(jetpickups, (jet) => jet.y >= WORLD_H + 50);
+    removeWhere(platforms, (platform) => platform.y >= 650);
+    removeWhere(verticalPlatforms, (platform) => (platform.baseY ?? 0) >= 650);
+    removeWhere(springs, (spring) => spring.y >= 650 || spring.owner !== void 0 && !platforms.includes(spring.owner));
+    removeWhere(coins, (coin) => coin.y >= 650);
+    removeWhere(lifePickups, (life) => life.y >= 650);
+    removeWhere(jetpickups, (jet) => jet.y >= 650);
     while (platforms.length < 8) {
-      let lastY = WORLD_H - 50;
+      let lastY = 550;
       if (platforms.length) {
         lastY = platforms[0].y;
         for (let k = 1; k < platforms.length; k++) {
@@ -15390,7 +15380,7 @@ var __srcSkins = (() => {
       sfx.fall();
       vibrate(40);
       lives--;
-      player.y = WORLD_H - 100;
+      player.y = 500;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
@@ -16236,7 +16226,7 @@ var __srcSkins = (() => {
       return;
     }
     let x = 15;
-    const y = WORLD_H - 56, h = 20;
+    const y = 544, h = 20;
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
     setFont(6.5, "bold");
     const head = `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
@@ -16573,8 +16563,7 @@ var __srcSkins = (() => {
   function sensPlusZone(row) {
     return { x: row.x + row.w - 30, y: row.y + 18, w: 22, h: 18 };
   }
-  function sensHitTest(raw) {
-    const point = { x: raw.x, y: raw.y - UI_CENTER_DY };
+  function sensHitTest(point) {
     for (const row of SENS_ROWS) {
       if (point.x < row.x || point.x > row.x + row.w) continue;
       if (point.y < row.y || point.y > row.y + row.h) continue;
@@ -16589,8 +16578,7 @@ var __srcSkins = (() => {
     }
     return null;
   }
-  function pauseButtonAt(raw) {
-    const point = { x: raw.x, y: raw.y - UI_CENTER_DY };
+  function pauseButtonAt(point) {
     for (const button of PAUSE_BUTTONS) {
       if (point.x >= button.x && point.x <= button.x + button.w && point.y >= button.y && point.y <= button.y + button.h) {
         return button;
@@ -16813,12 +16801,6 @@ var __srcSkins = (() => {
     ctx.restore();
   }
   function drawPauseMenu() {
-    ctx.save();
-    ctx.translate(0, UI_CENTER_DY);
-    drawPauseMenuInner();
-    ctx.restore();
-  }
-  function drawPauseMenuInner() {
     const elapsed = performance.now() - pauseState.openedAt;
     const progress = Math.min(1, elapsed / 170);
     const alpha = 1 - Math.pow(1 - progress, 3);
@@ -16893,8 +16875,7 @@ var __srcSkins = (() => {
   }
   var GAMEOVER_INPUT_DELAY = 300;
   var gameOverCache = { canvas: null, cacheCtx: null, key: null, scrim: null };
-  function gameOverButtonAt(raw) {
-    const point = { x: raw.x, y: raw.y - UI_CENTER_DY };
+  function gameOverButtonAt(point) {
     for (const button of GAMEOVER_BUTTONS) {
       if (point.x >= button.x && point.x <= button.x + button.w && point.y >= button.y && point.y <= button.y + button.h) {
         return button;
@@ -17061,12 +17042,6 @@ var __srcSkins = (() => {
     return true;
   }
   function drawGameOver() {
-    ctx.save();
-    ctx.translate(0, UI_CENTER_DY);
-    drawGameOverInner();
-    ctx.restore();
-  }
-  function drawGameOverInner() {
     if (!gameOverState.openedAt) gameOverState.openedAt = performance.now();
     const score = Math.floor(player.score);
     ctx.save();
@@ -17952,18 +17927,18 @@ var __srcSkins = (() => {
     }
   }
   var GACHA_UI = {
-    panel: { x: 20, y: 122, w: 360, h: 200 },
-    reel: { x: 34, y: 134, w: 332, h: 146 },
-    collectY: 332,
-    ratesY: 370,
-    spinY: 414,
+    panel: { x: 20, y: 82, w: 360, h: 200 },
+    reel: { x: 34, y: 94, w: 332, h: 146 },
+    collectY: 292,
+    ratesY: 330,
+    spinY: 374,
     spinH: 44,
     spinX: 20,
     spinW: 228,
     playX: 260,
     playW: 120,
-    hintY: 472,
-    picker: { x: 0, y: 528, w: WORLD_W, h: 112 },
+    hintY: 432,
+    picker: { x: 0, y: 472, w: WORLD_W, h: 112 },
     cellW: 76
   };
   // Сортировка витрины рамок: базовый порядок FRAMES уже по цене.
@@ -17973,7 +17948,7 @@ var __srcSkins = (() => {
     { id: "name", label: "ИМЯ" },
     { id: "owned", label: "МОИ" }
   ];
-  var FRAME_SORT_ROW = { y: 492, h: 20 };
+  var FRAME_SORT_ROW = { y: 450, h: 20 };
   var frameSort = readFrameSort();
   function readFrameSort() {
     try {
@@ -18439,16 +18414,16 @@ var __srcSkins = (() => {
   var PLATFORM_REEL_LEN = 36;
   var PLATFORM_REEL_LAND = 30;
   var PLATFORM_UI = {
-    panel: { x: 20, y: 140, w: 360, h: 222 },
-    chipY: [370, 402],
+    panel: { x: 20, y: 80, w: 360, h: 122 },
+    chipY: [210, 242],
     chipW: 80,
     chipH: 26,
     chipGap: 6,
-    reel: { x: 20, y: 438, w: 360, h: 96 },
+    reel: { x: 20, y: 278, w: 360, h: 96 },
     cellStep: 90,
-    resultY: 550,
-    collectY: 570,
-    tileY: 580,
+    resultY: 390,
+    collectY: 410,
+    tileY: 420,
     tileW: 28,
     tileH: 22,
     tileGap: 3

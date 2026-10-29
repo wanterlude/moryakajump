@@ -171,7 +171,7 @@
     lives = end.livesLeft;
     player.x = duelPlayerX();
     player.vx = 0;
-    player.y = WORLD_H - 100;
+    player.y = 500;
     player.dy = -15;
     refillJumps();
     if (end.won) {

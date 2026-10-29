@@ -236,7 +236,7 @@
       console.warn("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441:", error);
     }
   }
-  var player = { x: 185, y: WORLD_H - 100, vx: 0, dy: 0, score: 0 };
+  var player = { x: 185, y: 500, vx: 0, dy: 0, score: 0 };
   var squash = 0;
   var fallCooldown = 0;
   var WIND_FROM_SCORE = 1e4;
