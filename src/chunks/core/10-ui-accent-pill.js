@@ -2119,18 +2119,18 @@
     }
   }
   var GACHA_UI = {
-    panel: { x: 20, y: 122, w: 360, h: 200 },
-    reel: { x: 34, y: 134, w: 332, h: 146 },
-    collectY: 332,
-    ratesY: 370,
-    spinY: 414,
+    panel: { x: 20, y: 82, w: 360, h: 200 },
+    reel: { x: 34, y: 94, w: 332, h: 146 },
+    collectY: 292,
+    ratesY: 330,
+    spinY: 374,
     spinH: 44,
     spinX: 20,
     spinW: 228,
     playX: 260,
     playW: 120,
-    hintY: 472,
-    picker: { x: 0, y: 528, w: WORLD_W, h: 112 },
+    hintY: 432,
+    picker: { x: 0, y: 472, w: WORLD_W, h: 112 },
     cellW: 76
   };
   // Сортировка витрины рамок: базовый порядок FRAMES уже по цене.
@@ -2140,7 +2140,7 @@
     { id: "name", label: "ИМЯ" },
     { id: "owned", label: "МОИ" }
   ];
-  var FRAME_SORT_ROW = { y: 492, h: 20 };
+  var FRAME_SORT_ROW = { y: 450, h: 20 };
   var frameSort = readFrameSort();
   function readFrameSort() {
     try {
@@ -2606,16 +2606,16 @@
   var PLATFORM_REEL_LEN = 36;
   var PLATFORM_REEL_LAND = 30;
   var PLATFORM_UI = {
-    panel: { x: 20, y: 140, w: 360, h: 222 },
-    chipY: [370, 402],
+    panel: { x: 20, y: 80, w: 360, h: 122 },
+    chipY: [210, 242],
     chipW: 80,
     chipH: 26,
     chipGap: 6,
-    reel: { x: 20, y: 438, w: 360, h: 96 },
+    reel: { x: 20, y: 278, w: 360, h: 96 },
     cellStep: 90,
-    resultY: 550,
-    collectY: 570,
-    tileY: 580,
+    resultY: 390,
+    collectY: 410,
+    tileY: 420,
     tileW: 28,
     tileH: 22,
     tileGap: 3
