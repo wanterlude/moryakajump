@@ -1,0 +1,10 @@
+  // Тестовая сборка: сразу открываем вкладку карточек.
+  setTimeout(function () {
+    try {
+      menuState.tab = "cards";
+      menuState.tabAnim = -3;
+      menuState.swipe = -3;
+      menuCursors.cards = 0;
+      scheduleDraw();
+    } catch (e) {}
+  }, 300);

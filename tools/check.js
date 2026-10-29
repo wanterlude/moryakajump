@@ -62,7 +62,7 @@ function scriptOf(file) {
 }
 
 const html = read("index.html");
-for (const file of ["index.html", "test-boss.html", "test-frames.html", "ui-preview.html"]) {
+for (const file of ["index.html", "test-boss.html", "test-frames.html", "test-cards.html", "ui-preview.html"]) {
   try {
     const code = scriptOf(file);
     new Function(code);

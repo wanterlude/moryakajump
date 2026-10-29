@@ -6,7 +6,8 @@
 //
 // Варианты:
 //   test-boss.html   index.html + панель выбора босса и числа жизней
-//   test-frames.html index.html + галерея всех 211 рамок
+//   test-frames.html index.html + галерея всех 1000 рамок
+//   test-cards.html  index.html + вкладка карточек (в релизе она выключена)
 //   ui-preview.html  index.html с версией «<версия>-ui» (превью для UI-аудита)
 //
 // Блоки вставки лежат в tools/variants/*.js.txt и вставляются после строки
@@ -51,6 +52,10 @@ function withBlock(blockFile) {
 const outputs = [
   { file: "test-boss.html", text: withBlock("boss-panel.js.txt") },
   { file: "test-frames.html", text: withBlock("frames-gallery.js.txt") },
+  {
+    file: "test-cards.html",
+    text: withBlock("cards-tab.js.txt").replace("var CARDS_TAB_ENABLED = false;", "var CARDS_TAB_ENABLED = true;"),
+  },
   {
     file: "ui-preview.html",
     text: base.replace(versionMatch[0], 'var GAME_VERSION = "' + version + '-ui";'),
