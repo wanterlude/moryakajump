@@ -17,6 +17,7 @@ const { createSandbox, extractScripts } = require("./sim/dom-shim");
 const root = path.resolve(__dirname, "..");
 const goldenFile = path.join(__dirname, "golden", "calls.json");
 const ANCHOR = "  setTimeout(maybeShowTutorial, 500);\n";
+const FIXED_DATE_MS = new Date(2026, 0, 15, 12, 0, 0).getTime();
 const FRAME_MS = 5000;
 
 const update = process.argv.includes("--update");
@@ -58,6 +59,16 @@ function loadGame() {
     "var __seed = 1337;" +
       "Math.random = function () { __seed = (__seed * 1664525 + 1013904223) % 4294967296; return __seed / 4294967296; };" +
       "performance.now = function () { return " + FRAME_MS + "; };" +
+  // Дата тоже замораживается: ежедневные задания зависят от неё, и без этого
+  // эталоны разъезжались сами собой на смене суток.
+  "var __FIXED_DATE = " + FIXED_DATE_MS + ";" +
+  "var __RealDate = Date;" +
+  "Date = function (a, b, c, d, e, f, g) {" +
+  "  if (this instanceof Date) { return arguments.length === 0 ? new __RealDate(__FIXED_DATE) : new __RealDate(a, b, c, d, e, f, g); }" +
+  "  return new __RealDate(__FIXED_DATE).toString();" +
+  "};" +
+  "Date.now = function () { return __FIXED_DATE; };" +
+  "Date.parse = __RealDate.parse; Date.UTC = __RealDate.UTC; Date.prototype = __RealDate.prototype;" +
       "requestAnimationFrame = function () { return 0; };",
     sandbox,
     { filename: "golden-bootstrap" }
