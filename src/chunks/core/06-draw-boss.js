@@ -1,6 +1,10 @@
   function drawBoss() {
     if (duelIsActive()) {
+      // Сцена дуэли нарисована под 400×600: центрируем её в кадре 700.
+      ctx.save();
+      ctx.translate(0, UI_CENTER_DY);
       duelDraw(ctx);
+      ctx.restore();
       return;
     }
     const b = bossState;

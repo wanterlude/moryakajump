@@ -239,7 +239,7 @@
       const platform = fallingPlatforms[i];
       platform.vy = (platform.vy ?? 0) + fallingGravity * dt;
       platform.y += (platform.vy ?? 0) * dt;
-      if (platform.y > 640) fallingPlatforms.splice(i, 1);
+      if (platform.y > WORLD_H + 40) fallingPlatforms.splice(i, 1);
     }
     for (const spring of springs) {
       if (player.dy > 0 && player.x + 25 > spring.x && player.x < spring.x + 20 && player.y + 35 > spring.y && player.y + 35 < spring.y + 20) {
@@ -283,14 +283,14 @@
         bird.y += diff;
       });
     }
-    removeWhere(platforms, (platform) => platform.y >= 650);
-    removeWhere(verticalPlatforms, (platform) => (platform.baseY ?? 0) >= 650);
-    removeWhere(springs, (spring) => spring.y >= 650 || spring.owner !== void 0 && !platforms.includes(spring.owner));
-    removeWhere(coins, (coin) => coin.y >= 650);
-    removeWhere(lifePickups, (life) => life.y >= 650);
-    removeWhere(jetpickups, (jet) => jet.y >= 650);
+    removeWhere(platforms, (platform) => platform.y >= WORLD_H + 50);
+    removeWhere(verticalPlatforms, (platform) => (platform.baseY ?? 0) >= WORLD_H + 50);
+    removeWhere(springs, (spring) => spring.y >= WORLD_H + 50 || spring.owner !== void 0 && !platforms.includes(spring.owner));
+    removeWhere(coins, (coin) => coin.y >= WORLD_H + 50);
+    removeWhere(lifePickups, (life) => life.y >= WORLD_H + 50);
+    removeWhere(jetpickups, (jet) => jet.y >= WORLD_H + 50);
     while (platforms.length < 8) {
-      let lastY = 550;
+      let lastY = WORLD_H - 50;
       if (platforms.length) {
         lastY = platforms[0].y;
         for (let k = 1; k < platforms.length; k++) {
@@ -309,7 +309,7 @@
       sfx.fall();
       vibrate(40);
       lives--;
-      player.y = 500;
+      player.y = WORLD_H - 100;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();

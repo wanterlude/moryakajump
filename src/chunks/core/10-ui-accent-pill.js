@@ -403,7 +403,7 @@
       return;
     }
     let x = 15;
-    const y = 544, h = 20;
+    const y = WORLD_H - 56, h = 20;
     const pulse = 0.72 + 0.28 * Math.sin(performance.now() / 360);
     setFont(6.5, "bold");
     const head = `ЕЖЕДНЕВНО · ${def.short} ${shown}/${def.target}`;
@@ -740,7 +740,8 @@
   function sensPlusZone(row) {
     return { x: row.x + row.w - 30, y: row.y + 18, w: 22, h: 18 };
   }
-  function sensHitTest(point) {
+  function sensHitTest(raw) {
+    const point = { x: raw.x, y: raw.y - UI_CENTER_DY };
     for (const row of SENS_ROWS) {
       if (point.x < row.x || point.x > row.x + row.w) continue;
       if (point.y < row.y || point.y > row.y + row.h) continue;
@@ -755,7 +756,8 @@
     }
     return null;
   }
-  function pauseButtonAt(point) {
+  function pauseButtonAt(raw) {
+    const point = { x: raw.x, y: raw.y - UI_CENTER_DY };
     for (const button of PAUSE_BUTTONS) {
       if (point.x >= button.x && point.x <= button.x + button.w && point.y >= button.y && point.y <= button.y + button.h) {
         return button;
@@ -978,6 +980,12 @@
     ctx.restore();
   }
   function drawPauseMenu() {
+    ctx.save();
+    ctx.translate(0, UI_CENTER_DY);
+    drawPauseMenuInner();
+    ctx.restore();
+  }
+  function drawPauseMenuInner() {
     const elapsed = performance.now() - pauseState.openedAt;
     const progress = Math.min(1, elapsed / 170);
     const alpha = 1 - Math.pow(1 - progress, 3);
@@ -1052,7 +1060,8 @@
   }
   var GAMEOVER_INPUT_DELAY = 300;
   var gameOverCache = { canvas: null, cacheCtx: null, key: null, scrim: null };
-  function gameOverButtonAt(point) {
+  function gameOverButtonAt(raw) {
+    const point = { x: raw.x, y: raw.y - UI_CENTER_DY };
     for (const button of GAMEOVER_BUTTONS) {
       if (point.x >= button.x && point.x <= button.x + button.w && point.y >= button.y && point.y <= button.y + button.h) {
         return button;
@@ -1219,6 +1228,12 @@
     return true;
   }
   function drawGameOver() {
+    ctx.save();
+    ctx.translate(0, UI_CENTER_DY);
+    drawGameOverInner();
+    ctx.restore();
+  }
+  function drawGameOverInner() {
     if (!gameOverState.openedAt) gameOverState.openedAt = performance.now();
     const score = Math.floor(player.score);
     ctx.save();
@@ -2104,18 +2119,18 @@
     }
   }
   var GACHA_UI = {
-    panel: { x: 20, y: 82, w: 360, h: 200 },
-    reel: { x: 34, y: 94, w: 332, h: 146 },
-    collectY: 292,
-    ratesY: 330,
-    spinY: 374,
+    panel: { x: 20, y: 122, w: 360, h: 200 },
+    reel: { x: 34, y: 134, w: 332, h: 146 },
+    collectY: 332,
+    ratesY: 370,
+    spinY: 414,
     spinH: 44,
     spinX: 20,
     spinW: 228,
     playX: 260,
     playW: 120,
-    hintY: 432,
-    picker: { x: 0, y: 472, w: WORLD_W, h: 112 },
+    hintY: 472,
+    picker: { x: 0, y: 528, w: WORLD_W, h: 112 },
     cellW: 76
   };
   // Сортировка витрины рамок: базовый порядок FRAMES уже по цене.
@@ -2125,7 +2140,7 @@
     { id: "name", label: "ИМЯ" },
     { id: "owned", label: "МОИ" }
   ];
-  var FRAME_SORT_ROW = { y: 450, h: 20 };
+  var FRAME_SORT_ROW = { y: 492, h: 20 };
   var frameSort = readFrameSort();
   function readFrameSort() {
     try {
@@ -2591,16 +2606,16 @@
   var PLATFORM_REEL_LEN = 36;
   var PLATFORM_REEL_LAND = 30;
   var PLATFORM_UI = {
-    panel: { x: 20, y: 80, w: 360, h: 122 },
-    chipY: [210, 242],
+    panel: { x: 20, y: 140, w: 360, h: 222 },
+    chipY: [370, 402],
     chipW: 80,
     chipH: 26,
     chipGap: 6,
-    reel: { x: 20, y: 278, w: 360, h: 96 },
+    reel: { x: 20, y: 438, w: 360, h: 96 },
     cellStep: 90,
-    resultY: 390,
-    collectY: 410,
-    tileY: 420,
+    resultY: 550,
+    collectY: 570,
+    tileY: 580,
     tileW: 28,
     tileH: 22,
     tileGap: 3

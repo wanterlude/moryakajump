@@ -1,7 +1,9 @@
   var canvas = document.getElementById("game");
   var WORLD_W = 400;
-  var WORLD_H = 600;
-  var RENDER_SCALE = Math.max(1, Math.min(4, Math.ceil(
+  var WORLD_H = 700;
+  // Насколько вырос экран: оверлеи, рассчитанные на 600, центрируем на 700.
+  var UI_CENTER_DY = (WORLD_H - 600) / 2;
+  var RENDER_SCALE = Math.max(1, Math.min(8, Math.ceil(
     canvas.getBoundingClientRect().width / WORLD_W * (window.devicePixelRatio || 1)
   )));
   canvas.width = WORLD_W * RENDER_SCALE;

@@ -861,7 +861,7 @@
       sfx.jump();
       vibrate(18);
       hudPop(player.x + 15, 470, "\u041D\u0415\u0423\u042F\u0417\u0412\u0418\u041C", PERK_RARITY.legendary.color);
-      player.y = 500;
+      player.y = WORLD_H - 100;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
@@ -872,7 +872,7 @@
       sfx.jump();
       vibrate(18);
       hudPop(player.x + 15, 470, "\u0411\u0415\u0417 \u041F\u0410\u0414\u0415\u041D\u0418\u0419", PERK_RARITY.epic.color);
-      player.y = 500;
+      player.y = WORLD_H - 100;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
@@ -883,7 +883,7 @@
       sfx.fall();
       vibrate(40);
       lives--;
-      player.y = 500;
+      player.y = WORLD_H - 100;
       stickyStuck = null;
       player.dy = -42;
       refillJumps();
