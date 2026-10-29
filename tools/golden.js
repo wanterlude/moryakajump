@@ -29,6 +29,7 @@ const SHOTS = [
   { name: "menu-shop-owned", min: 800, setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); } },
   { name: "menu-shop-rarity", min: 800, setup: (api) => { api.setState("MENU"); api.menuState.tab = "shop"; api.menuState.swipe = -1; api.grantFrames([1, 2, 3, 21, 61, 141, 500]); api.setSort("rarity"); } },
   { name: "menu-platforms", min: 450, setup: (api) => { api.setState("MENU"); api.menuState.tab = "platforms"; api.menuState.swipe = -2; } },
+  { name: "menu-cards", min: 400, setup: (api) => { api.setState("MENU"); api.menuState.tab = "cards"; api.menuState.swipe = -3; } },
   { name: "settings", min: 400, setup: (api) => { api.setState("MENU"); api.openSettings(); } },
   { name: "pause", min: 900, setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("PAUSE"); } },
   { name: "game-over", min: 450, setup: (api) => { api.setState("MENU"); api.startGame(); api.setState("GAMEOVER"); } },

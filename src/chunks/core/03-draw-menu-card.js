@@ -247,8 +247,10 @@
         });
       } else if (k === 1) {
         drawGachaShop();
-      } else {
+      } else if (k === 2) {
         drawPlatformShop();
+      } else {
+        drawCardsShop();
       }
       ctx.restore();
     }

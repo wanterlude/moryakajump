@@ -1300,7 +1300,15 @@
       };
       if (event.code === "Enter" || event.code === "Space") {
         event.preventDefault();
-        if (menuState.tab === "platforms") {
+        if (menuState.tab === "cards") {
+        const onTabsC = point.y >= MENU.tabsY && point.y <= MENU.tabsY + MENU.tabsH && point.x >= MENU.padX && point.x <= WORLD_W - MENU.padX;
+        if (!onTabsC) {
+          cardsPressStart = { x: point.x, y: point.y, id: event.pointerId };
+          event.preventDefault();
+          return;
+        }
+      }
+      if (menuState.tab === "platforms") {
           platformShopSpin();
         } else if (menuState.tab === "shop") {
           if (gachaState.phase === "reveal") gachaState.phase = "idle";
@@ -1868,6 +1876,12 @@
       const moved = Math.hypot(up.x - platformPressStart.x, up.y - platformPressStart.y);
       platformPressStart = null;
       if (menuState.tab === "platforms" && moved < 8) platformShopTap(up);
+    }
+    if (cardsPressStart && cardsPressStart.id === event.pointerId) {
+      const up = canvasPoint(event);
+      const moved = Math.hypot(up.x - cardsPressStart.x, up.y - cardsPressStart.y);
+      cardsPressStart = null;
+      if (menuState.tab === "cards" && moved < 8) cardsTap(up);
     }
     if (menuState.swiping && menuState.pointerId === event.pointerId) {
       finishMenuSwipe();

@@ -25,7 +25,7 @@
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.74";
+  var GAME_VERSION = "1.0.75";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -66,7 +66,8 @@
   var menuCursors = {
     avatars: selectedAvatar,
     shop: Math.max(0, shopFrames().findIndex((f) => f.id === selectedFrame)),
-    platforms: 0
+    platforms: 0,
+    cards: 0
   };
   var menuState = {
     tab: "avatars",
@@ -93,7 +94,9 @@
   var bossTrainOpen = false;
   var trainingState = { active: false, index: 0 };
   function menuTabCount() {
-    return menuState.tab === "shop" ? FRAMES.length : avatarImages.length;
+    if (menuState.tab === "shop") return FRAMES.length;
+    if (menuState.tab === "cards") return CARDS.length;
+    return avatarImages.length;
   }
   function menuCursor() {
     return menuCursors[menuState.tab];
@@ -727,7 +730,8 @@
   var MENU_TABS = [
     { id: "avatars", label: "\u0410\u0412\u0410\u0422\u0410\u0420\u042B" },
     { id: "shop", label: "\u0420\u0410\u041C\u041A\u0418" },
-    { id: "platforms", label: "\u041F\u041B\u0410\u0422\u0424\u041E\u0420\u041C\u042B" }
+    { id: "platforms", label: "\u041F\u041B\u0410\u0422\u0424\u041E\u0420\u041C\u042B" },
+    { id: "cards", label: "\u041A\u0410\u0420\u0422\u041E\u0427\u041A\u0418" }
   ];
   function menuTabAt(x) {
     const segW = (WORLD_W - MENU.padX * 2 - 8) / MENU_TABS.length;

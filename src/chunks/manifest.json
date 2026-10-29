@@ -44,6 +44,7 @@
         "core/07-update.js",
         "core/08-ui.js",
         "core/09-ui-pill.js",
+        "core/09b-cards-shop.js",
         "core/10-ui-accent-pill.js"
       ],
       "openBraces": -1
