@@ -1,9 +1,5 @@
   var DUEL_W = 400;
-  var DUEL_H = 700;
-  // Арены нарисованы под высоту 600: сдвигаем их вниз, а верхнюю полосу
-  // достраиваем растянутой первой строкой неба.
-  var DUEL_ARENA_H = 600;
-  var DUEL_ARENA_DY = DUEL_H - DUEL_ARENA_H;
+  var DUEL_H = 600;
   var DUEL_PLAYER_Y = DUEL_H - 90;
   var DUEL_PLAYER_HALF = 15;
   var DUEL_PAUSE_ZONE = { x: 354, y: 17, w: 24, h: 24 };
