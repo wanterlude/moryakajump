@@ -1,7 +1,7 @@
   function duelBuildBackdrop() {
     const cv = document.createElement("canvas");
     cv.width = DUEL_W;
-    cv.height = DUEL_H;
+    cv.height = DUEL_ARENA_H;
     const c = cv.getContext("2d");
 
     // ---------- НЕБО: синий час ----------
