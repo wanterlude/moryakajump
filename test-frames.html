@@ -13,6 +13,14 @@ html,body{margin:0;width:100%;min-height:100%;background:#101a35}
 body{min-height:100vh;min-height:100dvh;padding:12px 0;display:flex;justify-content:center;align-items:center;overflow:auto;touch-action:none;user-select:none;-webkit-user-select:none;font-family:Arial,sans-serif}
 #gameStage{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative}
 #game{display:block;width:min(1400px,94vw,calc((100dvh - 75px)*2/3));height:auto;aspect-ratio:2/3;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.45);touch-action:none;cursor:pointer}
+/* Компактный размер: кнопка возвращает прежние 600 px. */
+#stageWrap.compact #game{width:min(600px,94vw,calc((100dvh - 75px)*2/3))}
+#sizeButton{width:52px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.5);border-radius:14px;background:rgba(255,255,255,.14);color:#eaf6ff;cursor:pointer}
+#sizeButton:hover{background:rgba(255,255,255,.22)}
+#sizeButton svg{display:block}
+#sizeButton .szOut{display:none}
+#stageWrap.compact #sizeButton .szIn{display:none}
+#stageWrap.compact #sizeButton .szOut{display:inline}
 #gameStage:fullscreen{width:100vw;height:100vh;height:100dvh;gap:0;background:#101a35}
 #gameStage:fullscreen #game{width:min(100vw,calc(100dvh*2/3));height:min(100dvh,calc(100vw*3/2));max-width:none;max-height:none;border-radius:0}
 /* Полноэкранный режим на весь stageWrap: на широком ПК боковые панели остаются видимыми. */
@@ -235,6 +243,12 @@ html, body, body * {
         </svg>
     </button>
     <button id="fullscreenButton" type="button" aria-label="Включить полноэкранный режим">⛶</button>
+  <button id="sizeButton" type="button" aria-label="Уменьшить игру" title="Прежний размер">
+  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+  <path class="szIn" d="M4 9h5V4M20 9h-5V4M15 20v-5h5M9 20v-5H4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="szOut" d="M9 4H4v5M15 4h5v5M20 15v5h-5M4 15v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  </button>
     <button id="resetButton" type="button" aria-label="Сбросить прогресс" title="Сбросить прогресс">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
             <path d="M5 7h14M10 7V5.4c0-.5.4-.9.9-.9h2.2c.5 0 .9.4.9.9V7M7.2 7l.8 11.2c.05.7.63 1.2 1.33 1.2h5.34c.7 0 1.28-.5 1.33-1.2L16.8 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
@@ -11894,7 +11908,7 @@ var __srcSkins = (() => {
     ctx.restore();
   }
   // Версия игры: показывается в правом нижнем углу главного меню.
-  var GAME_VERSION = "1.0.81";
+  var GAME_VERSION = "1.0.82";
   var MENU = {
     padX: 20,
     titleY: 20,
@@ -20837,6 +20851,26 @@ window.__TEST_BUILD = true;
     gameOverCache.key = null;
     gameOverCache.scrim = null;
     gradientCache.clear();
+  }
+  // Переключатель размера: полный экран по высоте или прежние 600 px.
+  const sizeButton = document.getElementById("sizeButton");
+  if (sizeButton) {
+    const stageWrapEl = document.getElementById("stageWrap");
+    const readCompact = () => {
+      try { return localStorage.getItem("morjakaCompact") === "1"; } catch { return false; }
+    };
+    const applyCompact = (on) => {
+      if (stageWrapEl) stageWrapEl.classList.toggle("compact", on);
+      sizeButton.setAttribute("aria-label", on ? "\u0420\u0430\u0437\u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0438\u0433\u0440\u0443" : "\u0423\u043C\u0435\u043D\u044C\u0448\u0438\u0442\u044C \u0438\u0433\u0440\u0443");
+      sizeButton.title = on ? "\u0412\u043E \u0432\u0435\u0441\u044C \u044D\u043A\u0440\u0430\u043D" : "\u041F\u0440\u0435\u0436\u043D\u0438\u0439 \u0440\u0430\u0437\u043C\u0435\u0440";
+      setTimeout(applyRenderScale, 60);
+    };
+    applyCompact(readCompact());
+    sizeButton.addEventListener("click", () => {
+      const next = !(stageWrapEl && stageWrapEl.classList.contains("compact"));
+      try { localStorage.setItem("morjakaCompact", next ? "1" : "0"); } catch {}
+      applyCompact(next);
+    });
   }
   window.addEventListener("resize", () => setTimeout(applyRenderScale, 120));
   window.addEventListener("orientationchange", () => setTimeout(applyRenderScale, 220));
