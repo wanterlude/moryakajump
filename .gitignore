@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 graphify-out/
 .dshwolf/
 desktop-webview2/bin/
@@ -16,3 +16,4 @@ tools/shot-out/
 _*.txt
 msg.txt
 cm.txt
+.moryaka-ftp.json

@@ -256,6 +256,22 @@ WebView2 Runtime. Сборка даёт **один самодостаточны�
 7. `gh release create v<версия> <exe> --title "Moryaka Jump <версия>" --notes-file <(sed -n '/^\[Версия <версия>\]/,/^\[Версия /p' Changelog)`
    — заметки берутся из `Changelog`.
 
+## Сайт
+
+Игра лежит на `https://wanterlude.ru/moryaka-jump/` — статикой в
+`/www/wanterlude.ru/moryaka-jump/` на FTP-хостинге. Исходники сайта в этот
+репозиторий не входят, выкладывается только сборка:
+
+```
+node tools/deploy-site.js          # index.html и картинки рядом с ним
+node tools/deploy-site.js --dry    # показать, что будет залито
+```
+
+Доступ — `%USERPROFILE%\.moryaka-ftp.json` (поля `host`, `user`, `pass`, `dir`)
+или переменные `FTP_HOST`/`FTP_USER`/`FTP_PASS`; пароль в git не кладём. После
+загрузки скрипт скачивает файлы обратно и сверяет sha256, поэтому «ок» означает
+байт-в-байт, а не просто удачный ответ FTP.
+
 ## Соглашения
 
 - UTF-8 без BOM; в репозитории LF. Русские тексты — обычными символами
