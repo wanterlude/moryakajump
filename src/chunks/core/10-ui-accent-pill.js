@@ -4239,7 +4239,8 @@
     provider: "firebase",
     url: "https://moryaka-jump-default-rtdb.asia-southeast1.firebasedatabase.app", // URL базы Realtime Database
     endpoint: "",  // для provider:"worker"
-    game: "moryaka-jump"
+    game: "moryaka-jump",
+    api: "/api/scores.php"
   };
   var LB_MAX = 50;
   // Локальный топ — 5 лучших забегов игрока.
@@ -4284,6 +4285,37 @@
     list.sort((a, b) => b.s - a.s);
     lbWriteLocal(list);
   }
+  // Рейтинг на VPS (wanterlude.ru) — основная база.
+  function lbApiReady() {
+    return !!LB_CONFIG.api;
+  }
+  async function lbApiFetch() {
+    if (!lbApiReady()) return { scores: [], note: "" };
+    try {
+      const res = await fetch(LB_CONFIG.api + "?game=" + encodeURIComponent(LB_CONFIG.game) + "&limit=" + LB_MAX, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      const list = Array.isArray(data && data.scores) ? data.scores : [];
+      return {
+        scores: lbBestPerPlayer(list.map((r) => ({ name: r.name, score: r.score, ts: r.ts }))).slice(0, LB_MAX),
+        note: ""
+      };
+    } catch (e) {
+      return { scores: [], note: "VPS недоступен (" + (e && e.message ? e.message : "сеть") + ")." };
+    }
+  }
+  async function lbApiSubmit(name, score) {
+    if (!lbApiReady()) return;
+    try {
+      await fetch(LB_CONFIG.api, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ game: LB_CONFIG.game, name, score, ts: Date.now() }),
+        keepalive: true
+      });
+    } catch {}
+  }
+
   function lbFirebaseReady() {
     return LB_CONFIG.provider === "firebase" && !!LB_CONFIG.url;
   }
@@ -4324,9 +4356,12 @@
     // Тестовые забеги (сборки и ники вроде TestAi) в рейтинг не попадают.
     if (window.__TEST_BUILD || lbIsTestName(name)) return;
     lbRecordLocal(score, playerNick);
+    if (lbApiReady()) {
+      const sentApi = lbApiSubmit(name, Math.floor(score));
+      if (sentApi && sentApi.then) sentApi.then(() => lbRefreshGlobal(true)).catch(() => {});
+    }
     if (lbFirebaseReady()) {
-      const sent = lbFirebaseSubmit(name, Math.floor(score));
-      if (sent && sent.then) sent.then(() => lbRefreshGlobal(true)).catch(() => {});
+      lbFirebaseSubmit(name, Math.floor(score));
       return;
     }
     if (LB_CONFIG.provider !== "worker" || !LB_CONFIG.endpoint) return;
@@ -4339,6 +4374,10 @@
     } catch {}
   }
   async function lbFetchGlobal() {
+    if (lbApiReady()) {
+      const viaApi = await lbApiFetch();
+      if (viaApi.scores && viaApi.scores.length) return viaApi;
+    }
     if (lbFirebaseReady()) return lbFirebaseFetch();
     if (LB_CONFIG.provider === "worker" && LB_CONFIG.endpoint) {
       try {
